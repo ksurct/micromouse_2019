@@ -1,0 +1,14 @@
+{
+  "ProjectFilePath": "c:\\Users\\Dylan Staatz\\Documents\\Documents\\Github\\micromouse_2019\\Maze_Tester\\howto_maze.csproj",
+  "TargetFramework": "v3.5",
+  "TagHelpers": [],
+  "Configuration": {
+    "ConfigurationName": "UnsupportedRazor",
+    "LanguageVersion": "1.0",
+    "Extensions": [
+      {
+        "ExtensionName": "UnsupportedRazorExtension"
+      }
+    ]
+  }
+}
