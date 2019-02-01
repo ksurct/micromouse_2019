@@ -13,7 +13,7 @@ Here are some steps to get you started contributing to this project:
 
 ## About the repo
 
-- micromouse_main: the code we plan to run on the robot
-- MotorControl: development of a motor controller in MATLAB/Simulink
-- Maze_Tester: a visual studio project that can generate mazes and possibly test maze solving algorithm's in C#
-
+- micromouse_main: Code we plan to run on the robot
+- examples: Collection of short one-off programs to test how to use a library
+- MotorControl: Development of a motor controller in MATLAB/Simulink
+- Maze_Tester: Visual studio project that can generate mazes and possibly test maze solving algorithm's in C#
