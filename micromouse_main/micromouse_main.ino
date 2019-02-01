@@ -8,12 +8,9 @@
 #include "encoder.h"
 #include "sensor.h"
 
-uint8_t sensor_addresses[SENSOR_COUNT] = { 0, 1, 2, 3, 4 }; // dummy values
-
 void main_loop(){
   // Get sensor data
-  static int8_t sensor_measurements[SENSOR_COUNT];
-  readSensors(SENSOR_COUNT, sensor_addresses, sensor_measurements);
+  readSensors();
   
   // Get encoder data
   readEncoder(0); // Left encoder
@@ -37,7 +34,7 @@ void main_loop(){
 
 void setup() {
   // Setup Sensors
-  if (! sensorSetup(SENSOR_COUNT, sensor_addresses)){
+  if (! sensorSetup()){
     // Throw error? Serial message maybe?
   }
   

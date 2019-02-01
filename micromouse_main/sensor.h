@@ -24,18 +24,21 @@
 #ifndef _SENSOR_H_
 #define _SENSOR_H_
 
+typedef struct {
+    uint8_t address;
+    uint8_t interruptPin;
+    uint8_t distance;
+    bool needsUpdated;
+} sensor_t;
+
+extern sensor_t sensors[];
+
 /* Set up all the sensors to be used 
- *  sensorCount: number of sensors
- *  sensors: multiplexer address in the order described above
  *  Returns: true if successful */
-bool sensorSetup(uint8_t sensorCount, uint8_t* sensors);
+bool sensorSetup();
 
 /* Read from all the sensors
- *  sensorCount: number of sensors
- *  sensors: multiplexer address in the order described above
- *  measurements: the measurements taken by the sensors in the order described above
- *    - Note: measurement will be -1 if the sensor doesn't see anything or has an error
  *  Returns: true if successful */
-bool readSensors(uint8_t sensorCount, uint8_t* sensors, int8_t* measurements);
+bool readSensors();
 
 #endif //_SENSOR_H_

@@ -6,10 +6,11 @@
 // Main
 #define MAIN_LOOP_TIME 10000 // Delay between the start of each main_loop call in nanosecounds
 
+// Maze
+#define MAZE_WIDTH 16
+#define MAZE_HEIGHT 16
+
 // Sensors
 #define I2C_RESET_PIN 3 //dummy value
-#define SENSOR_COUNT 5
-
-
 
 #endif //_SETTINGS_H_
