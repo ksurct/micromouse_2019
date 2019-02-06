@@ -2,6 +2,29 @@
  *  
  *  This file defines a probabilistic maze where each
  *  wall holds the probablity of that wall exsits.
+ * 
+ * Structure of overall maze:
+ * 
+ *              maze
+ *           /   |    \
+ *       cell cell... cell
+ *       / \   / \    / \                   
+ *    wall  wall  wall   wall
+ * 
+ * Note: two cells will point to the same wall if the
+ * two cells are adjacent.
+ * 
+ * --------------------------------------------------
+ * 
+ * Structure of cells [row, column]:
+ * 
+ *  [0,0][0,1] ... [0,W]
+ *  [1,0][1,1] ... [1,W]
+ *   ...  ...  ...  ...
+ *  [H,0][H,1] ... [H,W]
+ * 
+ * Note: H = MAZE_HEIGHT
+ *       W = MAZE_WIDTH
  */
 
 
@@ -23,7 +46,7 @@ typedef struct {
 
 
 typedef struct {
-    probabilistic_cell_t cells[MAZE_WIDTH][MAZE_HEIGHT];
+    probabilistic_cell_t cells[MAZE_HEIGHT][MAZE_WIDTH];
 } probabilistic_maze_t;
 
 
