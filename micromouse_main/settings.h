@@ -10,6 +10,10 @@
 #define MAZE_WIDTH 16
 #define MAZE_HEIGHT 16
 
+// Motors
+#define LEFT 0
+#define RIGHT 1
+
 // Sensors
 #define I2C_RESET_PIN 3 //dummy value
 

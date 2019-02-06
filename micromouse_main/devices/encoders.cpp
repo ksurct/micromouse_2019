@@ -1,7 +1,7 @@
-/* encoder.cpp */
+  /* encoders.cpp */
 
 #include <Arduino.h>
-#include "encoder.h"
+#include "encoders.h"
 
 #define DIRECT_PIN_READ(base, mask)     (((*(base)) & (mask)) ? 1 : 0)
 

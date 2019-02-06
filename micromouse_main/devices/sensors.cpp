@@ -1,7 +1,7 @@
-/* sensor.cpp */
+/* sensors.cpp */
 
 
-#include "sensor.h"
+#include "sensors.h"
 
 #define TCAADDR 0x70
 
@@ -10,12 +10,12 @@ Adafruit_VL6180X vl6180x = Adafruit_VL6180X();
 
 sensor_t sensors[] = {
     {
-        .address = 0x00,
-        .interruptPin = 1
+        .address = 0x00, // dummy value
+        .interruptPin = 1 // dummy value
     },
     {
-        .address = 0x01,
-        .interruptPin = 2
+        .address = 0x01, // dummy value
+        .interruptPin = 2 // dummy value
     }
 };
 

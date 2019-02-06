@@ -1,4 +1,4 @@
-/* sensor.h
+/* sensors.h
  *  
  *  This file gives access to setting up Lidar Sensors for communication 
  *  over i2c. When working with these functions, the order of the sensor 
@@ -19,10 +19,10 @@
  */
 
 #include "Adafruit_VL6180X.h"
-#include "settings.h"
+#include "../settings.h"
 
-#ifndef _SENSOR_H_
-#define _SENSOR_H_
+#ifndef _SENSORS_H_
+#define _SENSORS_H_
 
 typedef struct {
     uint8_t address;
@@ -41,4 +41,4 @@ bool sensorSetup();
  *  Returns: true if successful */
 bool readSensors();
 
-#endif //_SENSOR_H_
+#endif //_SENSORS_H_

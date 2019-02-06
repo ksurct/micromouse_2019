@@ -5,8 +5,9 @@
 
 // Includes
 #include "settings.h"
-#include "encoder.h"
-#include "sensor.h"
+#include "devices/encoder.h"
+#include "devices/sensor.h"
+#include "devices/motor.h"
 
 void main_loop(){
   // Get sensor data
@@ -39,8 +40,8 @@ void setup() {
   }
   
   // Setup Encoders
-  encoderSetup(1, 2, 0); // pinA, pinB, id for left encoder
-  encoderSetup(3, 4, 1); // pinA, pinB, id for right encoder
+  encoderSetup(LEFT, 1, 2); // id for left encoder, pinA, pinB
+  encoderSetup(RIGHT, 3, 4); // id for right encoder, pinA, pinB
   
   Timer0.attachInterrupt(main_loop);
   Timer0.start(MAIN_LOOP_TIME);
