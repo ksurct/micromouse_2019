@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    uint_t id;
+    uint8_t id;
     uint8_t pinA;
     uint8_t pinB;
 } encoder_t;

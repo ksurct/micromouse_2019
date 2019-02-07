@@ -5,9 +5,9 @@
 
 // Includes
 #include "settings.h"
-#include "devices/encoder.h"
-#include "devices/sensor.h"
-#include "devices/motor.h"
+#include "devices/encoders.h"
+#include "devices/sensors.h"
+#include "devices/motors.h"
 
 void main_loop(){
   // Get sensor data
