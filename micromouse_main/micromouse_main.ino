@@ -4,20 +4,31 @@
 #include <DueTimer.h>
 
 // Includes
-#include "settings.h"
-#include "devices/encoders.h"
-#include "devices/sensors.h"
-#include "devices/motors.h"
+#include "src/settings.h"
+#include "src/devices/encoders.h"
+#include "src/devices/sensors.h"
+#include "src/devices/motors.h"
 
-void main_loop(){
+#include "src/util/conversions.h"
+
+
+void main_loop() {
+
+  // Initalize variables
+  static sensor_t sensor_data[NUM_SENSORS];
+
   // Get sensor data
-  readSensors();
+  if (!readSensors(sensor_data)){
+    // throw error and log to serial
+  }
   
   // Get encoder data
-  readEncoder(0); // Left encoder
-  readEncoder(1); // Right encoder
+  int left_distance = ticksToMM(readEncoder(LEFT)); // Left encoder
+  int right_distance = ticksToMM(readEncoder(RIGHT)); // Right encoder
 
   // Interpolate sensor and encoder data together using a kalman filter (measurement step)
+  //location_t* current_position = localization(sensor_data, left_distance, right_distance);
+
 
   // Check if in a new cell
   // update map of the maze

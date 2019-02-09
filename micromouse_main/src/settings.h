@@ -16,5 +16,6 @@
 
 // Sensors
 #define I2C_RESET_PIN 3 //dummy value
+#define NUM_SENSORS 5
 
 #endif //_SETTINGS_H_

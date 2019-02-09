@@ -8,7 +8,7 @@
 // Sensor object to communicate with all the the sensors
 Adafruit_VL6180X vl6180x = Adafruit_VL6180X();
 
-sensor_t sensors[] = {
+sensor_t sensors[NUM_SENSORS] = {
     {
         .address = 0x00, // dummy value
         .interruptPin = 1 // dummy value
@@ -16,6 +16,18 @@ sensor_t sensors[] = {
     {
         .address = 0x01, // dummy value
         .interruptPin = 2 // dummy value
+    },
+    {
+        .address = 0x02, // dummy value
+        .interruptPin = 3 // dummy value
+    },
+    {
+        .address = 0x03, // dummy value
+        .interruptPin = 4 // dummy value
+    },
+    {
+        .address = 0x04, // dummy value
+        .interruptPin = 5 // dummy value
     }
 };
 
@@ -37,7 +49,7 @@ bool sensorSetup() {
   // Important, we need this for tcaselect to work!
   Wire.begin();
 
-  for (int i = 0; i < sizeof(sensors); i++){
+  for (int i = 0; i < NUM_SENSORS; i++){
     tcaselect(sensors[i].address);
     if (! vl6180x.begin()) {
       return false;
@@ -48,8 +60,11 @@ bool sensorSetup() {
   return true;
 }
 
-bool readSensors() {
-  for (int i = 0; i < sizeof(sensors); ++i) {
+bool readSensors(sensor_t* sensor_data) {
+
+  if (sensor_data == NULL) { return false; }
+
+  for (int i = 0; i < NUM_SENSORS; ++i) {
     if (sensors[i].needsUpdated) {
       tcaselect(sensors[i].address);
       // TODO read the thing
