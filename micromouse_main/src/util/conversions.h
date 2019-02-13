@@ -10,7 +10,7 @@
 
 
 /* Converts encoder ticks to a distance in mm */
-int ticksToMM(int ticks);
+double ticksToMM(int ticks);
 
 
 #endif //_CONVERSIONS_H_

@@ -3,48 +3,34 @@
 // Libraries
 #include <DueTimer.h>
 
-// Includes
+// General
 #include "src/settings.h"
+#include "src/types.h"
+
+// Devices
 #include "src/devices/encoders.h"
 #include "src/devices/sensors.h"
-#include "src/devices/motors.h"
+//#include "src/devices/motors.h"
 
+// Subsystems
+
+// Utilities
 #include "src/util/conversions.h"
 
-
-void main_loop() {
-
-  // Initalize variables
-  static sensor_t sensor_data[NUM_SENSORS];
-
-  // Get sensor data
-  if (!readSensors(sensor_data)){
-    // throw error and log to serial
-  }
-  
-  // Get encoder data
-  int left_distance = ticksToMM(readEncoder(LEFT)); // Left encoder
-  int right_distance = ticksToMM(readEncoder(RIGHT)); // Right encoder
-
-  // Interpolate sensor and encoder data together using a kalman filter (measurement step)
-  //location_t* current_position = localization(sensor_data, left_distance, right_distance);
+// Fucntion Declarations
+void main_loop(void);
+void setup(void);
 
 
-  // Check if in a new cell
-  // update map of the maze
-
-  // if (at goal)
-    // CheckStrategy(maze, location) to get new goal
-  
-  // determine what speed to set the motors to (speed profile)
-
-  // Run predictions through the kalman filter (motion step)
-
-  // Set speed using motor controller (pid loop)
-
-}
-
+/* Entry point to the code for the robot, all initialization
+ * of subsystems should be done here */
 void setup() {
+
+  // Initialize serial if in debug mode
+  if (DEBUG) {
+    Serial.begin(9600);
+  }
+
   // Setup Sensors
   if (! sensorSetup()){
     // Throw error? Serial message maybe?
@@ -54,10 +40,62 @@ void setup() {
   encoderSetup(LEFT, 1, 2); // id for left encoder, pinA, pinB
   encoderSetup(RIGHT, 3, 4); // id for right encoder, pinA, pinB
   
+  // Initialize Localization subsystem
+  //initializeLocalization();
+
+  // Initialize Mapping subsystem
+  //initializeMapping();
+
+  // Initialize Strategy subsystem
+  //initializeStrategy();
+
+  // Initialize Control subsystem (includes motors)
+  //initializeControl();
+
+  // Start main loop
   Timer0.attachInterrupt(main_loop);
   Timer0.start(MAIN_LOOP_TIME);
 }
 
+
+void main_loop() {
+
+  // Initalize variables
+  static sensor_t sensor_data[NUM_SENSORS];
+  static double left_distance;
+  static double right_distance;
+  static double left_speed;
+  static double right_speed;
+
+  // Get sensor data
+  if (!readSensors(sensor_data)){
+    // throw error and log to serial
+  }
+  
+  // Get encoder data
+  left_distance = ticksToMM(readEncoder(LEFT)); // Left encoder
+  right_distance = ticksToMM(readEncoder(RIGHT)); // Right encoder
+
+  // Interpolate sensor and encoder data together using a kalman filter (measurement step)
+  //location_t* current_location = localize_measure_step(sensor_data, left_distance, right_distance);
+
+  // Update maze with sensor readings
+  //probablilistic_maze_t* updated_maze = mazeMapping(sensor_data, current_location);
+
+  // Determine next cell to go to (strategy step)
+  //location_t* next_location = strategy(current_location, updated_maze);
+  
+  // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
+  //calculateSpeed(current_location, next_location, &left_speed, &right_speed);
+
+  // Run predictions through the kalman filter (motion step)
+  //localize_motion_step(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
+
+  // Set speed using the motor controllers (pid loop)
+  //setSpeedPID(left_speed, right_speed);
+}
+
+/* This function is not in use because we would like to control the timing that the loop is called */
 void loop(){
   // do not use
 }

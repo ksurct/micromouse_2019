@@ -4,7 +4,7 @@
 #define _SETTINGS_H_
 
 // Main
-#define MAIN_LOOP_TIME 10000 // Delay between the start of each main_loop call in nanosecounds
+#define MAIN_LOOP_TIME 10000 // Delay between the start of each main_loop call in nanoseconds
 
 // Maze
 #define MAZE_WIDTH 16
