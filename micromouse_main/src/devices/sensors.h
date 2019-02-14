@@ -18,14 +18,16 @@
  *         
  */
 
+#ifndef _SENSORS_H_
+#define _SENSORS_H_
+
+
 #include <Arduino.h>
 
 #include "Adafruit_VL6180X.h"
 #include "../settings.h"
 #include "../types.h"
 
-#ifndef _SENSORS_H_
-#define _SENSORS_H_
 
 extern sensor_t sensors[];
 

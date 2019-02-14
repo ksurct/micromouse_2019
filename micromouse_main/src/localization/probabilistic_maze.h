@@ -39,10 +39,10 @@ typedef struct {
 
 
 typedef struct {
-    probabilistic_wall_t * north;
-    probabilistic_wall_t * east;
-    probabilistic_wall_t * south;
-    probabilistic_wall_t * west;
+    probabilistic_wall_t* north;
+    probabilistic_wall_t* east;
+    probabilistic_wall_t* south;
+    probabilistic_wall_t* west;
 } probabilistic_cell_t;
 
 

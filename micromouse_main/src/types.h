@@ -6,6 +6,7 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
+#include <Arduino.h>
 
 typedef struct {
     uint8_t address;
@@ -28,9 +29,9 @@ typedef struct {
  * is defined as the angle in degrees counter-clockwise
  * from the x-axis */
 typedef struct {
-    gaussian_t x;
-    gaussian_t y;
-    gaussian_t theta;
+    gaussian_t* x;
+    gaussian_t* y;
+    gaussian_t* theta;
 } gaussian_location_t;
 
 
