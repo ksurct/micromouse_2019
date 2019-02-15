@@ -34,7 +34,7 @@
 
 
 typedef struct {
-    double exsits;
+    double exists;
 } probabilistic_wall_t;
 
 
@@ -48,6 +48,7 @@ typedef struct {
 
 typedef struct {
     probabilistic_cell_t cells[MAZE_HEIGHT][MAZE_WIDTH];
+    probabilistic_wall_t wall_buffer[MAZE_HEIGHT * (MAZE_WIDTH + 1) + (MAZE_HEIGHT + 1) * MAZE_WIDTH];
 } probabilistic_maze_t;
 
 
