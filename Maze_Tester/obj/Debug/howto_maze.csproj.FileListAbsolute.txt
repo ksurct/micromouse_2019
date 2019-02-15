@@ -1,9 +1,0 @@
-C:\projects\Maze\howto_maze\bin\Debug\howto_maze.exe
-C:\projects\Maze\howto_maze\bin\Debug\howto_maze.pdb
-C:\projects\Maze\howto_maze\obj\Debug\howto_maze.csprojAssemblyReference.cache
-C:\projects\Maze\howto_maze\obj\Debug\howto_maze.Form1.resources
-C:\projects\Maze\howto_maze\obj\Debug\howto_maze.Properties.Resources.resources
-C:\projects\Maze\howto_maze\obj\Debug\howto_maze.csproj.GenerateResource.cache
-C:\projects\Maze\howto_maze\obj\Debug\howto_maze.csproj.CoreCompileInputs.cache
-C:\projects\Maze\howto_maze\obj\Debug\howto_maze.exe
-C:\projects\Maze\howto_maze\obj\Debug\howto_maze.pdb
