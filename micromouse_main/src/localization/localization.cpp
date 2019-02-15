@@ -10,24 +10,23 @@
 
 
 // Globals
-probabilistic_maze_t* robot_maze_state;
-gaussian_location_t* robot_location;
+probabilistic_maze_t robot_maze_state;
+gaussian_location_t robot_location;
 
 
 /* initialize localizaiton */
 void initializeLocalization() {
 
     // Initialize robot_maze_state
-    initalizeMaze(robot_maze_state);
+    initalizeMaze(&robot_maze_state);
 
     // Initialize robot_location
-    robot_location = (gaussian_location_t*)malloc(sizeof(gaussian_location_t));
-    robot_location->x->mean = INIT_X_MEAN;
-    robot_location->x->sigma2 = INIT_X_SIGMA2;
-    robot_location->y->mean = INIT_Y_MEAN;
-    robot_location->y->sigma2 = INIT_Y_SIGMA2;
-    robot_location->theta->mean = INIT_THETA_MEAN;
-    robot_location->theta->sigma2 = INIT_THETA_SIGMA2;
+    robot_location.x.mean = INIT_X_MEAN;
+    robot_location.x.sigma2 = INIT_X_SIGMA2;
+    robot_location.y.mean = INIT_Y_MEAN;
+    robot_location.y.sigma2 = INIT_Y_SIGMA2;
+    robot_location.theta.mean = INIT_THETA_MEAN;
+    robot_location.theta.sigma2 = INIT_THETA_SIGMA2;
 }
 
 /* localize measure step */

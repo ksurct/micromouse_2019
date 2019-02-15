@@ -11,10 +11,10 @@
 #include "probabilistic_maze.h"
 
 // The current state of the maze
-extern probabilistic_maze_t* robot_maze_state;
+extern probabilistic_maze_t robot_maze_state;
 
 // The current location of the robot
-extern gaussian_location_t* robot_location;
+extern gaussian_location_t robot_location;
 
 /* initialize localizaiton
  * Initializes robot_maze_state and robot_location */

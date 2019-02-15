@@ -29,9 +29,9 @@ typedef struct {
  * is defined as the angle in degrees counter-clockwise
  * from the x-axis */
 typedef struct {
-    gaussian_t* x;
-    gaussian_t* y;
-    gaussian_t* theta;
+    gaussian_t x;
+    gaussian_t y;
+    gaussian_t theta;
 } gaussian_location_t;
 
 
