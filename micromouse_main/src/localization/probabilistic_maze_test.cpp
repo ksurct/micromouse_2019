@@ -151,6 +151,15 @@ TEST_FUNC_BEGIN {
     TEST_PASS("invalid outer wall references");
     after_valid_outer_walls:
 
+    for (int i = 0; i < sizeof(maze.wall_buffer) / sizeof(maze.wall_buffer[0]); ++i) {
+        if (count_cell_references(&maze, maze.wall_buffer + i) == 0) {
+            TEST_FAIL("memory waste");
+            goto after_memory_waste;
+        }
+    }
+    TEST_PASS("memory waste");
+    after_memory_waste:
+
     asm("nop;");
 } TEST_FUNC_END("probabilistic_maze_test")
 
