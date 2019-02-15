@@ -1,6 +1,5 @@
 /* probabilistic_maze.cpp */
 
-#include <string.h>
 #include "probabilistic_maze.h"
 #include "../settings.h"
 
