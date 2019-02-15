@@ -18,20 +18,18 @@
  *         
  */
 
+#ifndef _SENSORS_H_
+#define _SENSORS_H_
+
+
 #include <Arduino.h>
 
 #include "Adafruit_VL6180X.h"
 #include "../settings.h"
+#include "../types.h"
 
-#ifndef _SENSORS_H_
-#define _SENSORS_H_
 
-typedef struct {
-    uint8_t address;
-    uint8_t interruptPin;
-    uint8_t distance;
-    bool needsUpdated;
-} sensor_t;
+extern sensor_t sensors[];
 
 /* Set up all the sensors to be used 
  *  Returns: true if successful */

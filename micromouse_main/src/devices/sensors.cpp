@@ -2,8 +2,7 @@
 
 
 #include "sensors.h"
-
-#define TCAADDR 0x70
+#include "../settings.h"
 
 // Sensor object to communicate with all the the sensors
 Adafruit_VL6180X vl6180x = Adafruit_VL6180X();

@@ -5,3 +5,5 @@ slprj/
 *.slxc
 *.vs/
 *.vscode/
+*.o
+*_test

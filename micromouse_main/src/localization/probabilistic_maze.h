@@ -27,26 +27,28 @@
  *       W = MAZE_WIDTH
  */
 
+#ifndef _PROBABILISTIC_MAZE_H_
+#define _PROBABILISTIC_MAZE_H_
 
-
-#include "settings.h"
+#include "../settings.h"
 
 
 typedef struct {
-    double exsits;
+    double exists;
 } probabilistic_wall_t;
 
 
 typedef struct {
-    probabilistic_wall_t * north;
-    probabilistic_wall_t * east;
-    probabilistic_wall_t * south;
-    probabilistic_wall_t * west;
+    probabilistic_wall_t* north;
+    probabilistic_wall_t* east;
+    probabilistic_wall_t* south;
+    probabilistic_wall_t* west;
 } probabilistic_cell_t;
 
 
 typedef struct {
     probabilistic_cell_t cells[MAZE_HEIGHT][MAZE_WIDTH];
+    probabilistic_wall_t wall_buffer[MAZE_HEIGHT * (MAZE_WIDTH + 1) + (MAZE_HEIGHT + 1) * MAZE_WIDTH];
 } probabilistic_maze_t;
 
 
@@ -55,3 +57,6 @@ typedef struct {
  * wall in such a way that there are no duplicates.
  */
 void initalizeMaze(probabilistic_maze_t* maze);
+
+
+#endif //_PROBABILISTIC_MAZE_H_

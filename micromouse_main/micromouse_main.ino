@@ -13,11 +13,13 @@
 //#include "src/devices/motors.h"
 
 // Subsystems
+#include "src/localization/localization.h"
+#include "src/localization/probabilistic_maze.h"
 
 // Utilities
 #include "src/util/conversions.h"
 
-// Fucntion Declarations
+// Function Declarations
 void main_loop(void);
 void setup(void);
 
@@ -41,10 +43,7 @@ void setup() {
   encoderSetup(RIGHT, 3, 4); // id for right encoder, pinA, pinB
   
   // Initialize Localization subsystem
-  //initializeLocalization();
-
-  // Initialize Mapping subsystem
-  //initializeMapping();
+  initializeLocalization();
 
   // Initialize Strategy subsystem
   //initializeStrategy();
@@ -77,19 +76,19 @@ void main_loop() {
   right_distance = ticksToMM(readEncoder(RIGHT)); // Right encoder
 
   // Interpolate sensor and encoder data together using a kalman filter (measurement step)
-  //location_t* current_location = localize_measure_step(sensor_data, left_distance, right_distance);
+  //localizeMeasureStep(sensor_data, left_distance, right_distance);
 
   // Update maze with sensor readings
-  //probablilistic_maze_t* updated_maze = mazeMapping(sensor_data, current_location);
+  //mazeMapping(sensor_data);
 
   // Determine next cell to go to (strategy step)
-  //location_t* next_location = strategy(current_location, updated_maze);
+  //gaussian_location_t* next_location = strategy(&robot_location, &robot_maze_state);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   //calculateSpeed(current_location, next_location, &left_speed, &right_speed);
 
   // Run predictions through the kalman filter (motion step)
-  //localize_motion_step(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
+  //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
 
   // Set speed using the motor controllers (pid loop)
   //setSpeedPID(left_speed, right_speed);
