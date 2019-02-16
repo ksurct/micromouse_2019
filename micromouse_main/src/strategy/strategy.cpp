@@ -6,12 +6,19 @@
 #include "../settings.h"
 
 
+typedef struct {
+   int x;
+   int y; 
+} cell_t;
+
+
 // Function declarations
 void floodfill(probabilistic_maze_t* robot_maze_state);
 
 
+
 /* The number of steps away from the goal based on the floodfill algorithm */
-int values[MAZE_HEIGHT][MAZE_WIDTH];
+int values[MAZE_WIDTH][MAZE_HEIGHT];
 
 
 /* initialize strategy
@@ -28,6 +35,6 @@ gaussian_location_t* strategy(gaussian_location_t* robot_location, probabilistic
 
 /* floodfill
  * Implements the floodfill algorithm on the 2d-array values */
-void floodfill(probabilistic_maze_t* robot_maze_state) {
+void floodfill(probabilistic_maze_t* robot_maze_state, cell_t* cell) {
     // dothething();
 }
