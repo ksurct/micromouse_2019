@@ -13,6 +13,10 @@
 #define MAZE_WIDTH  16
 #define MAZE_HEIGHT 16
 
+// Robot
+#define WHEEL_RADIUS            16          // Wheel radius in mm
+#define TICKS_PER_REVOLUTION    3575.0855   // Number to encoder ticks per one revolution of a wheel
+
 // Localization
 #define INIT_X_MEAN         100.0   //dummy value
 #define INIT_X_SIGMA2       10.0    //dummy value
@@ -20,6 +24,11 @@
 #define INIT_Y_SIGMA2       10.0    //dummy value
 #define INIT_THETA_MEAN     90.0    //dummy value
 #define INIT_THETA_SIGMA2   10.0    //dummy value
+
+// Control
+#define CONTROL_LOOP_TIME   1000    // Delay between start times of control loop in microseconds
+#define TAU_P               1000    //dummy value
+#define TAU_I               100     //dummy value
 
 // Motors
 #define LEFT    0

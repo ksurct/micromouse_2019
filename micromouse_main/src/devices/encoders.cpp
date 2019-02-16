@@ -77,12 +77,12 @@ void encoderSetup(uint8_t pinA, uint8_t pinB, uint8_t id)
         attachInterrupt(digitalPinToInterrupt(pinA), encoderISR0, CHANGE);
         attachInterrupt(digitalPinToInterrupt(pinB), encoderISR0, CHANGE);
     }
-} 
+}
 
 // Read the position relative to the old position
 // and reset the position to zero
-int readEncoder(uint8_t id) 
-{ 
+int readEncoder(uint8_t id)
+{
     int currentPosition = encoders[id].position;
     encoders[id].position = 0;
     return currentPosition;

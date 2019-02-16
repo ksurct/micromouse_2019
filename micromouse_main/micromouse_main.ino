@@ -71,9 +71,8 @@ void main_loop() {
     // throw error and log to serial
   }
   
-  // Get encoder data
-  left_distance = ticksToMM(readEncoder(LEFT)); // Left encoder
-  right_distance = ticksToMM(readEncoder(RIGHT)); // Right encoder
+  // Get distance travelled from control subsystem
+  distanceTravelled(&left_distance, &right_distance);
 
   // Interpolate sensor and encoder data together using a kalman filter (measurement step)
   //localizeMeasureStep(sensor_data, left_distance, right_distance);

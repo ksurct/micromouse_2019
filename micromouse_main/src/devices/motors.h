@@ -5,14 +5,6 @@
 #ifndef _MOTORS_H_
 #define _MOTORS_H_
 
-typedef struct {
-    uint8_t id;
-    uint8_t pinA;
-    uint8_t pinB;
-    double value;
-} motor_t;
-
-extern motor_t motors[];
 
 /* Sets up all of the motors */
 void motorSetup();
