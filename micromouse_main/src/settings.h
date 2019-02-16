@@ -33,6 +33,12 @@
 // Motors
 #define LEFT    0
 #define RIGHT   1
+#define RESOLUTION_BITS     12      // Number of bits to use in analogWrite()
+#define MAX_PWM_OUTPUT      4095    // Should be 2^(RESOLUTION_BITS) - 1
+#define LEFT_MOTOR_PIN_A    1       //dummy value
+#define LEFT_MOTOR_PIN_B    1       //dummy value
+#define RIGHT_MOTOR_PIN_A   1       //dummy value
+#define RIGHT_MOTOR_PIN_B   1       //dummy value
 
 // Sensors
 #define I2C_RESET_PIN   3 //dummy value
