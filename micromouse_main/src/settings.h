@@ -22,8 +22,9 @@
 #define INIT_THETA_SIGMA2   10.0    //dummy value (in mm)
 
 // Strategy
-#define INIT_CELL_X 0
-#define INIT_CELL_Y 0
+#define INIT_CELL_X     0
+#define INIT_CELL_Y     0
+#define WALL_THRESHOLD  0.7     // Probablity that we believe that a wall actually exists
 
 // Motors
 #define LEFT    0
