@@ -35,8 +35,8 @@ volatile controller_state_t controllers[] = {
 /* initialize control
  * starts the PID loop with a speed of 0 on each motor */
 void initializeControl(void) {
-    DueTimer1.attachInterrupt(speedController);
-    DueTimer1.start(CONTROL_LOOP_TIME);
+    Timer1.attachInterrupt(speedController);
+    Timer1.start(CONTROL_LOOP_TIME);
 }
 
 /* distance travelled
@@ -59,7 +59,7 @@ void setSpeedPID(double left_speed, double right_speed){
  * This function is a ISR to run the PID loop for both controllers */
 void speedController(void) {
     
-    static prev_time = micros();
+    static unsigned long prev_time = micros();
 
     int ticks;
     double cur_speed;
@@ -68,6 +68,7 @@ void speedController(void) {
     unsigned long cur_time = micros();
 
     for (int i = 0; i < 2; i++){
+        // Read encoder ticks, and update ticks_travelled
         ticks = readEncoder(i);
         controllers[i].ticks_travelled += ticks;
 

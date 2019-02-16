@@ -16,6 +16,8 @@
 #include "src/localization/localization.h"
 #include "src/localization/probabilistic_maze.h"
 
+#include "src/control/control.h"
+
 // Utilities
 #include "src/util/conversions.h"
 
@@ -70,7 +72,7 @@ void main_loop() {
   if (!readSensors(sensor_data)){
     // throw error and log to serial
   }
-  
+
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
 
