@@ -30,7 +30,6 @@ motor_t motors[] = {
 
 /* Sets up all of the motors */
 void motorSetup() {
-    
     analogWriteResolution(RESOLUTION_BITS);
 
     for (int i = 0; i < 2; i++) {
@@ -46,6 +45,7 @@ void motorSetup() {
  *   the amount to output */
 void setMotorPWM(uint8_t id, double value) {
     int output = (int) (value * MAX_PWM_OUTPUT);
+    
     if (output < 0) {
         analogWrite(motors[id].pinA, 0);
         analogWrite(motors[id].pinB, output);

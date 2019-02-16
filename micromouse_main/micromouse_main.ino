@@ -41,8 +41,8 @@ void setup() {
   }
   
   // Setup Encoders
-  encoderSetup(LEFT, 1, 2); // id for left encoder, pinA, pinB
-  encoderSetup(RIGHT, 3, 4); // id for right encoder, pinA, pinB
+  encoderSetup(LEFT, LEFT_ENCODER_PIN_A, LEFT_ENCODER_PIN_B);
+  encoderSetup(RIGHT, RIGHT_ENCODER_PIN_A, RIGHT_ENCODER_PIN_B);
   
   // Initialize Localization subsystem
   initializeLocalization();
@@ -51,7 +51,7 @@ void setup() {
   //initializeStrategy();
 
   // Initialize Control subsystem (includes motors)
-  //initializeControl();
+  initializeControl();
 
   // Start main loop
   Timer0.attachInterrupt(main_loop);

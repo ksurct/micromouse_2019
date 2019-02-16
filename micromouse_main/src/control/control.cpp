@@ -35,6 +35,8 @@ volatile controller_state_t controllers[] = {
 /* initialize control
  * starts the PID loop with a speed of 0 on each motor */
 void initializeControl(void) {
+    motorSetup();
+
     Timer1.attachInterrupt(speedController);
     Timer1.start(CONTROL_LOOP_TIME);
 }

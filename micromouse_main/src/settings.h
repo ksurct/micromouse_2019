@@ -3,6 +3,7 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
+
 // General
 #define DEBUG false
 
@@ -30,6 +31,12 @@
 #define TAU_P               1000    //dummy value
 #define TAU_I               100     //dummy value
 
+// Encoders
+#define LEFT_ENCODER_PIN_A  1       //dummy value
+#define LEFT_ENCODER_PIN_B  1       //dummy value
+#define RIGHT_ENCODER_PIN_A 1       //dummy value
+#define RIGHT_ENCODER_PIN_B 1       //dummy value
+
 // Motors
 #define LEFT    0
 #define RIGHT   1
@@ -44,5 +51,6 @@
 #define I2C_RESET_PIN   3 //dummy value
 #define NUM_SENSORS     5
 #define TCAADDR         0x70
+
 
 #endif //_SETTINGS_H_
