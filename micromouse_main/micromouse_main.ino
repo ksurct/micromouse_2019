@@ -16,6 +16,8 @@
 #include "src/localization/localization.h"
 #include "src/localization/probabilistic_maze.h"
 
+#include "src/strategy/strategy.h"
+
 // Utilities
 #include "src/util/conversions.h"
 
@@ -46,7 +48,7 @@ void setup() {
   initializeLocalization();
 
   // Initialize Strategy subsystem
-  //initializeStrategy();
+  initializeStrategy();
 
   // Initialize Control subsystem (includes motors)
   //initializeControl();
