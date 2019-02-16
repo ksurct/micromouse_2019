@@ -15,6 +15,11 @@ void initializeControl(void);
  * main loop can get the distance travelled */
 void distanceTravelled(double* left_distance, double* right_distance);
 
+/* calculate speed
+ * Calculate the speed to set the motors to given the current_location and the next_location */
+void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* next_location,
+                        double* left_speed, double* right_speed);
+
 /* set speed PID
  * Sets the speed that the control algorithm uses */
 void setSpeedPID(double left_speed, double right_speed);
