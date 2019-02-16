@@ -14,12 +14,16 @@
 #define MAZE_HEIGHT 16
 
 // Localization
-#define INIT_X_MEAN         100.0   //dummy value
-#define INIT_X_SIGMA2       10.0    //dummy value
-#define INIT_Y_MEAN         100.0   //dummy value
-#define INIT_Y_SIGMA2       10.0    //dummy value
-#define INIT_THETA_MEAN     90.0    //dummy value
-#define INIT_THETA_SIGMA2   10.0    //dummy value
+#define INIT_X_MEAN         100.0   //dummy value (in mm)
+#define INIT_X_SIGMA2       10.0    //dummy value (in mm)
+#define INIT_Y_MEAN         100.0   //dummy value (in mm)
+#define INIT_Y_SIGMA2       10.0    //dummy value (in mm)
+#define INIT_THETA_MEAN     0.0     //dummy value (in mm)
+#define INIT_THETA_SIGMA2   10.0    //dummy value (in mm)
+
+// Strategy
+#define INIT_CELL_X 0
+#define INIT_CELL_Y 0
 
 // Motors
 #define LEFT    0

@@ -7,6 +7,7 @@
 #include "../types.h"
 #include "../localization/probabilistic_maze.h"
 
+
 /* initialize strategy
  * Initializes the maze solving algorithm */
 void initializeStrategy(void);

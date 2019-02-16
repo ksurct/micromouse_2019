@@ -1,7 +1,13 @@
 /* strategy.cpp */
 
+
 #include "strategy.h"
 #include "../types.h"
+#include "../settings.h"
+
+
+/* The number of steps away from the goal based on the floodfill algorithm */
+int values[MAZE_HEIGHT][MAZE_WIDTH];
 
 
 /* initialize strategy
