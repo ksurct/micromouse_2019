@@ -24,7 +24,7 @@
 // Strategy
 #define INIT_CELL_X     0
 #define INIT_CELL_Y     0
-#define WALL_THRESHOLD  0.7     // Probablity that we believe that a wall actually exists
+#define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
 
 // Motors
 #define LEFT    0
