@@ -59,7 +59,7 @@ void setup() {
 
 void main_loop() {
 
-  // Initalize variables
+  // Initialize variables
   static sensor_t sensor_data[NUM_SENSORS];
   static double left_distance;
   static double right_distance;
