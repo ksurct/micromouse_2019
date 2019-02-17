@@ -1,7 +1,5 @@
 /* localization.cpp */
 
-#include <Arduino.h>
-
 #include "../types.h"
 #include "../devices/sensors.h"
 

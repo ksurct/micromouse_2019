@@ -22,8 +22,6 @@
 #define _SENSORS_H_
 
 
-#include <Arduino.h>
-
 #include "Adafruit_VL6180X.h"
 #include "../settings.h"
 #include "../types.h"

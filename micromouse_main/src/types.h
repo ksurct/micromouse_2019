@@ -6,12 +6,11 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
-#include <Arduino.h>
 
 typedef struct {
-    uint8_t address;
-    uint8_t interruptPin;
-    uint8_t distance;
+    unsigned char address;
+    unsigned char interruptPin;
+    unsigned char distance;
     bool needsUpdated;
 } sensor_t;
 

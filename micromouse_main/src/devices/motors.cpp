@@ -1,7 +1,9 @@
 /* motors.cpp */
 
+
 #include "../settings.h"
 #include "motors.h"
+
 
 motor_t motors[] = {
     {
@@ -23,7 +25,7 @@ void motorSetup()
     // dothething();
 }
 
-void setMotorPWM(uint8_t id, double value)
+void setMotorPWM(unsigned char id, double value)
 {
     // dothething();
 }

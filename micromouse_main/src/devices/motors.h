@@ -1,14 +1,13 @@
 /* motors.h */
 
-#include <Arduino.h>
 
 #ifndef _MOTORS_H_
 #define _MOTORS_H_
 
 typedef struct {
-    uint8_t id;
-    uint8_t pinA;
-    uint8_t pinB;
+    unsigned char id;
+    unsigned char pinA;
+    unsigned char pinB;
     double value;
 } motor_t;
 
@@ -22,6 +21,6 @@ void motorSetup();
  *   value: a number between 0 and 1 that represents
  *          the percentage of the time the signal
  *          should be on                          */
-void setMotorPWM(uint8_t id, double value);
+void setMotorPWM(unsigned char id, double value);
 
 #endif //_MOTORS_H_
