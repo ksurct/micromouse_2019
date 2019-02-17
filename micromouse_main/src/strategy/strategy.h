@@ -14,7 +14,7 @@ void initializeStrategy(void);
 
 /* strategy
  * Given the robots location and the state of the maze calculate the next location to go to */
-gaussian_location_t* strategy(gaussian_location_t* robot_location, probabilistic_maze_t* robot_maze_state);
+void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* robot_maze_state, gaussian_location_t* next_location);
 
 
 #endif //_STRATEGY_H_

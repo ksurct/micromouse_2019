@@ -19,6 +19,7 @@ void floodfill(probabilistic_maze_t* robot_maze_state, cell_t* cell, int value);
 void convertLocationToCell(gaussian_location_t* location, cell_t* to_return);
 void convertCellToLocation(cell_t* cell, gaussian_location_t* to_return);
 cell_t chooseNextCell(probabilistic_maze_t* robot_maze_state, cell_t* robot_cell);
+void resetValues(void);
 
 
 // Global declarations
@@ -34,26 +35,29 @@ int values[MAZE_WIDTH][MAZE_HEIGHT];
 /* initialize strategy
  * Initializes the maze solving algorithm */
 void initializeStrategy(void) {
-    // dothething();
+    
+    resetValues();
 }
 
 /* strategy
  * Given the robots location and the state of the maze calculate the next location to go to */
-gaussian_location_t* strategy(gaussian_location_t* robot_location, probabilistic_maze_t* robot_maze_state) {
+void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* robot_maze_state, gaussian_location_t* next_location) {
     
     // Get the current cell
     cell_t robot_cell;
     convertLocationToCell(robot_location, &robot_cell);
 
-    // Clear values
-    //resetValues();
+    // Rest values to MAX_VALUE
+    resetValues();
 
     // Update values by floodfill
     floodfill(robot_maze_state, &goal_cell, 0);
 
     // Choose the lowest valued cell we can go to
-    
+    cell_t next_cell = chooseNextCell(robot_maze_state, &robot_cell);
 
+    // Convert to a gaussian_location_t that edits the next_location
+    convertCellToLocation(&next_cell, next_location);
 }
 
 /* floodfill
@@ -157,4 +161,13 @@ cell_t chooseNextCell(probabilistic_maze_t* robot_maze_state, cell_t* robot_cell
     }
     
     return next_cell;
+}
+
+/* Resets Values 2d-array back MAX_VALUE */
+void resetValues(void) {
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+        for (int y = 0; y < MAZE_HEIGHT; y++) {
+            values[x][y] = MAX_VALUE;
+        }
+    }
 }
