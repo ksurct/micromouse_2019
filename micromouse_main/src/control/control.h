@@ -5,6 +5,9 @@
 #define _CONTROL_H_
 
 
+#include "../types.h"
+
+
 /* initialize control
  * starts the PID loop with a speed of 0 on each motor */
 void initializeControl(void);
