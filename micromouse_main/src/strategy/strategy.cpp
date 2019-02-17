@@ -6,6 +6,8 @@
 #include "../settings.h"
 
 
+/* Simple representation of a cell 
+ *  - For use with probabilistic_maze_t */
 typedef struct {
    int x;
    int y; 
@@ -14,6 +16,8 @@ typedef struct {
 
 // Function declarations
 void floodfill(probabilistic_maze_t* robot_maze_state);
+void convertLocationToCell(gaussian_location_t* location, cell_t* to_return);
+void convertCellToLocation(cell_t* cell, gaussian_location_t* to_return);
 
 
 /* The number of steps away from the goal based on the floodfill algorithm */
@@ -71,4 +75,16 @@ void floodfill(probabilistic_maze_t* robot_maze_state, cell_t* cell, int value) 
         floodfill(robot_maze_state, cell, value + 1);
         cell->x++;
     }
+}
+
+/* Uses the mean location to determine the cell this location is in */
+void convertLocationToCell(gaussian_location_t* location, cell_t* to_return) {
+    to_return->x = (int) (location->x.mean / (WALL_THICKNESS + CELL_LENGTH));
+    to_return->y = (int) (location->y.mean / (WALL_THICKNESS + CELL_LENGTH));
+}
+
+/* Returns the middle of the cell given only changing the x and y mean */
+void convertCellToLocation(cell_t* cell, gaussian_location_t* to_return) {
+    to_return->x.mean = (double) (((cell->x) * (WALL_THICKNESS + CELL_LENGTH)) + (CELL_LENGTH / 2));
+    to_return->y.mean = (double) (((cell->y) * (WALL_THICKNESS + CELL_LENGTH)) + (CELL_LENGTH / 2));
 }

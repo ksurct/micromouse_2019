@@ -9,9 +9,11 @@
 // Main
 #define MAIN_LOOP_TIME 10000 // Delay between the start of each main_loop call in microseconds
 
-// Maze
-#define MAZE_WIDTH  16
-#define MAZE_HEIGHT 16
+// Maze Specifications
+#define MAZE_WIDTH      16      // Number of cells wide
+#define MAZE_HEIGHT     16      // Number of cells tall
+#define WALL_THICKNESS  12      // Thickness of the walls in mm
+#define CELL_LENGTH     168     // Length and width of each cell inside the walls in mm
 
 // Localization
 #define INIT_X_MEAN         100.0   //dummy value (in mm)
@@ -22,8 +24,8 @@
 #define INIT_THETA_SIGMA2   10.0    //dummy value (in mm)
 
 // Strategy
-#define INIT_CELL_X     0
-#define INIT_CELL_Y     0
+#define INIT_CELL_X     0       // Initial Cell x coordinate
+#define INIT_CELL_Y     0       // Initial Cell y coordinate
 #define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
 
 // Motors
