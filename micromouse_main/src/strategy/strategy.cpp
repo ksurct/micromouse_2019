@@ -38,7 +38,7 @@ gaussian_location_t* strategy(gaussian_location_t* robot_location, probabilistic
 void floodfill(probabilistic_maze_t* robot_maze_state, cell_t* cell, int value) {
     
     // base case, outside of maze (shouldn't ever happen)
-    // remove if it is garenteed that all outside walls will be > WALL_THRESHOLD
+    // remove if it is guaranteed that all outside walls will be > WALL_THRESHOLD
     if (cell->x < 0 || cell->x >= MAZE_WIDTH || cell->y < 0 || cell->y >= MAZE_HEIGHT) {
         return;
     }
