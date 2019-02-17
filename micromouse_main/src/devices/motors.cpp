@@ -48,7 +48,7 @@ void setMotorPWM(uint8_t id, double value) {
     
     if (output < 0) {
         analogWrite(motors[id].pinA, 0);
-        analogWrite(motors[id].pinB, output);
+        analogWrite(motors[id].pinB, -output);
     } else {
         analogWrite(motors[id].pinA, output);
         analogWrite(motors[id].pinB, 0);
