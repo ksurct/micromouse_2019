@@ -1,7 +1,8 @@
 /* motors.cpp */
 
 
-#include "../settings.h"
+#include <Arduino.h>
+
 #include "motors.h"
 #include "../settings.h"
 
