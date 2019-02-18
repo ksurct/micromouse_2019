@@ -12,11 +12,11 @@ probabilistic_maze_t robot_maze_state;
 gaussian_location_t robot_location;
 
 
-/* initialize localizaiton */
+/* initialize localization */
 void initializeLocalization() {
 
     // Initialize robot_maze_state
-    initalizeMaze(&robot_maze_state);
+    initializeMaze(&robot_maze_state);
 
     // Initialize robot_location
     robot_location.x.mean = INIT_X_MEAN;

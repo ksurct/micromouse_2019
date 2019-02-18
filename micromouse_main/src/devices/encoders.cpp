@@ -59,19 +59,18 @@ void encoderISR0() {
 }
 
 // Create an Encoder object and save it to the pointer
-void encoderSetup(unsigned char pinA, unsigned char pinB, unsigned char id)
-{ 
+void encoderSetup(unsigned char id, unsigned char pinA, unsigned char pinB)
+{
     pinMode(pinA, INPUT_PULLUP);
     pinMode(pinB, INPUT_PULLUP);
-    
-    
+
     encoders[id].pinA_register = portInputRegister(digitalPinToPort(pinA));
     encoders[id].pinB_register = portInputRegister(digitalPinToPort(pinB));
     encoders[id].pinA_bitmask = digitalPinToBitMask(pinA);
     encoders[id].pinB_bitmask = digitalPinToBitMask(pinB);
     encoders[id].state = 0;
     encoders[id].position = 0;
-    
+
     if (id == 1) {
         attachInterrupt(digitalPinToInterrupt(pinA), encoderISR1, CHANGE);
         attachInterrupt(digitalPinToInterrupt(pinB), encoderISR1, CHANGE);
@@ -79,7 +78,7 @@ void encoderSetup(unsigned char pinA, unsigned char pinB, unsigned char id)
         attachInterrupt(digitalPinToInterrupt(pinA), encoderISR0, CHANGE);
         attachInterrupt(digitalPinToInterrupt(pinB), encoderISR0, CHANGE);
     }
-} 
+}
 
 // Read the position relative to the old position
 // and reset the position to zero

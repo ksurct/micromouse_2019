@@ -17,8 +17,8 @@ int count_cell_references(probabilistic_maze_t *maze, probabilistic_wall_t *chec
 
 TEST_FUNC_BEGIN {
     probabilistic_maze_t maze;
-    initalizeMaze(&maze);
-    TEST_PASS("initalizeMaze called");
+    initializeMaze(&maze);
+    TEST_PASS("initializeMaze called");
 
     for (int x = 0; x < MAZE_WIDTH; ++x) {
         if (maze.cells[x][0].north->exists != 1) {
