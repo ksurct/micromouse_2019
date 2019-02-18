@@ -16,6 +16,8 @@
 #include "src/localization/localization.h"
 #include "src/localization/probabilistic_maze.h"
 
+#include "src/control/control.h"
+
 // Utilities
 #include "src/util/conversions.h"
 
@@ -39,8 +41,8 @@ void setup() {
   }
   
   // Setup Encoders
-  encoderSetup(LEFT, 1, 2); // id for left encoder, pinA, pinB
-  encoderSetup(RIGHT, 3, 4); // id for right encoder, pinA, pinB
+  encoderSetup(LEFT, LEFT_ENCODER_PIN_A, LEFT_ENCODER_PIN_B);
+  encoderSetup(RIGHT, RIGHT_ENCODER_PIN_A, RIGHT_ENCODER_PIN_B);
   
   // Initialize Localization subsystem
   initializeLocalization();
@@ -49,7 +51,7 @@ void setup() {
   //initializeStrategy();
 
   // Initialize Control subsystem (includes motors)
-  //initializeControl();
+  initializeControl();
 
   // Start main loop
   Timer0.attachInterrupt(main_loop);
@@ -70,10 +72,9 @@ void main_loop() {
   if (!readSensors(sensor_data)){
     // throw error and log to serial
   }
-  
-  // Get encoder data
-  left_distance = ticksToMM(readEncoder(LEFT)); // Left encoder
-  right_distance = ticksToMM(readEncoder(RIGHT)); // Right encoder
+
+  // Get distance travelled from control subsystem
+  distanceTravelled(&left_distance, &right_distance);
 
   // Interpolate sensor and encoder data together using a kalman filter (measurement step)
   //localizeMeasureStep(sensor_data, left_distance, right_distance);
