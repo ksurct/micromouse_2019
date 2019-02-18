@@ -163,4 +163,4 @@ TEST_FUNC_BEGIN {
     asm("nop;");
 } TEST_FUNC_END("probabilistic_maze_test")
 
-#endif
+#endif // ARDUINO

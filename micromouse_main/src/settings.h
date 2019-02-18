@@ -10,21 +10,31 @@
 // Main
 #define MAIN_LOOP_TIME 10000 // Delay between the start of each main_loop call in microseconds
 
-// Maze
-#define MAZE_WIDTH  16
-#define MAZE_HEIGHT 16
+// Maze Specifications
+#define MAZE_WIDTH      16      // Number of cells wide
+#define MAZE_HEIGHT     16      // Number of cells tall
+#define WALL_THICKNESS  12      // Thickness of the walls in mm
+#define CELL_LENGTH     168     // Length and width of each cell inside the walls in mm
 
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
 #define TICKS_PER_REVOLUTION    3575.0855   // Number to encoder ticks per one revolution of a wheel
 
 // Localization
-#define INIT_X_MEAN         100.0   //dummy value
-#define INIT_X_SIGMA2       10.0    //dummy value
-#define INIT_Y_MEAN         100.0   //dummy value
-#define INIT_Y_SIGMA2       10.0    //dummy value
-#define INIT_THETA_MEAN     90.0    //dummy value
-#define INIT_THETA_SIGMA2   10.0    //dummy value
+#define INIT_X_MEAN         100.0   //dummy value (in mm)
+#define INIT_X_SIGMA2       10.0    //dummy value (in mm)
+#define INIT_Y_MEAN         100.0   //dummy value (in mm)
+#define INIT_Y_SIGMA2       10.0    //dummy value (in mm)
+#define INIT_THETA_MEAN     0.0     //dummy value (in mm)
+#define INIT_THETA_SIGMA2   10.0    //dummy value (in mm)
+
+// Strategy
+#define INIT_CELL_X     0       // Initial Cell x coordinate
+#define INIT_CELL_Y     0       // Initial Cell y coordinate
+#define GOAL_CELL_X     7       // Goal cell x coordinate
+#define GOAL_CELL_Y     7       // Goal cell y coordinate
+#define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
+#define MAX_VALUE       32767   // Maximum value that can be in values
 
 // Control
 #define CONTROL_LOOP_TIME   1000    // Delay between start times of control loop in microseconds

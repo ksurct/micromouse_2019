@@ -8,8 +8,8 @@
 
 
 typedef struct {
-    uint8_t pinA;
-    uint8_t pinB;
+    unsigned char pinA;
+    unsigned char pinB;
     double value;
 } motor_t;
 
@@ -43,7 +43,7 @@ void motorSetup() {
  *   id: id of the motor, use either LEFT or RIGHT
  *   value: a number between -1 and 1 that represents
  *   the amount to output */
-void setMotorPWM(uint8_t id, double value) {
+void setMotorPWM(unsigned char id, double value) {
     int output = (int) (value * MAX_PWM_OUTPUT);
     
     if (output < 0) {

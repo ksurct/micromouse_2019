@@ -1,6 +1,5 @@
 /* motors.h */
 
-#include <Arduino.h>
 
 #ifndef _MOTORS_H_
 #define _MOTORS_H_
@@ -13,7 +12,7 @@ void motorSetup();
  *   id: id of the motor, use either LEFT or RIGHT
  *   value: a number between -1 and 1 that represents
  *   the amount to output */
-void setMotorPWM(uint8_t id, double value);
+void setMotorPWM(unsigned char id, double value);
 
 
 #endif //_MOTORS_H_

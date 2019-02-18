@@ -16,7 +16,10 @@
 #include "src/localization/localization.h"
 #include "src/localization/probabilistic_maze.h"
 
+#include "src/strategy/strategy.h"
+
 #include "src/control/control.h"
+
 
 // Utilities
 #include "src/util/conversions.h"
@@ -48,7 +51,7 @@ void setup() {
   initializeLocalization();
 
   // Initialize Strategy subsystem
-  //initializeStrategy();
+  initializeStrategy();
 
   // Initialize Control subsystem (includes motors)
   initializeControl();
@@ -67,6 +70,7 @@ void main_loop() {
   static double right_distance;
   static double left_speed;
   static double right_speed;
+  static gaussian_location_t next_location;
 
   // Get sensor data
   if (!readSensors(sensor_data)){
@@ -83,10 +87,10 @@ void main_loop() {
   //mazeMapping(sensor_data);
 
   // Determine next cell to go to (strategy step)
-  //gaussian_location_t* next_location = strategy(&robot_location, &robot_maze_state);
+  //strategy(&robot_location, &robot_maze_state, &next_location);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-  //calculateSpeed(current_location, next_location, &left_speed, &right_speed);
+  //calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
   // Run predictions through the kalman filter (motion step)
   //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);

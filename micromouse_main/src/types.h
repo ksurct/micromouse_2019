@@ -6,12 +6,11 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
-#include <Arduino.h>
 
 typedef struct {
-    uint8_t address;
-    uint8_t interruptPin;
-    uint8_t distance;
+    unsigned char address;
+    unsigned char interruptPin;
+    unsigned char distance;
     bool needsUpdated;
 } sensor_t;
 
@@ -25,9 +24,19 @@ typedef struct {
 
 /* gaussian_location_t
  * Defines the location of the robot in mm from
- * the bottom left of the maze(starting point), theta
+ * the top left of the maze(starting point), theta
  * is defined as the angle in degrees counter-clockwise
- * from the x-axis */
+ * from the x axis
+ * 
+ * (0,0) starts in the top left corner of the maze inside of the maze
+ * +---------> +x axis
+ * |
+ * |
+ * |
+ * V
+ * +y axis
+ * 
+ * */
 typedef struct {
     gaussian_t x;
     gaussian_t y;
