@@ -28,11 +28,11 @@ void initializeLocalization() {
 }
 
 /* localize measure step */
-gaussian_location_t* localize_measure_step(sensor_t* sensor_data, double left_distance, double right_distance) {
+gaussian_location_t* localize_measure_step(sensor_reading_t* sensor_data, double left_distance, double right_distance) {
     // dothething();
 }
 
-probabilistic_maze_t* mazeMapping(sensor_t* sensor_data) {
+probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data) {
     // dothething();
 }
 

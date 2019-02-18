@@ -65,7 +65,7 @@ void setup() {
 void main_loop() {
 
   // Initialize variables
-  static sensor_t sensor_data[NUM_SENSORS];
+  static sensor_reading_t sensor_data[NUM_SENSORS];
   static double left_distance;
   static double right_distance;
   static double left_speed;
@@ -73,9 +73,7 @@ void main_loop() {
   static gaussian_location_t next_location;
 
   // Get sensor data
-  if (!readSensors(sensor_data)){
-    // throw error and log to serial
-  }
+  readSensors(sensor_data);
 
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
