@@ -31,8 +31,7 @@
  *  Returns: true if successful */
 bool sensorSetup();
 
-/* Read from all the sensors
- *  Returns: true if successful */
+/* Read from all the sensors */
 void readSensors(sensor_reading_t* sensor_data);
 
 
