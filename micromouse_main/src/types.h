@@ -7,15 +7,24 @@
 #define _TYPES_H_
 
 
+/* The reported state of a sensor */
+enum sensor_state_t {
+    good,       // Successful reading
+    too_far,    // Object to far to detect
+    too_close,  // Object to close to detect
+    waiting,    // Sensor has no measurement yet, disregard distance
+    error       // Error in reading, disregard distance
+};
+
+
+/* A single sensor reading */
 typedef struct {
-    unsigned char address;
-    unsigned char interruptPin;
-    unsigned char distance;
-    bool needsUpdated;
-} sensor_t;
+    sensor_state_t state;   // The reported state of the sensor
+    unsigned char distance; // The reported distance of the sensor's measurement in mm
+} sensor_reading_t;
 
 
-// Holds a gaussian value
+/* Holds a gaussian value */
 typedef struct {
     double mean;
     double sigma2;
