@@ -35,7 +35,7 @@ volatile controller_state_t controllers[] = {
 /* initialize control
  * starts the PID loop with a speed of 0 on each motor */
 void initializeControl(void) {
-    motorSetup();
+    setSpeedPID(0.0, 0.0);
 
     Timer1.attachInterrupt(speedController);
     Timer1.start(CONTROL_LOOP_TIME);
@@ -48,6 +48,8 @@ void initializeControl(void) {
 void distanceTravelled(double* left_distance, double* right_distance) {
     *left_distance = ticksToMM(controllers[LEFT].ticks_travelled);
     *right_distance = ticksToMM(controllers[RIGHT].ticks_travelled);
+    controllers[LEFT].ticks_travelled = 0;
+    controllers[RIGHT].ticks_travelled = 0;
 }
 
 /* calculate speed
@@ -60,8 +62,10 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
 /* set speed PID
  * Sets the speed that the control algorithm uses */
 void setSpeedPID(double left_speed, double right_speed){
+    noInterrupts();
     controllers[LEFT].set_speed = left_speed;
     controllers[RIGHT].set_speed = right_speed;
+    interrupts();
 }
 
 /* speed controller
@@ -82,20 +86,23 @@ void speedController(void) {
         controllers[i].ticks_travelled += ticks;
 
         // Calculate Speed we are going in mm/sec
-        cur_speed = ticksToMM(ticks) / ((cur_time-prev_time) * 1000000);
+        cur_speed = ticksToMM(ticks) / ((double)(cur_time-prev_time) / 1000000);
 
         // calculate error
         error = cur_speed - controllers[i].set_speed;
 
-        // add to integral error sum
-        controllers[i].int_error += error;
+        // add to integral error sum (bounded)
+        if (controllers[i].int_error + error > -1 * INT_BOUND && controllers[i].int_error + error < INT_BOUND) {
+            controllers[i].int_error += error;
+        }
 
-        output = (TAU_P * error) + (TAU_I * controllers[i].int_error);
+        output = (-1 * TAU_P * error) + (-1 * TAU_I * controllers[i].int_error);
 
         // Limit output between -1 and 1
         if (output > 1) output = 1;
-        if (output < 1) output = -1;
+        if (output < -1) output = -1;
 
         setMotorPWM(i, output);
     }
+    prev_time = cur_time;
 }

@@ -8,9 +8,9 @@
 #include "src/types.h"
 
 // Devices
-#include "src/devices/encoders.h"
 #include "src/devices/sensors.h"
-//#include "src/devices/motors.h"
+#include "src/devices/motors.h"
+#include "src/devices/encoders.h"
 
 // Subsystems
 #include "src/localization/localization.h"
@@ -25,38 +25,39 @@
 #include "src/util/conversions.h"
 
 // Function Declarations
-void main_loop(void);
 void setup(void);
+void main_loop(void);
 
 
 /* Entry point to the code for the robot, all initialization
  * of subsystems should be done here */
 void setup() {
 
-  // Initialize serial if in debug mode
-  if (DEBUG) {
-    Serial.begin(9600);
-  }
+  // Initialize Serial
+  Serial.begin(115200);
 
   // Setup Sensors
   if (! sensorSetup()){
     // Throw error? Serial message maybe?
   }
-  
+
+  // Setup Motors
+  motorSetup();
+
   // Setup Encoders
   encoderSetup(LEFT, LEFT_ENCODER_PIN_A, LEFT_ENCODER_PIN_B);
   encoderSetup(RIGHT, RIGHT_ENCODER_PIN_A, RIGHT_ENCODER_PIN_B);
-  
+
   // Initialize Localization subsystem
   initializeLocalization();
 
   // Initialize Strategy subsystem
   initializeStrategy();
 
-  // Initialize Control subsystem (includes motors)
+  // Initialize Control subsystem
   initializeControl();
 
-  // Start main loop
+  // // Start main loop
   Timer0.attachInterrupt(main_loop);
   Timer0.start(MAIN_LOOP_TIME);
 }
@@ -96,7 +97,8 @@ void main_loop() {
   //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
 
   // Set speed using the motor controllers (pid loop)
-  //setSpeedPID(left_speed, right_speed);
+  setSpeedPID(left_speed, right_speed);
+
 }
 
 /* This function is not in use because we would like to control the timing that the loop is called */
