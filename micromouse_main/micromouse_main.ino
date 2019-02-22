@@ -10,7 +10,7 @@
 // Devices
 #include "src/devices/encoders.h"
 #include "src/devices/sensors.h"
-//#include "src/devices/motors.h"
+#include "src/devices/motors.h"
 
 // Subsystems
 #include "src/localization/localization.h"
@@ -25,57 +25,70 @@
 #include "src/util/conversions.h"
 
 // Function Declarations
-void main_loop(void);
 void setup(void);
+void main_loop(void);
 
 
 /* Entry point to the code for the robot, all initialization
  * of subsystems should be done here */
 void setup() {
 
-  // Initialize serial if in debug mode
-  if (DEBUG) {
-    Serial.begin(9600);
-  }
+  // Initialize Serial
+  Serial.begin(115200);
 
   // Setup Sensors
-  if (! sensorSetup()){
-    // Throw error? Serial message maybe?
-  }
-  
+  // if (! sensorSetup()){
+  //   // Throw error? Serial message maybe?
+  // }
+
+  Serial.println("Before motorSetup()");
+
+  // Setup Motors
+  motorSetup();
+
   // Setup Encoders
   encoderSetup(LEFT, LEFT_ENCODER_PIN_A, LEFT_ENCODER_PIN_B);
   encoderSetup(RIGHT, RIGHT_ENCODER_PIN_A, RIGHT_ENCODER_PIN_B);
-  
+
   // Initialize Localization subsystem
-  initializeLocalization();
+  //initializeLocalization();
 
   // Initialize Strategy subsystem
-  initializeStrategy();
+  //initializeStrategy();
 
-  // Initialize Control subsystem (includes motors)
+  Serial.println("Starting Control");
+
+  // Initialize Control subsystem
   initializeControl();
 
-  // Start main loop
+  Serial.println("Control Started");
+
+  Serial.println("Staring Main");  
+
+  // // Start main loop
   Timer0.attachInterrupt(main_loop);
   Timer0.start(MAIN_LOOP_TIME);
+
+  Serial.println("Main Started");
 }
 
 
 void main_loop() {
+  static int MAX_SPEED = 100;
+  static int MIN_SPEED = 50;
 
   // Initialize variables
   static sensor_t sensor_data[NUM_SENSORS];
   static double left_distance;
   static double right_distance;
-  static double left_speed;
-  static double right_speed;
+  static double left_speed = MAX_SPEED;
+  static double right_speed = MIN_SPEED;
   static gaussian_location_t next_location;
 
   // Get sensor data
-  if (!readSensors(sensor_data)){
-    // throw error and log to serial
-  }
+  // if (!readSensors(sensor_data)){
+  //   // throw error and log to serial
+  // }
 
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
@@ -95,8 +108,16 @@ void main_loop() {
   // Run predictions through the kalman filter (motion step)
   //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
 
+  left_speed--;
+
   // Set speed using the motor controllers (pid loop)
-  //setSpeedPID(left_speed, right_speed);
+  setSpeedPID(left_speed, right_speed);
+
+//  Serial.print("Distance: ");
+//  Serial.print(left_distance);
+//  Serial.print(" Speed: ");
+//  Serial.println(left_speed);
+
 }
 
 /* This function is not in use because we would like to control the timing that the loop is called */
