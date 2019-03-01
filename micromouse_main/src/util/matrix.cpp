@@ -5,7 +5,7 @@ matrix_t<cols, rows> matrix<cols, rows>::operator +(const matrix_t<cols, rows> o
     matrix_t<cols, rows> res;
     for (int j = cols - 1; j >= 0; --j) {
         for (int i = rows - 1; i >= 0; --i) {
-            rows.data[j][i] = data[j][i] + other.data[j][i];
+            res.data[j][i] = data[j][i] + other.data[j][i];
         }
     }
     return res;
@@ -16,19 +16,20 @@ matrix_t<cols, rows> matrix<cols, rows>::operator -(const matrix_t<cols, rows> o
     matrix_t<cols, rows> res;
     for (int j = cols - 1; j >= 0; --j) {
         for (int i = rows - 1; i >= 0; --i) {
-            rows.data[j][i] = data[j][i] - other.data[j][i];
+            res.data[j][i] = data[j][i] - other.data[j][i];
         }
     }
     return res;
 }
 
-template <int cols, int mid, int rows>
-matrix_t<cols, rows> matrix<cols, mid>::operator *(const matrix_t<mid, rows> other) const {
-    matrix_t<cols, rows> res;
+template <int cols, int rows>
+template <int rhs>
+matrix_t<cols, rhs> matrix<cols, rows>::operator *(const matrix_t<rows, rhs> other) const {
+    matrix_t<cols, rhs> res;
     for (int j = cols - 1; j >= 0; --j) {
-        for (int i = rows - 1; i >= 0; --i) {
+        for (int i = rhs - 1; i >= 0; --i) {
             res[j][i] = 0;
-            for (int k = mid - 1; k >= 0; --k) {
+            for (int k = rows - 1; k >= 0; --k) {
                 res[j][i] += data[j][k] * other.data[k][i];
             }
         }
@@ -41,7 +42,7 @@ matrix_t<cols, rows> matrix<cols, rows>::operator *(double scalar) const {
     matrix_t<cols, rows> res;
     for (int j = cols - 1; j >= 0; --j) {
         for (int i = rows - 1; i >= 0; --i) {
-            rows.data[j][i] = data[j][i] * scalar;
+            res.data[j][i] = data[j][i] * scalar;
         }
     }
     return res;
@@ -56,7 +57,7 @@ column_vector_t<rows> matrix<cols, rows>::operator [](int col) const {
 }
 
 template <int rows>
-column_vector<rows>::column_vector() : data(double[rows] {0}) {
+column_vector<rows>::column_vector() : data({0}) {
 }
 
 template <int rows>

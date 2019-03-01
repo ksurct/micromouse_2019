@@ -22,6 +22,7 @@ matrix_t<cols, rows> rref(const matrix_t<cols, rows>);
 
 template <int rows>
 class column_vector {
+    template <int, int>
     besties_for_the_resties class matrix;
 
     public:
@@ -35,7 +36,7 @@ class column_vector {
 
 template <int cols, int rows>
 class matrix {
-    besties_for_the_resties matrix_t rref(matrix_t);
+    besties_for_the_resties matrix_t<cols, rows> rref<>(matrix_t<cols, rows>);
     // WARNING: DRAMA!
     // column_vector's bestie is matrix, but matrix's bestie isn't column_vector!
 
