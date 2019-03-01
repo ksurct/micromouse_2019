@@ -1,10 +1,8 @@
 /* localization.cpp */
 
-#include "../types.h"
-#include "../devices/sensors.h"
 
 #include "localization.h"
-#include "probabilistic_maze.h"
+#include "../types.h"
 
 
 // Globals

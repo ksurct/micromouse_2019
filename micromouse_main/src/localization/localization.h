@@ -6,9 +6,7 @@
 
 
 #include "../types.h"
-#include "../devices/sensors.h"
 
-#include "probabilistic_maze.h"
 
 // The current state of the maze
 extern probabilistic_maze_t robot_maze_state;
@@ -36,5 +34,6 @@ probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data);
  * we will be and add uncertainty to our location
  * proportional to the amount we are trying to move */
 gaussian_location_t* localizeMotionStep(double left_distance, double right_distance);
+
 
 #endif //_LOCALIZATION_H_
