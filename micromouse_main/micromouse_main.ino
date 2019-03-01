@@ -1,5 +1,6 @@
 /* Micromouse 2019 */
 
+
 // Libraries
 #include <DueTimer.h>
 
@@ -14,15 +15,14 @@
 
 // Subsystems
 #include "src/localization/localization.h"
-#include "src/localization/probabilistic_maze.h"
 
 #include "src/strategy/strategy.h"
 
 #include "src/control/control.h"
 
-
 // Utilities
 #include "src/util/conversions.h"
+
 
 // Function Declarations
 void setup(void);

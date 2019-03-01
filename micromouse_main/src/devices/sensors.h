@@ -23,7 +23,7 @@
 
 
 #include "Adafruit_VL6180X.h"
-#include "../settings.h"
+
 #include "../types.h"
 
 

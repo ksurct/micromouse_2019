@@ -3,6 +3,7 @@
 
 #include "sensors.h"
 #include "../settings.h"
+#include "../types.h"
 
 
 /* Sensor type to hold data about sensors */
