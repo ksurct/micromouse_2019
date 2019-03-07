@@ -10,18 +10,6 @@
 
 // Devices
 #include "src/devices/sensors.h"
-#include "src/devices/motors.h"
-#include "src/devices/encoders.h"
-
-// Subsystems
-#include "src/localization/localization.h"
-
-#include "src/strategy/strategy.h"
-
-#include "src/control/control.h"
-
-// Utilities
-#include "src/util/conversions.h"
 
 
 // Function Declarations
@@ -38,24 +26,8 @@ void setup() {
 
   // Setup Sensors
   if (! sensorSetup()){
-    // Throw error? Serial message maybe?
+    Serial.println("Sensors not found!");
   }
-
-  // Setup Motors
-  motorSetup();
-
-  // Setup Encoders
-  encoderSetup(LEFT, LEFT_ENCODER_PIN_A, LEFT_ENCODER_PIN_B);
-  encoderSetup(RIGHT, RIGHT_ENCODER_PIN_A, RIGHT_ENCODER_PIN_B);
-
-  // Initialize Localization subsystem
-  initializeLocalization();
-
-  // Initialize Strategy subsystem
-  initializeStrategy();
-
-  // Initialize Control subsystem
-  initializeControl();
 
   // // Start main loop
   Timer0.attachInterrupt(main_loop);
@@ -67,36 +39,39 @@ void main_loop() {
 
   // Initialize variables
   static sensor_reading_t sensor_data[NUM_SENSORS];
-  static double left_distance;
-  static double right_distance;
-  static double left_speed;
-  static double right_speed;
-  static gaussian_location_t next_location;
 
   // Get sensor data
   readSensors(sensor_data);
 
-  // Get distance travelled from control subsystem
-  distanceTravelled(&left_distance, &right_distance);
+  for(int i = 0; i < NUM_SENSORS; i++) {
+    Serial.print("Sensor ");
+    Serial.print(i);
+    Serial.print(": \t");
+    Serial.print(sensor_data[i].distance);
+    Serial.print(", \t");
+    switch(sensor_data[i].state) {
+      case good:       // Successful reading
+        Serial.print("good");
+        break;
+      case too_far:    // Object to far to detect
+        Serial.print("too_far");
+        break;
+      case too_close:  // Object to close to detect
+        Serial.print("too_close");
+        break;
+      case waiting:    // Sensor has no measurement yet, disregard distance
+        Serial.print("waiting");
+        break;
+      case error:      // Error in reading, disregard distance
+        Serial.print("error");
+        break;
+      default:
+        Serial.print("WHAT THE FREAK!!!");
+        break;
+    }
 
-  // Interpolate sensor and encoder data together using a kalman filter (measurement step)
-  //localizeMeasureStep(sensor_data, left_distance, right_distance);
-
-  // Update maze with sensor readings
-  //mazeMapping(sensor_data);
-
-  // Determine next cell to go to (strategy step)
-  //strategy(&robot_location, &robot_maze_state, &next_location);
-  
-  // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-  //calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
-
-  // Run predictions through the kalman filter (motion step)
-  //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
-
-  // Set speed using the motor controllers (pid loop)
-  setSpeedPID(left_speed, right_speed);
-
+    Serial.println();
+  }
 }
 
 /* This function is not in use because we would like to control the timing that the loop is called */
