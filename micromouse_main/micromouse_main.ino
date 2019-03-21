@@ -26,7 +26,7 @@ void setup() {
 
   // Setup Sensors
   if (! sensorSetup()){
-    Serial.println("Sensors not found!");
+    Serial.println("Error connecting to sensors!");
   }
 
   // // Start main loop
