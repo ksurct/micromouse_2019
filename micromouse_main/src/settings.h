@@ -60,21 +60,19 @@
 #define RIGHT_MOTOR_PIN_B   5       //dummy value
 
 // Sensors
-#define I2C_RESET_PIN   3       //dummy value
+#define I2C_RESET_PIN   31
 #define TCAADDR         0x70
 #define NUM_SENSORS     5
-#define SENSOR_0_ADDR   0x00    //dummy value
-#define SENSOR_0_PIN    0       //dummy value
-#define SENSOR_1_ADDR   0x01    //dummy value
-#define SENSOR_1_PIN    1       //dummy value
-#define SENSOR_2_ADDR   0x02    //dummy value
-#define SENSOR_2_PIN    2       //dummy value
-#define SENSOR_3_ADDR   0x03    //dummy value
-#define SENSOR_3_PIN    3       //dummy value
-#define SENSOR_4_ADDR   0x04    //dummy value
-#define SENSOR_4_PIN    4       //dummy value
-#define SENSOR_5_ADDR   0x05    //dummy value
-#define SENSOR_5_PIN    5       //dummy value
+#define SENSOR_0_ADDR   0x00
+#define SENSOR_0_PIN    22
+#define SENSOR_1_ADDR   0x01
+#define SENSOR_1_PIN    33
+#define SENSOR_2_ADDR   0x02
+#define SENSOR_2_PIN    41
+#define SENSOR_3_ADDR   0x03
+#define SENSOR_3_PIN    53
+#define SENSOR_4_ADDR   0x04
+#define SENSOR_4_PIN    29
 
 
 #endif //_SETTINGS_H_

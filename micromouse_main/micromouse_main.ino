@@ -38,7 +38,7 @@ void setup() {
 
   // Setup Sensors
   if (! sensorSetup()){
-    // Throw error? Serial message maybe?
+    Serial.println("Error connecting to sensors!");
   }
 
   // Setup Motors

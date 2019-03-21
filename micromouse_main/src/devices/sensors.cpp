@@ -1,6 +1,8 @@
 /* sensors.cpp */
 
 
+#include <Arduino.h>
+
 #include "sensors.h"
 #include "../settings.h"
 #include "../types.h"
@@ -64,19 +66,33 @@ void tcaselect(unsigned char i) {
     Wire.endTransmission();
 }
 
+/* Sensor interrupts */
+void sensorISR0() { sensors[0].needsUpdated = true; }
+void sensorISR1() { sensors[1].needsUpdated = true; }
+void sensorISR2() { sensors[2].needsUpdated = true; }
+void sensorISR3() { sensors[3].needsUpdated = true; }
+void sensorISR4() { sensors[4].needsUpdated = true; }
+
 bool sensorSetup() {
 
     Wire.begin(); // Important, we need this for tcaselect to work!
 
+    bool found = true;
+
     for (int i = 0; i < NUM_SENSORS; i++){
         tcaselect(sensors[i].address);
         if (! vl6180x.begin()) {
-            return false;
+            found = false;
         }
     }
 
-    // TODO register interrupts
-    return true;
+    attachInterrupt(digitalPinToInterrupt(sensors[0].address), sensorISR0, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[1].address), sensorISR1, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[2].address), sensorISR2, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[3].address), sensorISR3, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[4].address), sensorISR4, RISING);
+
+    return found;
 }
 
 void readSensors(sensor_reading_t* sensor_data) {
