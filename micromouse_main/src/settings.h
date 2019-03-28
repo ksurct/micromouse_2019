@@ -76,5 +76,5 @@
 #define SENSOR_5_ADDR   0x05    //dummy value
 #define SENSOR_5_PIN    5       //dummy value
 
-
+#define PI 3.14159265358979323846264
 #endif //_SETTINGS_H_

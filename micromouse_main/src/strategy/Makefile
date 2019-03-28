@@ -10,5 +10,5 @@ clean:
 test: all
 	./strategy_test
 
-strategy_test: strategy.o strategy_test.o
-	$(CXX) -o $@ $^
+strategy_test: strategy.o strategy_test.o ../localization/probabilistic_maze.o
+	$(CXX) -g -o $@ $^

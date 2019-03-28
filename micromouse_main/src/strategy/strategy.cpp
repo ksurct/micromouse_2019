@@ -5,12 +5,15 @@
 #include "../types.h"
 #include "../settings.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 
-/* Simple representation of a cell 
+
+/* Simple representation of a cell
  *  - For use with probabilistic_maze_t */
 typedef struct {
    int x;
-   int y; 
+   int y;
 } cell_t;
 
 
@@ -35,18 +38,18 @@ int values[MAZE_WIDTH][MAZE_HEIGHT];
 /* initialize strategy
  * Initializes the maze solving algorithm */
 void initializeStrategy(void) {
-    
+
     resetValues();
 }
 
 /* strategy
  * Given the robots location and the state of the maze calculate the next location to go to */
 void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* robot_maze_state, gaussian_location_t* next_location) {
-    
+    printf("check 1");
     // Get the current cell
     cell_t robot_cell;
     convertLocationToCell(robot_location, &robot_cell);
-
+    printf("check 2");
     // Rest values to MAX_VALUE
     resetValues();
 
@@ -64,7 +67,7 @@ void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* robot_m
  * Implements the floodfill algorithm on the 2d-array values
  * Values should be set to numbers higher than possible to have */
 void floodfill(probabilistic_maze_t* robot_maze_state, cell_t* cell, int value) {
-    
+
     // base case, outside of maze (shouldn't ever happen)
     // remove if it is guaranteed that all outside walls will be > WALL_THRESHOLD
     if (cell->x < 0 || cell->x >= MAZE_WIDTH || cell->y < 0 || cell->y >= MAZE_HEIGHT) {
@@ -76,7 +79,7 @@ void floodfill(probabilistic_maze_t* robot_maze_state, cell_t* cell, int value) 
         values[cell->x][cell->y] = value;
 
     // Check each direction from this cell and floodfill it
-    
+
     // Check North
     if (robot_maze_state->cells[cell->x][cell->y].north->exists < WALL_THRESHOLD) {
         cell->y--; // North one
@@ -97,7 +100,7 @@ void floodfill(probabilistic_maze_t* robot_maze_state, cell_t* cell, int value) 
         floodfill(robot_maze_state, cell, value + 1);
         cell->y--;
     }
-    
+
     // Check West
     if (robot_maze_state->cells[cell->x][cell->y].west->exists < WALL_THRESHOLD) {
         cell->x--; // West one
@@ -159,7 +162,7 @@ cell_t chooseNextCell(probabilistic_maze_t* robot_maze_state, cell_t* robot_cell
         next_cell.x = x - 1;
         next_cell.y = y;
     }
-    
+
     return next_cell;
 }
 

@@ -6,26 +6,32 @@
 
 
 TEST_FUNC_BEGIN {
-    
-    // Setup a maze to test with
-    probabilistic_maze_t maze;
-    initializeMaze(&maze);
-
-    // Initialize a location to test with
-    gaussian_location_t location;
-    location.x.mean = 100.0f;
-    location.x.sigma2 = 10.0f;
-    location.y.mean = 100.0f;
-    location.y.sigma2 = 10.0f;
-    location.theta.mean = 0.0f;
-    location.theta.sigma2 = 10.0f;
-
-
-    // Setup strategy
     initializeStrategy();
-    
 
-    // 
+    gaussian_location_t robot_location;
+    robot_location.x.mean = 0.0;
+    robot_location.y.mean = 0.0;
+    robot_location.theta.mean = PI/2;
+
+    gaussian_location_t next_location;
+    next_location.x.mean = 1.0;
+    next_location.y.mean = 0.0;
+    next_location.theta.mean = 0.0;
+
+    probabilistic_maze_t robot_maze_state;
+    initializeMaze(&robot_maze_state);
+
+    while ((next_location.x.mean != 7.0) || (next_location.y.mean != 7.0))
+    {
+        printf("Hello there\n");
+        printf("%f, %f\n",robot_location.x.mean, robot_location.y.mean);
+        strategy(&robot_location, &robot_maze_state, &next_location);
+        printf("General Kenobi\n");
+        robot_location = next_location;
+    }
+
+
+    TEST_FAIL("no tests written yet!!!");
 
 
 
