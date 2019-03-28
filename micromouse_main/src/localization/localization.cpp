@@ -25,17 +25,21 @@ void initializeLocalization() {
     robot_location.theta.sigma2 = INIT_THETA_SIGMA2;
 }
 
+/* localize motion step */
+gaussian_location_t* localize_motion_step(double left_distance, double right_distance) {
+    
+    // Calculate the motion mean and covariance matrix
+    
+    // Update the current location and covariance matrix based on the distance travelled
+
+}
+
 /* localize measure step */
-gaussian_location_t* localize_measure_step(sensor_reading_t* sensor_data, double left_distance, double right_distance) {
+gaussian_location_t* localize_measure_step(sensor_reading_t* sensor_data) {
     // dothething();
 }
 
 probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data) {
-    // dothething();
-}
-
-/* localize motion step */
-gaussian_location_t* localize_motion_step(double left_distance, double right_distance) {
     // dothething();
 }
 
