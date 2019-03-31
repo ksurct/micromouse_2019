@@ -108,10 +108,10 @@ void main_loop() {
   // Run predictions through the kalman filter (motion step)
   //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
 
-  left_speed--;
+  
 
   // Set speed using the motor controllers (pid loop)
-  setSpeedPID(left_speed, right_speed);
+  setSpeedPID(MAX_SPEED, 0);
 
 //  Serial.print("Distance: ");
 //  Serial.print(left_distance);

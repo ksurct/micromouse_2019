@@ -18,7 +18,7 @@
 
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
-#define TICKS_PER_REVOLUTION    3575.0855   // Number to encoder ticks per one revolution of a wheel
+#define TICKS_PER_REVOLUTION    1808.3333   // Number to encoder ticks per one revolution of a wheel
 
 // Localization
 #define INIT_X_MEAN         100.0   //dummy value (in mm)
@@ -39,7 +39,7 @@
 // Control
 #define CONTROL_LOOP_TIME   5000    // Delay between start times of control loop in microseconds
 #define TAU_P               0.05    // Proportional Gain
-#define TAU_I               0.001   // Integral Gain
+#define TAU_I               0       // Integral Gain
 #define INT_BOUND           100     // Integral Bound
 
 // Encoders
@@ -54,10 +54,10 @@
 #define RESOLUTION_BITS     8       // Number of bits to use in analogWrite()
 #define MAX_PWM_OUTPUT      255     // Should be 2^(RESOLUTION_BITS) - 1
 #define MIN_PWM_OUTPUT      50      // Lowest PWM value that the motors can handle
-#define LEFT_MOTOR_PIN_A    3       //dummy value
-#define LEFT_MOTOR_PIN_B    6       //dummy value
-#define RIGHT_MOTOR_PIN_A   4       //dummy value
-#define RIGHT_MOTOR_PIN_B   5       //dummy value
+#define LEFT_MOTOR_PIN_A    12
+#define LEFT_MOTOR_PIN_B    13
+#define RIGHT_MOTOR_PIN_A   5
+#define RIGHT_MOTOR_PIN_B   6
 
 // Sensors
 #define I2C_RESET_PIN   3 //dummy value
