@@ -1,5 +1,6 @@
 /* control.cpp */
 
+#include <Arduino.h>
 
 // Libraries
 #include <DueTimer.h>
@@ -35,10 +36,9 @@ volatile controller_state_t controllers[] = {
 /* initialize control
  * starts the PID loop with a speed of 0 on each motor */
 void initializeControl(void) {
+    pinMode(8, OUTPUT);
     setSpeedPID(0.0, 0.0);
-
-    Timer1.attachInterrupt(speedController);
-    Timer1.start(CONTROL_LOOP_TIME);
+    Timer2.attachInterrupt(speedController).start(CONTROL_LOOP_TIME);
 }
 
 /* distance travelled
@@ -71,33 +71,28 @@ void setSpeedPID(double left_speed, double right_speed){
 /* speed controller
  * This function is a ISR to run the PID loop for both controllers */
 void speedController(void) {
-    
-    static unsigned long prev_time = micros();
+    // digitalWrite(8, HIGH); // For debuging
 
+    static unsigned long prev_time = micros();
     int ticks;
     double cur_speed;
     double error;
     double output; // Value between 0 and 1
     unsigned long cur_time = micros();
 
-    for (int i = 0; i < 2; i++){
+    for (int i = 0; i < 2; i++) {
         // Read encoder ticks, and update ticks_travelled
         ticks = readEncoder(i);
         controllers[i].ticks_travelled += ticks;
-
         // Calculate Speed we are going in mm/sec
         cur_speed = ticksToMM(ticks) / ((double)(cur_time-prev_time) / 1000000);
-
         // calculate error
         error = cur_speed - controllers[i].set_speed;
-
         // add to integral error sum (bounded)
         if (controllers[i].int_error + error > -1 * INT_BOUND && controllers[i].int_error + error < INT_BOUND) {
             controllers[i].int_error += error;
         }
-
         output = (-1 * TAU_P * error) + (-1 * TAU_I * controllers[i].int_error);
-
         // Limit output between -1 and 1
         if (output > 1) output = 1;
         if (output < -1) output = -1;
@@ -105,4 +100,5 @@ void speedController(void) {
         setMotorPWM(i, output);
     }
     prev_time = cur_time;
+    // digitalWrite(8, LOW); // For debuging
 }

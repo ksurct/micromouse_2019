@@ -8,7 +8,7 @@
 #define DEBUG false
 
 // Main
-#define MAIN_LOOP_TIME 500000 // Delay between the start of each main_loop call in microseconds
+#define MAIN_LOOP_TIME 50000 // Delay between the start of each main_loop call in microseconds
 
 // Maze Specifications
 #define MAZE_WIDTH      16      // Number of cells wide
@@ -37,14 +37,14 @@
 #define MAX_VALUE       32767   // Maximum value that can be in values
 
 // Control
-#define CONTROL_LOOP_TIME   5000    // Delay between start times of control loop in microseconds
-#define TAU_P               0.05    // Proportional Gain
-#define TAU_I               0       // Integral Gain
-#define INT_BOUND           100     // Integral Bound
+#define CONTROL_LOOP_TIME   10000    // Delay between start times of control loop in microseconds
+#define TAU_P               0.015   // Proportional Gain
+#define TAU_I               0.001       // Integral Gain
+#define INT_BOUND           500     // Integral Bound
 
 // Encoders
-#define LEFT_ENCODER_PIN_A  48
-#define LEFT_ENCODER_PIN_B  49
+#define LEFT_ENCODER_PIN_A  49
+#define LEFT_ENCODER_PIN_B  48
 #define RIGHT_ENCODER_PIN_A 38
 #define RIGHT_ENCODER_PIN_B 40
 
@@ -54,8 +54,8 @@
 #define RESOLUTION_BITS     8       // Number of bits to use in analogWrite()
 #define MAX_PWM_OUTPUT      255     // Should be 2^(RESOLUTION_BITS) - 1
 #define MIN_PWM_OUTPUT      50      // Lowest PWM value that the motors can handle
-#define LEFT_MOTOR_PIN_A    12
-#define LEFT_MOTOR_PIN_B    13
+#define LEFT_MOTOR_PIN_A    13
+#define LEFT_MOTOR_PIN_B    12
 #define RIGHT_MOTOR_PIN_A   5
 #define RIGHT_MOTOR_PIN_B   6
 

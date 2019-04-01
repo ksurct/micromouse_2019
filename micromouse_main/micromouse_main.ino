@@ -41,11 +41,9 @@ void setup() {
   //   // Throw error? Serial message maybe?
   // }
 
-  Serial.println("Before motorSetup()");
-
   // Setup Motors
-  motorSetup();
-
+  //motorSetup();
+  
   // Setup Encoders
   encoderSetup(LEFT, LEFT_ENCODER_PIN_A, LEFT_ENCODER_PIN_B);
   encoderSetup(RIGHT, RIGHT_ENCODER_PIN_A, RIGHT_ENCODER_PIN_B);
@@ -55,26 +53,19 @@ void setup() {
 
   // Initialize Strategy subsystem
   //initializeStrategy();
-
-  Serial.println("Starting Control");
-
+  
   // Initialize Control subsystem
   initializeControl();
+  
+  Serial.println("Staring Main");
+  // Start main loop
+  Timer1.attachInterrupt(main_loop).start(MAIN_LOOP_TIME);
 
-  Serial.println("Control Started");
-
-  Serial.println("Staring Main");  
-
-  // // Start main loop
-  Timer0.attachInterrupt(main_loop);
-  Timer0.start(MAIN_LOOP_TIME);
-
-  Serial.println("Main Started");
+  //Serial.println("Main Started");
 }
 
-
 void main_loop() {
-  static int MAX_SPEED = 100;
+  static int MAX_SPEED = 275;
   static int MIN_SPEED = 50;
 
   // Initialize variables
@@ -82,7 +73,7 @@ void main_loop() {
   static double left_distance;
   static double right_distance;
   static double left_speed = MAX_SPEED;
-  static double right_speed = MIN_SPEED;
+  static double right_speed = -1 * MAX_SPEED;
   static gaussian_location_t next_location;
 
   // Get sensor data
@@ -108,10 +99,9 @@ void main_loop() {
   // Run predictions through the kalman filter (motion step)
   //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
 
-  
-
   // Set speed using the motor controllers (pid loop)
-  setSpeedPID(MAX_SPEED, 0);
+  setSpeedPID(left_speed--, right_speed++);
+  
 
 //  Serial.print("Distance: ");
 //  Serial.print(left_distance);

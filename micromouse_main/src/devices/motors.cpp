@@ -34,6 +34,7 @@ void motorSetup() {
     for (int i = 0; i < 2; i++) {
         setMotorPWM(i, 0.0);
     }
+    delay(10);
 }
 
 /* Sets the motor PWM for the specified motor
