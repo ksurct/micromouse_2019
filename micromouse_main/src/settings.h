@@ -21,12 +21,15 @@
 #define TICKS_PER_REVOLUTION    3575.0855   // Number to encoder ticks per one revolution of a wheel
 
 // Localization
-#define INIT_X_MEAN         100.0   //dummy value (in mm)
-#define INIT_X_SIGMA2       10.0    //dummy value (in mm)
-#define INIT_Y_MEAN         100.0   //dummy value (in mm)
-#define INIT_Y_SIGMA2       10.0    //dummy value (in mm)
-#define INIT_THETA_MEAN     0.0     //dummy value (in mm)
-#define INIT_THETA_SIGMA2   10.0    //dummy value (in mm)
+#define INIT_X_MU           100.0   //dummy value (in mm)
+#define INIT_X_SIGMA        10.0    //dummy value (in mm)
+#define INIT_XY_SIGMA       0       //dummy value (in mm)
+#define INIT_Y_MU           100.0   //dummy value (in mm)
+#define INIT_Y_SIGMA        10.0    //dummy value (in mm)
+#define INIT_THETA_MU       0.0     //dummy value (in mm)
+#define INIT_THETA_SIGMA    10.0    //dummy value (in mm)
+
+#define ENCODER_SIGMA       0.2     // dummy value (in mm per mm travelled)
 
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate

@@ -17,12 +17,13 @@ void initializeLocalization() {
     initializeMaze(&robot_maze_state);
 
     // Initialize robot_location
-    robot_location.x.mean = INIT_X_MEAN;
-    robot_location.x.sigma2 = INIT_X_SIGMA2;
-    robot_location.y.mean = INIT_Y_MEAN;
-    robot_location.y.sigma2 = INIT_Y_SIGMA2;
-    robot_location.theta.mean = INIT_THETA_MEAN;
-    robot_location.theta.sigma2 = INIT_THETA_SIGMA2;
+    robot_location.x_mu = INIT_X_MU;
+    robot_location.x_sigma = INIT_X_SIGMA;
+    robot_location.xy_sigma = INIT_XY_SIGMA;
+    robot_location.y_mu = INIT_Y_MU;
+    robot_location.y_sigma = INIT_Y_SIGMA;
+    robot_location.theta_mu = INIT_THETA_MU;
+    robot_location.theta_sigma = INIT_THETA_SIGMA;
 }
 
 /* localize motion step */

@@ -5,12 +5,8 @@
 #define _GAUSSIAN_LOCATION_H_
 
 
-/* Holds a gaussian value */
-typedef struct {
-    double mean;
-    double sigma2;
-} gaussian_t;
-
+/* Set the location type to double */
+typedef double location_t;
 
 /* gaussian_location_t
  * Defines the location of the robot in mm from
@@ -28,9 +24,13 @@ typedef struct {
  * 
  * */
 typedef struct {
-    gaussian_t x;
-    gaussian_t y;
-    gaussian_t theta;
+    location_t x_mu;           /* Mean x location */
+    location_t y_mu;           /* Mean y location */
+    location_t theta_mu;       /* Mean theta location */
+    location_t x_sigma;       /* Covariance in x */
+    location_t xy_sigma;      /* Covariance in x and y */
+    location_t y_sigma;       /* Covariance in y */
+    location_t theta_sigma;   /* Covariance in theta */
 } gaussian_location_t;
 
 #endif //_GAUSSIAN_LOCATION_H_
