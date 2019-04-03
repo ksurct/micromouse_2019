@@ -1,12 +1,15 @@
 /* localization.cpp */
 
 
-#include <Arduino.h>
 #include <math.h>
 
 #include "localization.h"
 #include "../types.h"
 
+
+// From Ardunio.h:
+#define TWO_PI 6.283185307179586476925286766559
+#define abs(x) ((x)>0?(x):-(x))
 
 #define ENCODER_VARIANCE(d) (((ENCODER_VARIANCE_PER_MM) * abs(d)) + (ENCODER_VARIANCE_BASE))
 
@@ -16,10 +19,7 @@ probabilistic_maze_t robot_maze_state;
 gaussian_location_t robot_location;
 
 
-// Private Functions
-void calculateMotion(gaussian_location_t* motion, double left_distance, double right_distance);
-void addMotion(gaussian_location_t* motion);
-
+/*----------- Public Functions -----------*/
 
 /* initialize localization */
 void initializeLocalization() {
@@ -61,6 +61,9 @@ gaussian_location_t* localizeMeasureStep(sensor_reading_t* sensor_data) {
     // dothething();
 }
 
+
+/*----------- Private Functions -----------*/
+
 void calculateMotion(gaussian_location_t* motion, double left_distance, double right_distance) {
 
     /* Run the motion through the system model */
@@ -97,12 +100,52 @@ void calculateMotion(gaussian_location_t* motion, double left_distance, double r
 
     motion->x_sigma = X_VARIANCE * ENCODER_VARIANCE(distance_travelled);
     motion->y_sigma = Y_VARIANCE * ENCODER_VARIANCE(distance_travelled);
+    motion->xy_sigma = 0;
     motion->theta_sigma = THETA_VARIANCE * ENCODER_VARIANCE(distance_travelled);
 
-    
-    
+    // rotate covariance by motion->theta_mu
+    rotateCovariance(motion->theta_mu, &motion->x_sigma, &motion->y_sigma, &motion->xy_sigma);
+}
+
+/* Rotate the covariance matrix described by x_sigma, y_sigma, and xy_sigma
+ * Assumes xy_sigma starts as 0 */
+void rotateCovariance(double rotate_by, double* x_sigma, double* y_sigma, double* xy_sigma) {
+
+    /* Rotation matrix
+        R:  [r1, r2]
+            [r3, r4]    */
+    double r1 = cos(rotate_by);
+    double r2 = -1 * sin(rotate_by);
+    double r3 = sin(rotate_by);
+    double r4 = cos(rotate_by);
+
+    // Rotate with: R * Sigma * R'
+    *x_sigma = (r1 * r1 * (*x_sigma)) + (r2 * r2 * (*y_sigma));
+    *y_sigma = (r3 * r3 * (*x_sigma)) + (r4 * r4 * (*y_sigma));
+    *xy_sigma = (r1 * r3 * (*x_sigma)) + (r2 * r4 * (*y_sigma));
 }
 
 void addMotion(gaussian_location_t* motion) {
     
+    /* Add in the mean of motion to the mean of robot_location */
+
+    robot_location.theta_mu = robot_location.theta_mu + motion->theta_mu;
+
+    // Limit robot_location.theta_mu to be between 0 and 2 pi
+    while (robot_location.theta_mu < 0) {
+        robot_location.theta_mu = robot_location.theta_mu + TWO_PI;
+    }
+
+    while (robot_location.theta_mu > TWO_PI) {
+        robot_location.theta_mu = robot_location.theta_mu - TWO_PI;
+    }
+
+    robot_location.x_mu = robot_location.x_mu + motion->x_mu * (cos(robot_location.theta_mu) - sin(robot_location.theta_mu));
+    robot_location.y_mu = robot_location.y_mu + motion->y_mu * (sin(robot_location.theta_mu) + cos(robot_location.theta_mu));
+
+    
+    /* Add in the covariance */
+
+
 }
+

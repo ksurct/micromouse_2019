@@ -33,6 +33,10 @@
 #define ENCODER_VARIANCE_BASE   2.0
 #define ENCODER_VARIANCE_PER_MM 0.2
 
+#define X_VARIANCE      1   //dummy value
+#define Y_VARIANCE      1   //dummy value
+#define THETA_VARIANCE  1   //dummy value
+
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
