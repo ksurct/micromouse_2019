@@ -13,6 +13,7 @@ typedef struct {
     unsigned char address;
     unsigned char interruptPin;
     bool needsUpdated;
+    bool setup;
 } sensor_t;
 
 
@@ -27,27 +28,32 @@ sensor_t sensors[NUM_SENSORS] = {
     {
         .address = SENSOR_0_ADDR,
         .interruptPin = SENSOR_0_PIN,
-        .needsUpdated = false
+        .needsUpdated = false,
+        .setup = false
     },
     {
         .address = SENSOR_1_ADDR,
         .interruptPin = SENSOR_1_PIN,
-        .needsUpdated = false
+        .needsUpdated = false,
+        .setup = false
     },
     {
         .address = SENSOR_2_ADDR,
         .interruptPin = SENSOR_2_PIN,
-        .needsUpdated = false
+        .needsUpdated = false,
+        .setup = false
     },
     {
         .address = SENSOR_3_ADDR,
         .interruptPin = SENSOR_3_PIN,
-        .needsUpdated = false
+        .needsUpdated = false,
+        .setup = false
     },
     {
         .address = SENSOR_4_ADDR,
         .interruptPin = SENSOR_4_PIN,
-        .needsUpdated = false
+        .needsUpdated = false,
+        .setup = false
     }
 };
 
@@ -55,11 +61,11 @@ sensor_t sensors[NUM_SENSORS] = {
 void tcaselect(unsigned char i) {
     if (i > 7) return;
 
-    { // Is this section necessary?
-        digitalWrite(I2C_RESET_PIN, LOW);
-        delay(1);
-        digitalWrite(I2C_RESET_PIN, HIGH);
-    }
+    // { // Is this section necessary?
+    //     digitalWrite(I2C_RESET_PIN, LOW);
+    //     delay(1);
+    //     digitalWrite(I2C_RESET_PIN, HIGH);
+    // }
     
     Wire.beginTransmission(TCAADDR);
     Wire.write(1 << i);
@@ -75,13 +81,20 @@ void sensorISR4() { sensors[4].needsUpdated = true; }
 
 bool sensorSetup() {
 
+    pinMode(50, OUTPUT);
+    digitalWrite(50, HIGH);
+    digitalWrite(50, LOW);
+    digitalWrite(50, HIGH);
+
+    pinMode(I2C_RESET_PIN, INPUT_PULLUP);
+
     Wire.begin(); // Important, we need this for tcaselect to work!
 
     bool found = true;
 
     for (int i = 0; i < NUM_SENSORS; i++){
         tcaselect(sensors[i].address);
-        if (! vl6180x.begin()) {
+        if (!(sensors[i].setup = vl6180x.begin())) {
             Serial.print("Sensor ");
             Serial.print(i);
             Serial.println(" was not found");
@@ -90,12 +103,12 @@ bool sensorSetup() {
     }
 
     // TODO register interrupts
+    delay(50);
     attachInterrupt(digitalPinToInterrupt(sensors[0].address), sensorISR0, RISING);
     attachInterrupt(digitalPinToInterrupt(sensors[1].address), sensorISR1, RISING);
     attachInterrupt(digitalPinToInterrupt(sensors[2].address), sensorISR2, RISING);
     attachInterrupt(digitalPinToInterrupt(sensors[3].address), sensorISR3, RISING);
     attachInterrupt(digitalPinToInterrupt(sensors[4].address), sensorISR4, RISING);
-    
 
     return found;
 }
@@ -104,7 +117,7 @@ void readSensors(sensor_reading_t* sensor_data) {
 
     for (int i = 0; i < NUM_SENSORS; i++) {
         
-        if (sensors[i].needsUpdated) {
+        if (sensors[i].needsUpdated && sensors[i].setup) {
             
             tcaselect(sensors[i].address);
             sensor_data[i].distance = vl6180x.readRange();
@@ -112,7 +125,7 @@ void readSensors(sensor_reading_t* sensor_data) {
             sensors[i].needsUpdated = false;
 
         } else {
-            sensor_data[i].distance = 0;
+            sensor_data[i].distance = -1;
             sensor_data[i].state = waiting;
         }
     }

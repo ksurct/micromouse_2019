@@ -1,6 +1,5 @@
 /* Micromouse 2019 */
 
-
 // Libraries
 #include <DueTimer.h>
 
@@ -25,23 +24,23 @@ void setup() {
   Serial.begin(115200);
 
   // Setup Sensors
-  if (! sensorSetup()){
+  if (!sensorSetup()){
     Serial.println("Error connecting to sensors!");
   }
 
   // // Start main loop
-  Timer0.attachInterrupt(main_loop);
-  Timer0.start(MAIN_LOOP_TIME);
-}
-
-
-void main_loop() {
+  // Timer1.attachInterrupt(main_loop);
+  // Timer1.start(MAIN_LOOP_TIME);
 
   // Initialize variables
   static sensor_reading_t sensor_data[NUM_SENSORS];
 
+  Serial.println("Hello");
+
   // Get sensor data
   readSensors(sensor_data);
+
+  Serial.println("Hello");
 
   for(int i = 0; i < NUM_SENSORS; i++) {
     Serial.print("Sensor ");
@@ -72,6 +71,12 @@ void main_loop() {
 
     Serial.println();
   }
+}
+
+
+void main_loop() {
+
+  
 }
 
 /* This function is not in use because we would like to control the timing that the loop is called */
