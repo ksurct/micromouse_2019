@@ -19,6 +19,7 @@
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
 #define TICKS_PER_REVOLUTION    3575.0855   // Number to encoder ticks per one revolution of a wheel
+#define WHEEL_BASE_LENGTH       100         //dummy value (in mm)
 
 // Localization
 #define INIT_X_MU           100.0   //dummy value (in mm)
@@ -29,7 +30,8 @@
 #define INIT_THETA_MU       0.0     //dummy value (in mm)
 #define INIT_THETA_SIGMA    10.0    //dummy value (in mm)
 
-#define ENCODER_SIGMA       0.2     // dummy value (in mm per mm travelled)
+#define ENCODER_VARIANCE_BASE   2.0
+#define ENCODER_VARIANCE_PER_MM 0.2
 
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate

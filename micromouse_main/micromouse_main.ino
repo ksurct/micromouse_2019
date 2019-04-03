@@ -80,7 +80,7 @@ void main_loop() {
   distanceTravelled(&left_distance, &right_distance);
 
   // Run distances through localization
-  //localizeMotionStep(left_distance, right_distance);
+  localizeMotionStep(left_distance, right_distance);
   
   // Update maze with sensor readings
   //mazeMapping(sensor_data);

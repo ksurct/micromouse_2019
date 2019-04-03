@@ -24,16 +24,16 @@ void initializeLocalization(void);
  * proportional to the amount we are trying to move */
 gaussian_location_t* localizeMotionStep(double left_distance, double right_distance);
 
+/* maze mapping
+ * Using the sensor data and the current location,
+ * update the robot_maze_state */
+probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data);
+
 /* localize measure step
  * Using the data from the sensors, our old location
  * and the state of the maze, determine our current
  * location and update robot_location */
 gaussian_location_t* localizeMeasureStep(sensor_reading_t* sensor_data);
-
-/* maze mapping
- * Using the sensor data and the current location,
- * update the robot_maze_state */
-probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data);
 
 
 #endif //_LOCALIZATION_H_
