@@ -61,7 +61,7 @@
 
 // Sensors
 #define I2C_RESET_PIN   34
-#define TCAADDR         0x70
+#define TCAADDR         0x77
 #define NUM_SENSORS     5
 #define SENSOR_0_ADDR   0x00
 #define SENSOR_0_PIN    22

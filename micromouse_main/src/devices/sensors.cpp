@@ -61,15 +61,14 @@ sensor_t sensors[NUM_SENSORS] = {
 void tcaselect(unsigned char i) {
     if (i > 7) return;
 
-    // { // Is this section necessary?
-    //     digitalWrite(I2C_RESET_PIN, LOW);
-    //     delay(1);
-    //     digitalWrite(I2C_RESET_PIN, HIGH);
-    // }
+    digitalWrite(I2C_RESET_PIN, LOW);
+    delay(1);
+    digitalWrite(I2C_RESET_PIN, HIGH);
     
     Wire.beginTransmission(TCAADDR);
     Wire.write(1 << i);
     Wire.endTransmission();
+    delay(1);
 }
 
 /* Sensor interrupts */
@@ -86,7 +85,10 @@ bool sensorSetup() {
     digitalWrite(50, LOW);
     digitalWrite(50, HIGH);
 
-    pinMode(I2C_RESET_PIN, INPUT_PULLUP);
+    Wire.setClock(10000);
+
+    pinMode(I2C_RESET_PIN, OUTPUT);
+    digitalWrite(I2C_RESET_PIN, HIGH);
 
     Wire.begin(); // Important, we need this for tcaselect to work!
 
@@ -94,7 +96,9 @@ bool sensorSetup() {
 
     for (int i = 0; i < NUM_SENSORS; i++){
         tcaselect(sensors[i].address);
-        if (!(sensors[i].setup = vl6180x.begin())) {
+        digitalWrite(50, LOW);
+        digitalWrite(50, HIGH);
+        if (!vl6180x.begin()) {
             Serial.print("Sensor ");
             Serial.print(i);
             Serial.println(" was not found");
