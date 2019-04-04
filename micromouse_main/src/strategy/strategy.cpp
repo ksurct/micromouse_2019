@@ -10,8 +10,6 @@
 #include <queue>
 
 
-using namespace std;
-
 /* Simple representation of a cell
  *  - For use with probabilistic_maze_t */
 typedef struct {
@@ -79,8 +77,8 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
     resetValues();
     setAllDiscoveredToFalse();
 
-    queue<cell_t> q;
-    queue<cell_t> next_q;
+    std::queue<cell_t> q;
+    std::queue<cell_t> next_q;
 
     discovered[cell.x][cell.y] = true;
 

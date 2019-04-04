@@ -11,4 +11,4 @@ test: all
 	./strategy_test
 
 strategy_test: strategy.o strategy_test.o ../localization/probabilistic_maze.o
-	$(CXX) -g -o $@ $^
+	$(CXX) -o $@ $^
