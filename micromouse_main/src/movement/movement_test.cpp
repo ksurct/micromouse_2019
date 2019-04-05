@@ -64,13 +64,14 @@ TEST_FUNC_BEGIN {
     max_steps = 1000;
 
     // Setup initial location and final location
-    current_loc.x_mu = ;
-    current_loc.y_mu = ;
-    current_loc.theta_mu = ;
+    #define DUMMY 1
+    current_loc.x_mu = DUMMY;
+    current_loc.y_mu = DUMMY;
+    current_loc.theta_mu = DUMMY;
 
-    final_loc.x_mu = ;
-    final_loc.y_mu = ;
-    final_loc.theta_mu = ;
+    final_loc.x_mu = DUMMY;
+    final_loc.y_mu = DUMMY;
+    final_loc.theta_mu = DUMMY;
 
     if (!goTo(&current_loc, &final_loc, max_steps))
         TEST_FAIL("standing still");
