@@ -37,9 +37,7 @@ volatile controller_state_t controllers[] = {
 void initializeControl(void) {
     setSpeedPID(0.0, 0.0);
 
-    Timer1.attachInterrupt(speedController);
-    Timer1.start(CONTROL_LOOP_TIME);
-}
+    Timer2.attachInterrupt(speedController).start(CONTROL_LOOP_TIME);
 
 /* distance travelled
  * The control subsystem keeps track of how far each wheel

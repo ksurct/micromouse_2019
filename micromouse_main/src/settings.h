@@ -38,10 +38,10 @@
 #define MAX_VALUE       999   // Maximum value that can be in values
 
 // Control
-#define CONTROL_LOOP_TIME   5000    // Delay between start times of control loop in microseconds
-#define TAU_P               0.05    // Proportional Gain
+#define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
+#define TAU_P               0.015   // Proportional Gain
 #define TAU_I               0.001   // Integral Gain
-#define INT_BOUND           100     // Integral Bound
+#define INT_BOUND           500     // Integral Bound
 
 // Encoders
 #define LEFT_ENCODER_PIN_A  48
@@ -55,10 +55,10 @@
 #define RESOLUTION_BITS     8       // Number of bits to use in analogWrite()
 #define MAX_PWM_OUTPUT      255     // Should be 2^(RESOLUTION_BITS) - 1
 #define MIN_PWM_OUTPUT      50      // Lowest PWM value that the motors can handle
-#define LEFT_MOTOR_PIN_A    3       //dummy value
-#define LEFT_MOTOR_PIN_B    6       //dummy value
-#define RIGHT_MOTOR_PIN_A   4       //dummy value
-#define RIGHT_MOTOR_PIN_B   5       //dummy value
+#define LEFT_MOTOR_PIN_A    13
+#define LEFT_MOTOR_PIN_B    12
+#define RIGHT_MOTOR_PIN_A   5
+#define RIGHT_MOTOR_PIN_B   6
 
 // Sensors
 #define I2C_RESET_PIN   31
