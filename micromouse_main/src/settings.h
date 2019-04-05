@@ -11,10 +11,11 @@
 #define MAIN_LOOP_TIME 500000 // Delay between the start of each main_loop call in microseconds
 
 // Maze Specifications
-#define MAZE_WIDTH      16      // Number of cells wide
-#define MAZE_HEIGHT     16      // Number of cells tall
-#define WALL_THICKNESS  12      // Thickness of the walls in mm
-#define CELL_LENGTH     168     // Length and width of each cell inside the walls in mm
+#define MAZE_SIZE       16          // If square, the length each side of the maze
+#define MAZE_WIDTH      MAZE_SIZE   // Number of cells wide
+#define MAZE_HEIGHT     MAZE_SIZE   // Number of cells tall
+#define WALL_THICKNESS  12          // Thickness of the walls in mm
+#define CELL_LENGTH     168         // Length and width of each cell inside the walls in mm
 
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
@@ -34,7 +35,7 @@
 #define GOAL_CELL_X     7       // Goal cell x coordinate
 #define GOAL_CELL_Y     7       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
-#define MAX_VALUE       32767   // Maximum value that can be in values
+#define MAX_VALUE       999   // Maximum value that can be in values
 
 // Control
 #define CONTROL_LOOP_TIME   5000    // Delay between start times of control loop in microseconds
