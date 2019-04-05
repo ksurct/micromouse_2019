@@ -20,6 +20,8 @@
 
 #include "src/control/control.h"
 
+#include "src/movement/movement.h"
+
 // Utilities
 #include "src/util/conversions.h"
 
@@ -88,7 +90,7 @@ void main_loop() {
   //strategy(&robot_location, &robot_maze_state, &next_location);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-  //calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
+  calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
   // Run predictions through the kalman filter (motion step)
   //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);

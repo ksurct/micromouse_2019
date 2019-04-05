@@ -42,6 +42,8 @@
 #define TAU_P               0.015   // Proportional Gain
 #define TAU_I               0.001   // Integral Gain
 #define INT_BOUND           500     // Integral Bound
+#define MAX_SPEED           250     // Maximum possible speed
+#define MIN_SPEED           50      // Minimum possible speed
 
 // Encoders
 #define LEFT_ENCODER_PIN_A  48
