@@ -58,8 +58,7 @@ void setup() {
   initializeControl();
 
   // // Start main loop
-  Timer0.attachInterrupt(main_loop);
-  Timer0.start(MAIN_LOOP_TIME);
+  Timer1.attachInterrupt(main_loop).start(MAIN_LOOP_TIME);
 }
 
 

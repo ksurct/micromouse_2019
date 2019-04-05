@@ -11,14 +11,15 @@
 #define MAIN_LOOP_TIME 500000 // Delay between the start of each main_loop call in microseconds
 
 // Maze Specifications
-#define MAZE_WIDTH      16      // Number of cells wide
-#define MAZE_HEIGHT     16      // Number of cells tall
-#define WALL_THICKNESS  12      // Thickness of the walls in mm
-#define CELL_LENGTH     168     // Length and width of each cell inside the walls in mm
+#define MAZE_SIZE       16          // If square, the length each side of the maze
+#define MAZE_WIDTH      MAZE_SIZE   // Number of cells wide
+#define MAZE_HEIGHT     MAZE_SIZE   // Number of cells tall
+#define WALL_THICKNESS  12          // Thickness of the walls in mm
+#define CELL_LENGTH     168         // Length and width of each cell inside the walls in mm
 
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
-#define TICKS_PER_REVOLUTION    3575.0855   // Number to encoder ticks per one revolution of a wheel
+#define TICKS_PER_REVOLUTION    1808.3333   // Number to encoder ticks per one revolution of a wheel
 #define WHEEL_BASE_LENGTH       100         //dummy value (in mm)
 
 // Localization
@@ -43,13 +44,13 @@
 #define GOAL_CELL_X     7       // Goal cell x coordinate
 #define GOAL_CELL_Y     7       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
-#define MAX_VALUE       32767   // Maximum value that can be in values
+#define MAX_VALUE       999   // Maximum value that can be in values
 
 // Control
-#define CONTROL_LOOP_TIME   5000    // Delay between start times of control loop in microseconds
-#define TAU_P               0.05    // Proportional Gain
+#define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
+#define TAU_P               0.015   // Proportional Gain
 #define TAU_I               0.001   // Integral Gain
-#define INT_BOUND           100     // Integral Bound
+#define INT_BOUND           500     // Integral Bound
 
 // Encoders
 #define LEFT_ENCODER_PIN_A  48
@@ -63,10 +64,10 @@
 #define RESOLUTION_BITS     8       // Number of bits to use in analogWrite()
 #define MAX_PWM_OUTPUT      255     // Should be 2^(RESOLUTION_BITS) - 1
 #define MIN_PWM_OUTPUT      50      // Lowest PWM value that the motors can handle
-#define LEFT_MOTOR_PIN_A    3       //dummy value
-#define LEFT_MOTOR_PIN_B    6       //dummy value
-#define RIGHT_MOTOR_PIN_A   4       //dummy value
-#define RIGHT_MOTOR_PIN_B   5       //dummy value
+#define LEFT_MOTOR_PIN_A    13
+#define LEFT_MOTOR_PIN_B    12
+#define RIGHT_MOTOR_PIN_A   5
+#define RIGHT_MOTOR_PIN_B   6
 
 // Sensors
 #define I2C_RESET_PIN   31
