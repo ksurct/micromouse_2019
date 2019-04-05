@@ -44,7 +44,11 @@
 #define GOAL_CELL_X     7       // Goal cell x coordinate
 #define GOAL_CELL_Y     7       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
-#define MAX_VALUE       999   // Maximum value that can be in values
+#define MAX_VALUE       999     // Maximum value that can be in values
+
+// Movement
+#define TOLERANCE_MM    10      //dummy value (in mm)
+#define TOLERANCE_RAD   0.25    //dummy value (in radians)
 
 // Control
 #define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
@@ -85,6 +89,15 @@
 #define SENSOR_3_PIN    53
 #define SENSOR_4_ADDR   0x04
 #define SENSOR_4_PIN    29
+
+
+/* Arduino.h macros for testing */
+#ifndef ARDUINO
+#define TWO_PI 6.283185307179586476925286766559
+#define PI 3.1415926535897932384626433832795
+#else
+#include <Arduino.h>
+#endif //ARDUINO
 
 
 #endif //_SETTINGS_H_

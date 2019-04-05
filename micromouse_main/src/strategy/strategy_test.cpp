@@ -4,16 +4,8 @@
 #include "../testing.h"
 #include "../settings.h"
 #include "../types.h"
+#include "../util/conversions.h"
 
-
-// Helper Functions
-double convertCellToLocation(int x) {
-    return (double) (((x) * (WALL_THICKNESS + CELL_LENGTH)) + (CELL_LENGTH / 2));
-}
-
-int convertLocationToCell(double x) {
-    return (int) (x / (WALL_THICKNESS + CELL_LENGTH));
-}
 
 void readInMaze(const char** maze_string, probabilistic_maze_t* maze) {
 
@@ -69,10 +61,10 @@ TEST_FUNC_BEGIN {
     readInMaze(empty_string, &robot_maze);
 
     // While not at goal
-    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (cellNumberToCoordinateDistance(GOAL_CELL_X)) ||
+            location.y_mu != (cellNumberToCoordinateDistance(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -86,7 +78,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
     TEST_PASS("Empty maze solve");
 
@@ -106,10 +98,10 @@ TEST_FUNC_BEGIN {
     readInMaze(spiral_string, &robot_maze);
 
     // While not at goal
-    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (cellNumberToCoordinateDistance(GOAL_CELL_X)) ||
+            location.y_mu != (cellNumberToCoordinateDistance(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -123,7 +115,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
     TEST_PASS("Spiral maze solve");
 
@@ -143,10 +135,10 @@ TEST_FUNC_BEGIN {
     readInMaze(loop_string, &robot_maze);
 
     // While not at goal
-    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (cellNumberToCoordinateDistance(GOAL_CELL_X)) ||
+            location.y_mu != (cellNumberToCoordinateDistance(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -160,7 +152,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
     TEST_PASS("Loop maze solve");
 
@@ -180,10 +172,10 @@ TEST_FUNC_BEGIN {
     readInMaze(actual_string, &robot_maze);
 
     // While not at goal
-    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (cellNumberToCoordinateDistance(GOAL_CELL_X)) ||
+            location.y_mu != (cellNumberToCoordinateDistance(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -197,7 +189,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, coordinateDistanceToCellNumber(location.x_mu), coordinateDistanceToCellNumber(location.y_mu));
 
     TEST_PASS("Actual maze solve");
 

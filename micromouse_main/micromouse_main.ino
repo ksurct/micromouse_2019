@@ -15,12 +15,9 @@
 
 // Subsystems
 #include "src/localization/localization.h"
-
 #include "src/strategy/strategy.h"
-
-#include "src/control/control.h"
-
 #include "src/movement/movement.h"
+#include "src/control/control.h"
 
 // Utilities
 #include "src/util/conversions.h"

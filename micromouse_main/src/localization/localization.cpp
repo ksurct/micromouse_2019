@@ -4,12 +4,10 @@
 #include <math.h>
 
 #include "localization.h"
+#include "../settings.h"
 #include "../types.h"
+#include "../abs.h"
 
-
-// From Ardunio.h:
-#define TWO_PI 6.283185307179586476925286766559
-#define abs(x) ((x)>0?(x):-(x))
 
 #define ENCODER_VARIANCE(d) (((ENCODER_VARIANCE_PER_MM) * abs(d)) + (ENCODER_VARIANCE_BASE))
 
