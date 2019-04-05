@@ -80,20 +80,20 @@ void main_loop() {
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
 
-  // Interpolate sensor and encoder data together using a kalman filter (measurement step)
-  //localizeMeasureStep(sensor_data, left_distance, right_distance);
-
+  // Run distances through localization
+  localizeMotionStep(left_distance, right_distance);
+  
   // Update maze with sensor readings
   //mazeMapping(sensor_data);
+
+  // Interpolate sensor data into the localization
+  //localizeMeasureStep(sensor_data);
 
   // Determine next cell to go to (strategy step)
   //strategy(&robot_location, &robot_maze_state, &next_location);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
-
-  // Run predictions through the kalman filter (motion step)
-  //localizeMotionStep(left_speed * MAIN_LOOP_TIME, right_speed * MAIN_LOOP_TIME);
 
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);

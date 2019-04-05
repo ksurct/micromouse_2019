@@ -162,14 +162,14 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
 
 /* Uses the mean location to determine the cell this location is in */
 void convertLocationToCell(gaussian_location_t* location, cell_t* to_return) {
-    to_return->x = (int) (location->x.mean / (WALL_THICKNESS + CELL_LENGTH));
-    to_return->y = (int) (location->y.mean / (WALL_THICKNESS + CELL_LENGTH));
+    to_return->x = (int) (location->x_mu / (WALL_THICKNESS + CELL_LENGTH));
+    to_return->y = (int) (location->y_mu / (WALL_THICKNESS + CELL_LENGTH));
 }
 
 /* Returns the middle of the cell given only changing the x and y mean */
 void convertCellToLocation(cell_t* cell, gaussian_location_t* to_return) {
-    to_return->x.mean = (double) (((cell->x) * (WALL_THICKNESS + CELL_LENGTH)) + (CELL_LENGTH / 2));
-    to_return->y.mean = (double) (((cell->y) * (WALL_THICKNESS + CELL_LENGTH)) + (CELL_LENGTH / 2));
+    to_return->x_mu = (((cell->x) * (WALL_THICKNESS + CELL_LENGTH)) + (CELL_LENGTH / 2));
+    to_return->y_mu = (((cell->y) * (WALL_THICKNESS + CELL_LENGTH)) + (CELL_LENGTH / 2));
 }
 
 /* Return the next cell that we can go to with the lowest value */

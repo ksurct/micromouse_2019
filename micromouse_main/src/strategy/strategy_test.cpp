@@ -62,17 +62,17 @@ TEST_FUNC_BEGIN {
     steps = 0;
 
     // Setup initial location
-    location.x.mean = INIT_X_MEAN;
-    location.y.mean = INIT_Y_MEAN;
+    location.x_mu = INIT_X_MU;
+    location.y_mu = INIT_Y_MU;
 
     // Read in the maze
     readInMaze(empty_string, &robot_maze);
 
     // While not at goal
-    while (location.x.mean != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y.mean != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
+            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -86,7 +86,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
     TEST_PASS("Empty maze solve");
 
@@ -99,17 +99,17 @@ TEST_FUNC_BEGIN {
     steps = 0;
 
     // Setup initial location
-    location.x.mean = INIT_X_MEAN;
-    location.y.mean = INIT_Y_MEAN;
+    location.x_mu = INIT_X_MU;
+    location.y_mu = INIT_Y_MU;
 
     // Read in the maze
     readInMaze(spiral_string, &robot_maze);
 
     // While not at goal
-    while (location.x.mean != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y.mean != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
+            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -123,7 +123,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
     TEST_PASS("Spiral maze solve");
 
@@ -136,17 +136,17 @@ TEST_FUNC_BEGIN {
     steps = 0;
 
     // Setup initial location
-    location.x.mean = INIT_X_MEAN;
-    location.y.mean = INIT_Y_MEAN;
+    location.x_mu = INIT_X_MU;
+    location.y_mu = INIT_Y_MU;
 
     // Read in the maze
     readInMaze(loop_string, &robot_maze);
 
     // While not at goal
-    while (location.x.mean != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y.mean != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
+            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -160,7 +160,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
     TEST_PASS("Loop maze solve");
 
@@ -173,17 +173,17 @@ TEST_FUNC_BEGIN {
     steps = 0;
 
     // Setup initial location
-    location.x.mean = INIT_X_MEAN;
-    location.y.mean = INIT_Y_MEAN;
+    location.x_mu = INIT_X_MU;
+    location.y_mu = INIT_Y_MU;
 
     // Read in the maze
     readInMaze(actual_string, &robot_maze);
 
     // While not at goal
-    while (location.x.mean != (convertCellToLocation(GOAL_CELL_X)) ||
-            location.y.mean != (convertCellToLocation(GOAL_CELL_Y)))
+    while (location.x_mu != (convertCellToLocation(GOAL_CELL_X)) ||
+            location.y_mu != (convertCellToLocation(GOAL_CELL_Y)))
     {
-        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+        // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
         // Run strategy
         strategy(&location, &robot_maze, &location2);
@@ -197,7 +197,7 @@ TEST_FUNC_BEGIN {
         }
     }
 
-    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x.mean), convertLocationToCell(location.y.mean));
+    // printf("Step: %d,\tX: %d,\tY: %d\n", steps, convertLocationToCell(location.x_mu), convertLocationToCell(location.y_mu));
 
     TEST_PASS("Actual maze solve");
 
