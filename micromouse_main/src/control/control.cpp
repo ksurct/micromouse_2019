@@ -38,6 +38,7 @@ void initializeControl(void) {
     setSpeedPID(0.0, 0.0);
 
     Timer2.attachInterrupt(speedController).start(CONTROL_LOOP_TIME);
+}
 
 /* distance travelled
  * The control subsystem keeps track of how far each wheel
