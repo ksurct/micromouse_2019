@@ -19,7 +19,7 @@
 
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
-#define TICKS_PER_REVOLUTION    3575.0855   // Number to encoder ticks per one revolution of a wheel
+#define TICKS_PER_REVOLUTION    1808.3333   // Number to encoder ticks per one revolution of a wheel
 
 // Localization
 #define INIT_X_MEAN         100.0   //dummy value (in mm)
