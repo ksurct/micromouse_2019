@@ -88,7 +88,7 @@ void speedController(void) {
             controllers[i].int_error += error;
         }
 
-        output = (-1 * TAU_P * error) + (-1 * TAU_I * controllers[i].int_error);
+        output = (-1 * MOTOR_TAU_P * error) + (-1 * MOTOR_TAU_I * controllers[i].int_error);
 
         // Limit output between -1 and 1
         if (output > 1) output = 1;

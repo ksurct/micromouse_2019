@@ -35,42 +35,39 @@
 
 #include "movement.h"
 #include "../types.h"
+#include "../settings.h"
 #include "../abs.h"
-//#include <stdlib.h>
 
+// Temp
+#include <stdio.h>
 
-#define IS_BETWEEN_ERROR(x,y,e) (((x) < (y) + (e)) && ((x) > (y) - (e)))
 
 // Globals
-enum RobotState {
-    PERFECT,                    // Within tolerance for both x and y
-    OUT_XY_IN_THETA,            // Outside tolerance for one of x and y AND within tolerance for Theta
-    OUT_XY_OUT_THETA,           // Outside tolerance for one of x and y AND outside tolerance for Theta
-    IN_XY_IN_THETA,             // Within tolerance for one of x and y AND within tolerance for Theta
-    IN_XY_OUT_THETA             // Within tolerance for one of x and y AND outside tolerance for Theta
-};
-
-enum Direction {
-    North,  // North(0, -1) theta = 3*PI/2
-    East,   // East(1, 0)   theta = 0
-    South,  // South(0, 1)  theta = PI/2
-    West,   // West(-1, 0)  theta = PI
-};
-
 double directionToRAD[4] = { 3*PI/2, 0, PI/2, PI };
-
 double directionToXY[4][2] = { { 0, -1 }, { 1, 0 }, { 1, 0 }, { -1, 0 } };
 
 gaussian_location_t prev_location;
+RobotState prev_state;
 
 
 // Function Declarations
+Direction chooseDirectionOutOfTolerance(double x_cte, double y_cte);
+Direction chooseDirectionWithinTolerance(double x_cte, double y_cte);
+void straightController(gaussian_location_t* current_location, gaussian_location_t* next_location,
+                            double* left_speed, double* right_speed, Direction dir, bool same_state);
+double calculateCTE(gaussian_location_t* cur, gaussian_location_t* next, Direction dir);
+double calculateDistanceAway(gaussian_location_t* cur, gaussian_location_t* next, Direction dir);
+double straightSpeedProfile(double distance_away);
+
+void turnController(gaussian_location_t* current_location, double* left_speed,
+                            double* right_speed, Direction dir, bool same_state);
 
 
 /*----------- Public Functions -----------*/
 
 void initializeMovement(gaussian_location_t* current_location) {
     prev_location = *current_location;
+    prev_state = PERFECT;
 }
 
 /* calculate speed
@@ -78,12 +75,12 @@ void initializeMovement(gaussian_location_t* current_location) {
  * - left_speed and right_speed should be passed in with the current respective speeds*/
 void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* next_location,
                         double* left_speed, double* right_speed) {
-    
+
     // Overall changes
     double x_cte = next_location->x_mu - current_location->x_mu;
     double y_cte = next_location->y_mu - current_location->y_mu;
 
-    RobotState currentState;
+    RobotState current_state;
     Direction direction;
     
     if (abs(x_cte) > TOLERANCE_MM && abs(y_cte) > TOLERANCE_MM) {
@@ -93,14 +90,14 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
 
         // Are we facing that direction?
         if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[direction], TOLERANCE_RAD)) {
-            currentState = OUT_XY_IN_THETA;
+            current_state = OUT_XY_IN_THETA;
         } else {
-            currentState = OUT_XY_OUT_THETA;
+            current_state = OUT_XY_OUT_THETA;
         }
 
     } else if (abs(x_cte) < TOLERANCE_MM && abs(y_cte) < TOLERANCE_MM) {
         
-        currentState = PERFECT;
+        current_state = PERFECT;
 
     } else {
 
@@ -108,14 +105,27 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
         direction = chooseDirectionWithinTolerance(x_cte, y_cte);
 
         // Are we facing that direction?
-        if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[direction], TOLERANCE_RAD)) {
-            currentState = IN_XY_IN_THETA;
-        } else {
-            currentState = IN_XY_OUT_THETA;
+        if (direction != East){
+            if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[direction], TOLERANCE_RAD)) {
+                current_state = IN_XY_IN_THETA;
+            } else {
+                current_state = IN_XY_OUT_THETA;
+            }
+        } else { // Special case because circles
+            if (((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - TOLERANCE_MM))
+                    || ((current_location->theta_mu < TOLERANCE_MM) && (current_location->theta_mu >= 0.0))) {
+                current_state = IN_XY_IN_THETA;
+            } else {
+                current_state = IN_XY_OUT_THETA;
+            }
         }
     }
 
-    switch (currentState) {
+    bool same_state = (current_state == prev_state);
+
+    // printf("State : %d, Same: %d\n", current_state, same_state);
+
+    switch (current_state) {
         case PERFECT:
             // Stop
             *left_speed = 0;
@@ -127,37 +137,62 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
             // We need to find the location that is on the same axis as the next_location
             // in the direction we are being told to go
             gaussian_location_t intermediate_location;
-            
+
+            // To make sure that the axis for error doesn't drift
+            static double prev_axis_x; static double prev_axis_y;
+            double axis_x; double axis_y;
+            if (same_state) {
+                axis_x = prev_axis_x;
+                axis_y = prev_axis_y;
+            } else {
+                axis_x = prev_location.x_mu;
+                axis_y = prev_location.y_mu;
+            }
+
             // Direction does not depend on x, set to stay the same as previous location to keep same axis for cte
             if (directionToXY[direction][0] == 0)
-                intermediate_location.x_mu = prev_location.x_mu;
+                intermediate_location.x_mu = axis_x;
             else // Direction does depend on x, project to axis by setting to next location
                 intermediate_location.x_mu = next_location->x_mu;
 
             // Direction does not depend on y, set to stay the same as previous location to keep same axis for cte
             if (directionToXY[direction][1] == 0)
-                intermediate_location.y_mu = prev_location.y_mu;
+                intermediate_location.y_mu = axis_y;
             else // Direction does depend on y, project to axis by setting to next location
                 intermediate_location.y_mu = next_location->y_mu;
 
-            straightController(current_location, &intermediate_location, left_speed, right_speed, direction);
+            straightController(current_location, &intermediate_location, left_speed, right_speed, direction, same_state);
+
+            prev_axis_x = axis_x;
+            prev_axis_y = axis_y;
             break;
 
         case OUT_XY_OUT_THETA:
+            
             // Turn to get to within the tolerance of direction
-            turnController(current_location, left_speed, right_speed, direction);
+            turnController(current_location, left_speed, right_speed, direction, same_state);
             break;
+
         case IN_XY_IN_THETA:
+            
             // Go Straight
-            straightController(current_location, next_location, left_speed, right_speed, direction);
+            // printf("Calling straightController(): %f %f %f %f %d %d\n",
+            //             current_location->x_mu, next_location->x_mu,
+            //             *left_speed, *right_speed,
+            //             direction, same_state);
+
+            straightController(current_location, next_location, left_speed, right_speed, direction, same_state);
             break;
+            
         case IN_XY_OUT_THETA:
+            
             // Turn to get to within the tolerance of direction
-            turnController(current_location, left_speed, right_speed, direction);
+            turnController(current_location, left_speed, right_speed, direction, same_state);
             break;
     }
 
     prev_location = *current_location;
+    prev_state = current_state;
 }
 
 Direction chooseDirectionOutOfTolerance(double x_cte, double y_cte) {
@@ -174,12 +209,109 @@ Direction chooseDirectionWithinTolerance(double x_cte, double y_cte) {
         return x_cte > 0 ? East : West;
 }
 
+
+/* Controllers - tune in settings.h */
+
 void straightController(gaussian_location_t* current_location, gaussian_location_t* next_location,
-                            double* left_speed, double* right_speed, Direction dir) {
+                            double* left_speed, double* right_speed, Direction dir, bool same_state) {
     
+    static double int_cte = 0;    // Integral error (Resets when same_state is false)
+    static double prev_cte = 0;   // Previous error (Resets when same_state is false)
+
+    // Calculate the Cross Track Error (cte)
+    double cte = calculateCTE(current_location, next_location, dir);
+    // printf("CTE: %f\n", cte);
+    double d_cte; // derivative of cte
+
+    if (same_state) {
+        int_cte += cte;
+        d_cte = cte - prev_cte;
+    } else {
+        int_cte = cte;
+        d_cte = 0;
+    }
+
+    // The amount we should try to rotate to the left to get back to the correct location (PID)
+    double rotate_left = (-1 * STRAIGHT_TAU_P * cte) + (-1 * STRAIGHT_TAU_I * int_cte) + (-1 * STRAIGHT_TAU_D * d_cte);
+
+    // 
+    double distance_away = calculateDistanceAway(current_location, next_location, dir);
+    // printf("distance_away: %f\n", distance_away);
+    double base_speed = straightSpeedProfile(distance_away);
+    // printf("base_speed: %f\n", base_speed);
+
+    *left_speed = base_speed + rotate_left;
+    *right_speed = base_speed - rotate_left;
 
 }
 
-void turnController(gaussian_location_t* current_location, double* left_speed, double* right_speed, Direction dir) {
+double calculateCTE(gaussian_location_t* cur, gaussian_location_t* next, Direction dir) {
 
+    switch (dir) {
+
+        case North:  // North(0, -1) theta = 3*PI/2
+            return (cur->x_mu - next->x_mu);
+        
+        case East:   // East(1, 0)   theta = 0
+            return (cur->y_mu - next->y_mu);
+
+        case South:  // South(0, 1)  theta = PI/2
+            return -1 * (cur->x_mu - next->x_mu);
+
+        case West:   // West(-1, 0)  theta = PI
+            return -1 * (cur->y_mu - next->y_mu);
+        
+        default:
+            return 0;
+    }
+}
+
+double calculateDistanceAway(gaussian_location_t* cur, gaussian_location_t* next, Direction dir) {
+
+    switch (dir) {
+
+        case North:  // North(0, -1) theta = 3*PI/2
+            return -1 * (next->y_mu - cur->y_mu);
+        
+        case East:   // East(1, 0)   theta = 0
+            return (next->x_mu - cur->x_mu);
+
+        case South:  // South(0, 1)  theta = PI/2
+            return (next->y_mu - cur->y_mu);
+
+        case West:   // West(-1, 0)  theta = PI
+            return -1 * (next->x_mu - cur->x_mu);
+        
+        default:
+            return 0;
+    }
+}
+
+/*
+ *                     SLOPE
+ *                       v   Goal
+ * STABLE_SPEED----------\    |
+ *                         \  | 
+ *                           \|-INTERCEPT 
+ *                            |
+ * ===========================|===========> distance_away
+ */
+double straightSpeedProfile(double distance_away) {
+
+    // If within tolerance, don't move, I don't think is possible...
+    if (abs(distance_away) < TOLERANCE_MM)
+        return 0;
+
+    // Implement the function in the block comment above
+    if (distance_away > 0) {
+        return min((SPEED_PROFILE_SLOPE * distance_away) + SPEED_PROFILE_INTERCEPT, SPEED_PROFILE_STABLE_SPEED);
+    } else {
+        return max((SPEED_PROFILE_SLOPE * distance_away) + SPEED_PROFILE_INTERCEPT, -1 * SPEED_PROFILE_STABLE_SPEED);
+    }
+}
+
+void turnController(gaussian_location_t* current_location, double* left_speed,
+                            double* right_speed, Direction dir, bool same_state) {
+    *left_speed = 0;
+    *right_speed = 0;
 }

@@ -8,6 +8,9 @@
 #include "../types.h"
 #include "../abs.h"
 
+// Temp
+#include <stdio.h>
+
 
 #define ENCODER_VARIANCE(d) (((ENCODER_VARIANCE_PER_MM) * abs(d)) + (ENCODER_VARIANCE_BASE))
 
@@ -65,14 +68,12 @@ gaussian_location_t* localizeMeasureStep(sensor_reading_t* sensor_data) {
 void calculateMotion(gaussian_location_t* motion, double left_distance, double right_distance) {
 
     /* Run the motion through the system model */
+
+    // printf("CalculateMotion: \t%f \t%f \t%d \n", left_distance, right_distance, left_distance==right_distance);
     
     // If going straight
-    if (left_distance == right_distance) {
-        
-        motion->x_mu = left_distance;
-        motion->y_mu = 0.0;
-        motion->theta_mu = 0.0;
-    } else {
+    if (left_distance != right_distance) {
+
         // R = (l/2)*((dr + dl)./(dr - dl));
         double turn_radius = (WHEEL_BASE_LENGTH / 2) * ((right_distance + left_distance) / (right_distance - left_distance));
 
@@ -86,11 +87,16 @@ void calculateMotion(gaussian_location_t* motion, double left_distance, double r
 
         // yf = ((x - ICC(:,1)) .* sin(change_in_theta) + (y - ICC(:,2)) .* cos(change_in_theta)) + ICC(:,2);
         motion->y_mu = -1 * turn_radius * cos(delta_theta) + turn_radius;
+        motion->y_mu = -1 * motion->y_mu; // our axis are setup inverted in the y direction
 
         // thetaf = theta + change_in_theta;
-        motion->theta_mu = delta_theta;
-    }
+        motion->theta_mu = TWO_PI - delta_theta; // our axis are setup inverted in the y direction
 
+    } else { // Special case when going perfectly straight
+        motion->x_mu = left_distance;
+        motion->y_mu = 0.0;
+        motion->theta_mu = 0.0;
+    }
     
     /* Calculate the change in the covariance matrix */
     
@@ -101,8 +107,11 @@ void calculateMotion(gaussian_location_t* motion, double left_distance, double r
     motion->xy_sigma = 0;
     motion->theta_sigma = THETA_VARIANCE * ENCODER_VARIANCE(distance_travelled);
 
-    // rotate covariance by motion->theta_mu
-    rotateCovariance(motion->theta_mu, &motion->x_sigma, &motion->y_sigma, &motion->xy_sigma);
+    // If not straight
+    if (left_distance != right_distance)
+        // rotate covariance by motion->theta_mu
+        rotateCovariance(motion->theta_mu, &motion->x_sigma, &motion->y_sigma, &motion->xy_sigma);
+
 }
 
 /* Rotate the covariance matrix described by x_sigma, y_sigma, and xy_sigma
@@ -118,9 +127,13 @@ void rotateCovariance(double rotate_by, double* x_sigma, double* y_sigma, double
     double r4 = cos(rotate_by);
 
     // Rotate with: R * Sigma * R'
-    *x_sigma = (r1 * r1 * (*x_sigma)) + (r2 * r2 * (*y_sigma));
-    *y_sigma = (r3 * r3 * (*x_sigma)) + (r4 * r4 * (*y_sigma));
-    *xy_sigma = (r1 * r3 * (*x_sigma)) + (r2 * r4 * (*y_sigma));
+    double x_temp = *x_sigma;
+    double y_temp = *y_sigma;
+
+    *x_sigma = (r1 * r1 * (x_temp)) + (r2 * r2 * (y_temp));
+    *y_sigma = (r3 * r3 * (x_temp)) + (r4 * r4 * (y_temp));
+    *xy_sigma = (r1 * r3 * (x_temp)) + (r2 * r4 * (y_temp));
+    *xy_sigma = -1 * *xy_sigma; // our axis are setup inverted in the y direction
 }
 
 void addMotion(gaussian_location_t* motion) {

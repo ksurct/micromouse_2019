@@ -7,11 +7,11 @@
 
 /* The reported state of a sensor */
 enum sensor_state_t {
-    good,       // Successful reading
-    too_far,    // Object to far to detect
-    too_close,  // Object to close to detect
-    waiting,    // Sensor has no measurement yet, disregard distance
-    error       // Error in reading, disregard distance
+    GOOD,       // Successful reading
+    TOO_FAR,    // Object to far to detect
+    TOO_CLOSE,  // Object to close to detect
+    WAITING,    // Sensor has no measurement yet, disregard distance
+    ERROR       // Error in reading, disregard distance
 };
 
 

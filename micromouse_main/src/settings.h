@@ -3,6 +3,8 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
+#include "link_Arduino.h"
+
 
 // General
 #define DEBUG false
@@ -47,13 +49,24 @@
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
-#define TOLERANCE_MM    10      //dummy value (in mm)
-#define TOLERANCE_RAD   0.25    //dummy value (in radians)
+#define TOLERANCE_MM    10              //dummy value (in mm)
+#define TOLERANCE_RAD   radians(10)     //dummy value (in radians)
+
+#define STRAIGHT_TAU_P  10      // dummy value
+#define STRAIGHT_TAU_I  0       // dummy value
+#define STRAIGHT_TAU_D  0       // dummy value
+#define SPEED_PROFILE_STABLE_SPEED  150
+#define SPEED_PROFILE_SLOPE         10
+#define SPEED_PROFILE_INTERCEPT     0
+
+#define TURN_TAU_P      0       // dummy value
+#define TURN_TAU_I      0       // dummy value
+#define TURN_TAU_D      0       // dummy value
 
 // Control
 #define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
-#define TAU_P               0.015   // Proportional Gain
-#define TAU_I               0.001   // Integral Gain
+#define MOTOR_TAU_P         0.015   // Proportional Gain
+#define MOTOR_TAU_I         0.001   // Integral Gain
 #define INT_BOUND           500     // Integral Bound
 #define MAX_SPEED           250     // Maximum possible speed
 #define MIN_SPEED           50      // Minimum possible speed
@@ -89,15 +102,6 @@
 #define SENSOR_3_PIN    53
 #define SENSOR_4_ADDR   0x04
 #define SENSOR_4_PIN    29
-
-
-/* Arduino.h macros for testing */
-#ifndef ARDUINO
-#define TWO_PI 6.283185307179586476925286766559
-#define PI 3.1415926535897932384626433832795
-#else
-#include <Arduino.h>
-#endif //ARDUINO
 
 
 #endif //_SETTINGS_H_
