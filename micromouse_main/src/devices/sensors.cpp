@@ -24,7 +24,7 @@ sensor_state_t parseError(unsigned char status);
 // Sensor object to communicate with all the the sensors
 Adafruit_VL6180X vl6180x = Adafruit_VL6180X();
 
-sensor_t sensors[NUM_SENSORS] = {
+volatile sensor_t sensors[NUM_SENSORS] = {
     {
         .address = SENSOR_0_ADDR,
         .interruptPin = SENSOR_0_PIN,
@@ -80,44 +80,50 @@ void sensorISR4() { sensors[4].needsUpdated = true; }
 
 bool sensorSetup() {
 
-    pinMode(50, OUTPUT);
-    digitalWrite(50, HIGH);
-    digitalWrite(50, LOW);
-    digitalWrite(50, HIGH);
+    bool found = true;
 
-    Wire.setClock(10000);
-
+    // Setup Reset pin
     pinMode(I2C_RESET_PIN, OUTPUT);
     digitalWrite(I2C_RESET_PIN, HIGH);
 
+    Wire.setClock(10000); // Slow down the clock from 100 kHz to 10 kHz
+
     Wire.begin(); // Important, we need this for tcaselect to work!
 
-    bool found = true;
-
+    Serial.println();
     for (int i = 0; i < NUM_SENSORS; i++){
         tcaselect(sensors[i].address);
-        digitalWrite(50, LOW);
-        digitalWrite(50, HIGH);
         if (!vl6180x.begin()) {
             Serial.print("Sensor ");
             Serial.print(i);
             Serial.println(" was not found");
+            sensors[i].setup = true;
             found = false;
+        } else {
+            Serial.print("Sensor ");
+            Serial.print(i);
+            Serial.println(" was found");
         }
     }
 
-    // TODO register interrupts
     delay(50);
-    attachInterrupt(digitalPinToInterrupt(sensors[0].address), sensorISR0, RISING);
-    attachInterrupt(digitalPinToInterrupt(sensors[1].address), sensorISR1, RISING);
-    attachInterrupt(digitalPinToInterrupt(sensors[2].address), sensorISR2, RISING);
-    attachInterrupt(digitalPinToInterrupt(sensors[3].address), sensorISR3, RISING);
-    attachInterrupt(digitalPinToInterrupt(sensors[4].address), sensorISR4, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[0].interruptPin), sensorISR0, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[1].interruptPin), sensorISR1, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[2].interruptPin), sensorISR2, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[3].interruptPin), sensorISR3, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensors[4].interruptPin), sensorISR4, RISING);
 
     return found;
 }
 
 void readSensors(sensor_reading_t* sensor_data) {
+
+    // for (int i = 0; i < NUM_SENSORS; i++) {
+    //     tcaselect(sensors[i].address);
+    //     Serial.print("Reading: ");
+    //     Serial.println(vl6180x.readRange());
+    //     delay(50);
+    // }
 
     for (int i = 0; i < NUM_SENSORS; i++) {
         
@@ -125,6 +131,8 @@ void readSensors(sensor_reading_t* sensor_data) {
             
             tcaselect(sensors[i].address);
             sensor_data[i].distance = vl6180x.readRange();
+            Serial.print("Reading: "):
+            Serial.println(sensor_data[i].distance);
             sensor_data[i].state = parseError(vl6180x.readRangeStatus());
             sensors[i].needsUpdated = false;
 

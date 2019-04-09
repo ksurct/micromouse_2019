@@ -23,25 +23,22 @@ void setup() {
   // Initialize Serial
   Serial.begin(115200);
 
-  // Setup Sensors
+  // Setup Sensors 
   if (!sensorSetup()){
     Serial.println("Error connecting to sensors!");
   }
 
-  // // Start main loop
-  // Timer1.attachInterrupt(main_loop);
-  // Timer1.start(MAIN_LOOP_TIME);
+  // Start main loop
+  Timer1.attachInterrupt(main_loop);
+  Timer1.start(MAIN_LOOP_TIME);
 
-  // Initialize variables
+}
+
+
+void main_loop() {
+
   static sensor_reading_t sensor_data[NUM_SENSORS];
-
-  Serial.println("Hello");
-
-  // Get sensor data
   readSensors(sensor_data);
-
-  Serial.println("Hello");
-
   for(int i = 0; i < NUM_SENSORS; i++) {
     Serial.print("Sensor ");
     Serial.print(i);
@@ -68,15 +65,8 @@ void setup() {
         Serial.print("WHAT THE FREAK!!!");
         break;
     }
-
     Serial.println();
-  }
-}
-
-
-void main_loop() {
-
-  
+  } 
 }
 
 /* This function is not in use because we would like to control the timing that the loop is called */
