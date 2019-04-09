@@ -73,29 +73,31 @@ void calculateMotion(gaussian_location_t* motion, double left_distance, double r
     
     // If going straight
     if (left_distance != right_distance) {
-
+        
         // R = (l/2)*((dr + dl)./(dr - dl));
-        double turn_radius = (WHEEL_BASE_LENGTH / 2) * ((right_distance + left_distance) / (right_distance - left_distance));
+        double turn_radius = (WHEEL_BASE_LENGTH/2) * ((right_distance + left_distance) / (right_distance - left_distance));
 
         // change_in_theta = (dr - dl)/l;
         double delta_theta = (right_distance - left_distance) / WHEEL_BASE_LENGTH;
 
-        // ICC = [x - R.*sin(theta), y + R.*cos(theta)];
-
-        // xf = ((x - ICC(:,1)) .* cos(change_in_theta) - (y - ICC(:,2)) .* sin(change_in_theta)) + ICC(:,1);
+        // x = R .* sin(change_in_theta);
         motion->x_mu = turn_radius * sin(delta_theta);
 
-        // yf = ((x - ICC(:,1)) .* sin(change_in_theta) + (y - ICC(:,2)) .* cos(change_in_theta)) + ICC(:,2);
+        // y = -1 .* R .* cos(change_in_theta) + R;
         motion->y_mu = -1 * turn_radius * cos(delta_theta) + turn_radius;
+
+        // y = -1 .* y;
         motion->y_mu = -1 * motion->y_mu; // our axis are setup inverted in the y direction
 
-        // thetaf = theta + change_in_theta;
+        // theta = 2*pi - change_in_theta;
         motion->theta_mu = TWO_PI - delta_theta; // our axis are setup inverted in the y direction
 
     } else { // Special case when going perfectly straight
+
         motion->x_mu = left_distance;
         motion->y_mu = 0.0;
         motion->theta_mu = 0.0;
+
     }
     
     /* Calculate the change in the covariance matrix */
@@ -136,27 +138,65 @@ void rotateCovariance(double rotate_by, double* x_sigma, double* y_sigma, double
     *xy_sigma = -1 * *xy_sigma; // our axis are setup inverted in the y direction
 }
 
+/* Add in the mean of motion to the mean of robot_location */
 void addMotion(gaussian_location_t* motion) {
-    
-    /* Add in the mean of motion to the mean of robot_location */
 
+/* Inverse the input to normal coordinates */
+    // theta1 = 2*pi - theta1;
+    robot_location.theta_mu = TWO_PI - robot_location.theta_mu;
+    // theta2 = 2*pi - theta2;
+    motion->theta_mu = TWO_PI - motion->theta_mu;
+    // y2 = -1 * y2;
+    motion->y_mu = -1 * motion->y_mu;
+
+
+/* Calculate the change in x and y from rotating by the global theta */
+    // x_change = x2 .* cos(theta1) - y2 .* sin(theta1);
+    double x_delta = (motion->x_mu * cos(robot_location.theta_mu))
+                        - (motion->y_mu * sin(robot_location.theta_mu));
+    // y_change = x2 .* sin(theta1) + y2 .* cos(theta1);
+    double y_delta = (motion->x_mu * sin(robot_location.theta_mu))
+                        + (motion->y_mu * cos(robot_location.theta_mu));
+    // y_change = -1 .* y_change;
+    y_delta = -1 * y_delta; // Account for inverse y axis
+    
+/* Calculate final x and y location */
+    // xf = x1 + x_change;
+    robot_location.x_mu = robot_location.x_mu + x_delta;
+    // yf = y1 + y_change;
+    robot_location.y_mu = robot_location.y_mu + y_delta;
+
+ /* Calculate the final theta direction */
+    // thetaf = theta1 + theta2;
     robot_location.theta_mu = robot_location.theta_mu + motion->theta_mu;
 
-    // Limit robot_location.theta_mu to be between 0 and 2 pi
-    while (robot_location.theta_mu < 0) {
-        robot_location.theta_mu = robot_location.theta_mu + TWO_PI;
-    }
 
-    while (robot_location.theta_mu > TWO_PI) {
-        robot_location.theta_mu = robot_location.theta_mu - TWO_PI;
-    }
+/* Inverse final theta output */
+    // thetaf = 2*pi - thetaf;
+    robot_location.theta_mu = TWO_PI - robot_location.theta_mu;
 
-    robot_location.x_mu = robot_location.x_mu + motion->x_mu * (cos(robot_location.theta_mu) - sin(robot_location.theta_mu));
-    robot_location.y_mu = robot_location.y_mu + motion->y_mu * (sin(robot_location.theta_mu) + cos(robot_location.theta_mu));
+/* limit final theta between 0 and 2 pi */
 
-    
-    /* Add in the covariance */
+    while (robot_location.theta_mu < 0) { robot_location.theta_mu += TWO_PI; }
 
+    while (robot_location.theta_mu > TWO_PI) { robot_location.theta_mu -= TWO_PI; }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/* Old Code */
+    // robot_location.theta_mu = robot_location.theta_mu + motion->theta_mu;
+
+    // // Limit robot_location.theta_mu to be between 0 and 2 pi
+    // while (robot_location.theta_mu < 0) {
+    //     robot_location.theta_mu = robot_location.theta_mu + TWO_PI;
+    // }
+
+    // while (robot_location.theta_mu > TWO_PI) {
+    //     robot_location.theta_mu = robot_location.theta_mu - TWO_PI;
+    // }
+
+    // robot_location.x_mu = robot_location.x_mu + motion->x_mu * (cos(robot_location.theta_mu) - sin(robot_location.theta_mu));
+    // robot_location.y_mu = robot_location.y_mu + motion->y_mu * (sin(robot_location.theta_mu) + cos(robot_location.theta_mu));
 
 }
 
