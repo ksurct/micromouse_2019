@@ -181,22 +181,5 @@ void addMotion(gaussian_location_t* motion) {
 
     while (robot_location.theta_mu > TWO_PI) { robot_location.theta_mu -= TWO_PI; }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/* Old Code */
-    // robot_location.theta_mu = robot_location.theta_mu + motion->theta_mu;
-
-    // // Limit robot_location.theta_mu to be between 0 and 2 pi
-    // while (robot_location.theta_mu < 0) {
-    //     robot_location.theta_mu = robot_location.theta_mu + TWO_PI;
-    // }
-
-    // while (robot_location.theta_mu > TWO_PI) {
-    //     robot_location.theta_mu = robot_location.theta_mu - TWO_PI;
-    // }
-
-    // robot_location.x_mu = robot_location.x_mu + motion->x_mu * (cos(robot_location.theta_mu) - sin(robot_location.theta_mu));
-    // robot_location.y_mu = robot_location.y_mu + motion->y_mu * (sin(robot_location.theta_mu) + cos(robot_location.theta_mu));
-
 }
 

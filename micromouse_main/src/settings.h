@@ -52,9 +52,9 @@
 #define TOLERANCE_MM    10              //dummy value (in mm)
 #define TOLERANCE_RAD   radians(10)     //dummy value (in radians)
 
-#define STRAIGHT_TAU_P  10      // dummy value
+#define STRAIGHT_TAU_P  5       // dummy value
 #define STRAIGHT_TAU_I  0       // dummy value
-#define STRAIGHT_TAU_D  0       // dummy value
+#define STRAIGHT_TAU_D  0.5     // dummy value
 #define SPEED_PROFILE_STABLE_SPEED  150
 #define SPEED_PROFILE_SLOPE         10
 #define SPEED_PROFILE_INTERCEPT     0
