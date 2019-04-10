@@ -24,21 +24,22 @@ void setup() {
   
   
   Serial.begin(9600);
+  delay(500);
 
   // wait for serial port to open on native usb devices
-  while (!Serial) {
-    delay(1);
-  }
+//  while (!Serial) {
+//    delay(1);
+//  }
 
-  tcaselect(2);
+  tcaselect(0);
   Serial.println("Adafruit VL6180x test!");
   if (! vl.begin()) {
     Serial.println("Failed to find sensor");
     while (1);
   }
-  Serial.println("Sensor on port 2 found!");
+  Serial.println("Sensor on port 0 found!");
 
-  tcaselect(7);
+  tcaselect(1);
   Serial.println("Adafruit VL6180x test!");
   if (! vl.begin()) {
     Serial.println("Failed to find sensor");

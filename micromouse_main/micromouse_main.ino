@@ -29,14 +29,20 @@ void setup() {
   }
 
   // Start main loop
-  Timer1.attachInterrupt(main_loop);
-  Timer1.start(MAIN_LOOP_TIME);
+  //Timer1.attachInterrupt(main_loop);
+  //Timer1.start(MAIN_LOOP_TIME);
 
 }
 
 
 void main_loop() {
 
+  
+}
+
+/* This function is not in use because we would like to control the timing that the loop is called */
+void loop(){
+  // do not use
   static sensor_reading_t sensor_data[NUM_SENSORS];
   readSensors(sensor_data);
   for(int i = 0; i < NUM_SENSORS; i++) {
@@ -66,10 +72,6 @@ void main_loop() {
         break;
     }
     Serial.println();
-  } 
-}
-
-/* This function is not in use because we would like to control the timing that the loop is called */
-void loop(){
-  // do not use
+  }
+  delay(500);
 }
