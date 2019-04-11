@@ -52,16 +52,19 @@
 #define TOLERANCE_MM    10              //dummy value (in mm)
 #define TOLERANCE_RAD   radians(10)     //dummy value (in radians)
 
-#define STRAIGHT_TAU_P  5       // dummy value
-#define STRAIGHT_TAU_I  0       // dummy value
-#define STRAIGHT_TAU_D  0.5     // dummy value
-#define SPEED_PROFILE_STABLE_SPEED  150
-#define SPEED_PROFILE_SLOPE         10
-#define SPEED_PROFILE_INTERCEPT     0
+#define STRAIGHT_TAU_P  5                   // dummy value
+#define STRAIGHT_TAU_I  0                   // dummy value
+#define STRAIGHT_TAU_D  0.5                 // dummy value
+#define STRAIGHT_PROFILE_STABLE_SPEED  150  // dummy value
+#define STRAIGHT_PROFILE_SLOPE         5   // dummy value
+#define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
 
-#define TURN_TAU_P      0       // dummy value
-#define TURN_TAU_I      0       // dummy value
-#define TURN_TAU_D      0       // dummy value
+#define TURN_TAU_P      0                   // dummy value
+#define TURN_TAU_I      0                   // dummy value
+#define TURN_TAU_D      0                   // dummy value
+#define TURN_PROFILE_STABLE_SPEED  100  // dummy value
+#define TURN_PROFILE_SLOPE         10    // dummy value
+#define TURN_PROFILE_INTERCEPT     10     // dummy value
 
 // Control
 #define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds

@@ -1,7 +1,7 @@
 #ifndef ARDUINO
 #include <math.h>
 #include <time.h>
-#include <queue>  
+#include <queue>
 #include "movement.h"
 #include "../testing.h"
 #include "../settings.h"
@@ -31,7 +31,9 @@ bool goTo(gaussian_location_t* final_loc, int max_steps, bool debug) {
 
     if (debug) {
         printf("Step\t    DL\t\t    DR\t\t     X\t\t     Y\t\t  theta\n");
-        // printf("Speeds: %f  %f   --- ", 0, 0);
+        
+        printf("Start,");
+        printf("\t%f,\t%f,", 0, 0);
         printf("\t%f,\t%f,\t%f;\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
     }
 
@@ -44,7 +46,8 @@ bool goTo(gaussian_location_t* final_loc, int max_steps, bool debug) {
         localizeMotionStep(TIME_STEP * left_q.front(), TIME_STEP * right_q.front());
 
         if (debug) {
-            // printf("Speeds: %f %f --- ", left_q.front(), right_q.front());
+            printf("%d,", steps);
+            printf("\t%f,\t%f,", left_q.front(), right_q.front());
             printf("\t%f,\t%f,\t%f;\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
         }
 
@@ -53,12 +56,17 @@ bool goTo(gaussian_location_t* final_loc, int max_steps, bool debug) {
         ++steps;
 
         if (steps > max_steps) {
-            return false;
+            break;
         }
+    } while(true);
+    // } while (!IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, TOLERANCE_MM) ||
+    //          !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, TOLERANCE_MM));
 
-    } while (!IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, TOLERANCE_MM) ||
-             !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, TOLERANCE_MM));
-
+    // if not at goal
+    if ( !IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, TOLERANCE_MM) ||
+         !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, TOLERANCE_MM) )
+            return false;
+    
     return true;
 }
 
@@ -75,7 +83,7 @@ TEST_FUNC_BEGIN {
 /* Test standing still */
 
     // Maximum steps allowed
-    max_steps = 1;
+    max_steps = 100;
 
     // Initial location
     robot_location.x_mu = 100;
@@ -95,7 +103,7 @@ TEST_FUNC_BEGIN {
 /* Test going straight */
 
     // Maximum steps allowed
-    max_steps = 500;
+    max_steps = 200;
 
     // Initial location
     robot_location.x_mu = cellNumberToCoordinateDistance(0);
@@ -115,41 +123,41 @@ TEST_FUNC_BEGIN {
 /* Test going straight */
 
     // Maximum steps allowed
-    max_steps = 500;
+    max_steps = 200;
 
     // Initial location
     robot_location.x_mu = cellNumberToCoordinateDistance(0);
-    robot_location.y_mu = cellNumberToCoordinateDistance(0) + (TOLERANCE_MM-2);
+    robot_location.y_mu = cellNumberToCoordinateDistance(0) + (TOLERANCE_MM-1);
     robot_location.theta_mu = directionToRAD[East];
 
     // Final location
     final_loc.x_mu = cellNumberToCoordinateDistance(1);
     final_loc.y_mu = cellNumberToCoordinateDistance(0);
 
-    if (!goTo(&final_loc, max_steps, true))
+    if (!goTo(&final_loc, max_steps, false))
         TEST_FAIL("Test going straight (pid)");
     else
         TEST_PASS("Test going straight (pid)");
 
 
-/* Test turning */
+/* Test turning then going straight */
 
-    // // Maximum steps allowed
-    // max_steps = 1000;
+    // Maximum steps allowed
+    max_steps = 1000;
 
-    // // Initial location
-    // robot_location.x_mu = cellNumberToCoordinateDistance(0);
-    // robot_location.y_mu = cellNumberToCoordinateDistance(0);
-    // robot_location.theta_mu = directionToRAD[South];
+    // Initial location
+    robot_location.x_mu = cellNumberToCoordinateDistance(0);
+    robot_location.y_mu = cellNumberToCoordinateDistance(0);
+    robot_location.theta_mu = directionToRAD[South];
 
-    // // Final location
-    // final_loc.x_mu = cellNumberToCoordinateDistance(1);
-    // final_loc.y_mu = cellNumberToCoordinateDistance(0);
+    // Final location
+    final_loc.x_mu = cellNumberToCoordinateDistance(1);
+    final_loc.y_mu = cellNumberToCoordinateDistance(0);
 
-    // if (!goTo(&final_loc, max_steps))
-    //     TEST_FAIL("Test turning");
-    // else
-    //     TEST_PASS("Test turning");
+    if (!goTo(&final_loc, max_steps, true))
+        TEST_FAIL("Test turning then going straight");
+    else
+        TEST_PASS("Test turning then going straight");
 
 
 /* Test Other */

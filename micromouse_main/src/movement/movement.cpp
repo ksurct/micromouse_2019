@@ -5,26 +5,27 @@
  * Model:
  * C: current_location - the current state of the robot
  * N: next_location - goal location, where we want to be
- * I: intermediate_location - Not always used, but the location we should travel to first before attempting to go to the next_location
+ * I: intermediate_location - Not always used, but the location we should travel to first before
+ *      attempting to go to the next_location
  * v and ->: path of robot, goes down then over because the error in x is less than the error in y
  * 
  * Axis Definition:
- * +--> +X                                      N.x                                  
- * |                                             |                            
- * V        C                                    |                             
- * +Y       v                                    |                            
- *          v                                    |                           
- *          v                                    |                           
+ * +--> +X                                      N.x
+ * |                                             |
+ * V        C                                    |
+ * +Y       v                                    |
+ *          v                                    |
+ *          v                                    |
  *   - - - -v- - - - - - - - - - - - - - - - - - | - - - -
  *          v                                    |       ^
  *          v                                    |       TOLERANCE_MM
  *          v                                    |       v
- *  --------I->->->->->->->->->->->->->->->->->->N-------- N.y               
+ *  --------I->->->->->->->->->->->->->->->->->->N-------- N.y
  *                                               |       ^
  *                                               |       TOLERANCE_MM
  *                                               |       v
  *   - - - - - - - - - - - - - - - - - - - - - - | - - - -
- * 
+ *
  * Main ideas:
  * - Get to a point where you are within the goal tolerance for one axis before try to drive there
  * - Either call straightController() or turnController() each time based on what state we are determined to be in
@@ -61,6 +62,8 @@ double straightSpeedProfile(double distance_away);
 
 void turnController(gaussian_location_t* current_location, double* left_speed,
                             double* right_speed, Direction dir, bool same_state);
+double calculateThetaError(gaussian_location_t* cur, Direction dir);
+double turnSpeedProfile(double thetaError);
 
 
 /*----------- Public Functions -----------*/
@@ -112,8 +115,8 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
                 current_state = IN_XY_OUT_THETA;
             }
         } else { // Special case because circles
-            if (((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - TOLERANCE_MM))
-                    || ((current_location->theta_mu < TOLERANCE_MM) && (current_location->theta_mu >= 0.0))) {
+            if (((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - TOLERANCE_RAD))
+                    || ((current_location->theta_mu < TOLERANCE_RAD) && (current_location->theta_mu >= 0.0))) {
                 current_state = IN_XY_IN_THETA;
             } else {
                 current_state = IN_XY_OUT_THETA;
@@ -123,7 +126,7 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
 
     bool same_state = (current_state == prev_state);
 
-    // printf("State : %d, Same: %d\n", current_state, same_state);
+    // printf("State : %d, Same: %d, Direction: %d\n\n", current_state, same_state, direction);
 
     switch (current_state) {
         case PERFECT:
@@ -234,12 +237,12 @@ void straightController(gaussian_location_t* current_location, gaussian_location
     // The amount we should try to rotate to the left to get back to the correct location (PID)
     double rotate_left = (-1 * STRAIGHT_TAU_P * cte) + (-1 * STRAIGHT_TAU_I * int_cte) + (-1 * STRAIGHT_TAU_D * d_cte);
 
-    // 
+    // Determine the base straight forward speed
     double distance_away = calculateDistanceAway(current_location, next_location, dir);
-    // printf("distance_away: %f\n", distance_away);
+    
     double base_speed = straightSpeedProfile(distance_away);
-    // printf("base_speed: %f\n", base_speed);
 
+    // Set the speed the motors should be at
     *left_speed = base_speed + rotate_left;
     *right_speed = base_speed - rotate_left;
 
@@ -304,14 +307,68 @@ double straightSpeedProfile(double distance_away) {
 
     // Implement the function in the block comment above
     if (distance_away > 0) {
-        return min((SPEED_PROFILE_SLOPE * distance_away) + SPEED_PROFILE_INTERCEPT, SPEED_PROFILE_STABLE_SPEED);
+        return min((STRAIGHT_PROFILE_SLOPE * distance_away) + STRAIGHT_PROFILE_INTERCEPT, STRAIGHT_PROFILE_STABLE_SPEED);
     } else {
-        return max((SPEED_PROFILE_SLOPE * distance_away) + SPEED_PROFILE_INTERCEPT, -1 * SPEED_PROFILE_STABLE_SPEED);
+        return max((STRAIGHT_PROFILE_SLOPE * distance_away) + STRAIGHT_PROFILE_INTERCEPT, -1 * STRAIGHT_PROFILE_STABLE_SPEED);
     }
 }
 
+// TODO: Everything below this
+
+/* Turn toward the correct direction */
 void turnController(gaussian_location_t* current_location, double* left_speed,
                             double* right_speed, Direction dir, bool same_state) {
-    *left_speed = 0;
-    *right_speed = 0;
+
+    // Error between theta and the desired direction
+    double thetaError = calculateThetaError(current_location, dir);
+
+    // The amount we should try to rotate to the left to get back to the correct location (PID)
+    double rotate_left = turnSpeedProfile(thetaError);
+
+    *left_speed = rotate_left;
+    *right_speed = -1 * rotate_left;
+}
+
+
+double calculateThetaError(gaussian_location_t* cur, Direction dir) {
+    double thetaError = directionToRAD[dir] - cur->theta_mu;
+
+    // limit final theta between 0 and 2 pi
+    while (thetaError < 0) { thetaError += TWO_PI; }
+    while (thetaError >= TWO_PI) { thetaError -= TWO_PI; }
+
+    return thetaError;
+}
+
+
+/*
+ * This function defines the speed profile to be used while turning
+ * 
+ *     rotate_left
+ *          |      /--------------------------STABLE_SPEED                            |
+ *          |    /                                                                    |
+ *          |  / <- SLOPE                                                             |
+ *INTERCEPT-|/                                                                        |
+ *          |                                                                         |
+ *          |0                                pi                                   2pi|
+ *     -----|---------------------------------|---------------------------------------|-> thetaError
+ *          |                                                                         |
+ *          |                                                                         |
+ *          |                                                                        /|- -1*INTERCEPT
+ *          |                                                                      /  |
+ *          |                                                           SLOPE -> /    |
+ *          |                   -1*STABLE_SPEED--------------------------------/      |
+ */
+double turnSpeedProfile(double thetaError) {
+
+    // Implement the function in the block comment above
+    if (0 < thetaError && thetaError <= PI) {
+        return min((TURN_PROFILE_SLOPE * thetaError) + TURN_PROFILE_INTERCEPT, TURN_PROFILE_STABLE_SPEED);
+    } else if (PI < thetaError && thetaError < TWO_PI) {
+        // printf("thetaError: %f", thetaError);
+        // printf("Turn: %f\n", (TURN_PROFILE_SLOPE * (thetaError - TWO_PI)) - TURN_PROFILE_INTERCEPT);
+        return max((TURN_PROFILE_SLOPE * (thetaError - TWO_PI)) - TURN_PROFILE_INTERCEPT, -1 * TURN_PROFILE_STABLE_SPEED);
+    } else {
+        return 0;
+    }
 }
