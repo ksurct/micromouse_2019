@@ -25,10 +25,10 @@
 #define WHEEL_BASE_LENGTH       99.5         //dummy value (in mm)
 
 // Localization
-#define INIT_X_MU           100.0   //dummy value (in mm)
+#define INIT_X_MU           84.0    //dummy value (in mm)
 #define INIT_X_SIGMA        10.0    //dummy value (in mm)
 #define INIT_XY_SIGMA       0       //dummy value (in mm)
-#define INIT_Y_MU           100.0   //dummy value (in mm)
+#define INIT_Y_MU           84.0    //dummy value (in mm)
 #define INIT_Y_SIGMA        10.0    //dummy value (in mm)
 #define INIT_THETA_MU       0.0     //dummy value (in mm)
 #define INIT_THETA_SIGMA    10.0    //dummy value (in mm)

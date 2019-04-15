@@ -69,7 +69,7 @@ void main_loop() {
   static double right_distance;
   static double left_speed;
   static double right_speed;
-  static gaussian_location_t next_location;
+  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 
   // Get sensor data
   readSensors(sensor_data);
