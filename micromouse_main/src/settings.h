@@ -3,6 +3,8 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
+#include "link_Arduino.h"
+
 
 // General
 #define DEBUG false
@@ -20,13 +22,13 @@
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
 #define TICKS_PER_REVOLUTION    1808.3333   // Number to encoder ticks per one revolution of a wheel
-#define WHEEL_BASE_LENGTH       100         //dummy value (in mm)
+#define WHEEL_BASE_LENGTH       99.5         //dummy value (in mm)
 
 // Localization
-#define INIT_X_MU           100.0   //dummy value (in mm)
+#define INIT_X_MU           84.0    //dummy value (in mm)
 #define INIT_X_SIGMA        10.0    //dummy value (in mm)
 #define INIT_XY_SIGMA       0       //dummy value (in mm)
-#define INIT_Y_MU           100.0   //dummy value (in mm)
+#define INIT_Y_MU           84.0    //dummy value (in mm)
 #define INIT_Y_SIGMA        10.0    //dummy value (in mm)
 #define INIT_THETA_MU       0.0     //dummy value (in mm)
 #define INIT_THETA_SIGMA    10.0    //dummy value (in mm)
@@ -44,17 +46,39 @@
 #define GOAL_CELL_X     7       // Goal cell x coordinate
 #define GOAL_CELL_Y     7       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
-#define MAX_VALUE       999   // Maximum value that can be in values
+#define MAX_VALUE       999     // Maximum value that can be in values
+
+// Movement
+#define INNER_TOLERANCE_MM    3             //dummy value (in mm)
+#define INNER_TOLERANCE_RAD   radians(3)    //dummy value (in radians)
+#define OUTER_TOLERANCE_MM    10            //dummy value (in mm)
+#define OUTER_TOLERANCE_RAD   radians(10)   //dummy value (in radians)
+
+#define STRAIGHT_TAU_P  5                   // dummy value
+#define STRAIGHT_TAU_I  0                   // dummy value
+#define STRAIGHT_TAU_D  0.5                 // dummy value
+#define STRAIGHT_PROFILE_STABLE_SPEED  100  // dummy value
+#define STRAIGHT_PROFILE_SLOPE         5    // dummy value
+#define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
+
+#define TURN_TAU_P      0                   // unused
+#define TURN_TAU_I      0                   // unused
+#define TURN_TAU_D      0                   // unused
+#define TURN_PROFILE_STABLE_SPEED  100
+#define TURN_PROFILE_SLOPE         500
+#define TURN_PROFILE_INTERCEPT     10
 
 // Control
 #define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
-#define TAU_P               0.015   // Proportional Gain
-#define TAU_I               0.001   // Integral Gain
+#define MOTOR_TAU_P         0.015   // Proportional Gain
+#define MOTOR_TAU_I         0.001   // Integral Gain
 #define INT_BOUND           500     // Integral Bound
+#define MAX_SPEED           250     // Maximum possible speed
+#define MIN_SPEED           50      // Minimum possible speed
 
 // Encoders
-#define LEFT_ENCODER_PIN_A  48
-#define LEFT_ENCODER_PIN_B  49
+#define LEFT_ENCODER_PIN_A  49
+#define LEFT_ENCODER_PIN_B  48
 #define RIGHT_ENCODER_PIN_A 38
 #define RIGHT_ENCODER_PIN_B 40
 

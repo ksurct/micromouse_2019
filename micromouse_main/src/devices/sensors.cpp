@@ -108,7 +108,7 @@ void readSensors(sensor_reading_t* sensor_data) {
 
         } else {
             sensor_data[i].distance = 0;
-            sensor_data[i].state = waiting;
+            sensor_data[i].state = WAITING;
         }
     }
 }
@@ -116,37 +116,37 @@ void readSensors(sensor_reading_t* sensor_data) {
 sensor_state_t parseError(unsigned char status) {
     
     if (status == VL6180X_ERROR_NONE) {
-        return good;
+        return GOOD;
     }
 
     // Some error occurred
     if  ((status >= VL6180X_ERROR_SYSERR_1) && (status <= VL6180X_ERROR_SYSERR_5)) {
-        return error;
+        return ERROR;
     }
     else if (status == VL6180X_ERROR_ECEFAIL) {
-        return too_far;
+        return TOO_FAR;
     }
     else if (status == VL6180X_ERROR_NOCONVERGE) {
-        return too_far;
+        return TOO_FAR;
     }
     else if (status == VL6180X_ERROR_RANGEIGNORE) {
-        return too_far;
+        return TOO_FAR;
     }
     else if (status == VL6180X_ERROR_SNR) {
-        return error;
+        return ERROR;
     }
     else if (status == VL6180X_ERROR_RAWUFLOW) {
-        return too_close;
+        return TOO_CLOSE;
     }
     else if (status == VL6180X_ERROR_RAWOFLOW) {
-        return too_far;
+        return TOO_FAR;
     }
     else if (status == VL6180X_ERROR_RANGEUFLOW) {
-        return too_close;
+        return TOO_CLOSE;
     }
     else if (status == VL6180X_ERROR_RANGEOFLOW) {
-        return too_far;
+        return TOO_FAR;
     }
     
-    return error;
+    return ERROR;
 }

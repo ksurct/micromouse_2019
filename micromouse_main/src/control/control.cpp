@@ -51,13 +51,6 @@ void distanceTravelled(double* left_distance, double* right_distance) {
     controllers[RIGHT].ticks_travelled = 0;
 }
 
-/* calculate speed
- * Calculate the speed to set the motors to given the current_location and the next_location */
-void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* next_location,
-                        double* left_speed, double* right_speed) {
-    // dothething();
-}
-
 /* set speed PID
  * Sets the speed that the control algorithm uses */
 void setSpeedPID(double left_speed, double right_speed){
@@ -95,7 +88,7 @@ void speedController(void) {
             controllers[i].int_error += error;
         }
 
-        output = (-1 * TAU_P * error) + (-1 * TAU_I * controllers[i].int_error);
+        output = (-1 * MOTOR_TAU_P * error) + (-1 * MOTOR_TAU_I * controllers[i].int_error);
 
         // Limit output between -1 and 1
         if (output > 1) output = 1;

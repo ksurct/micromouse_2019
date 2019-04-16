@@ -15,9 +15,8 @@
 
 // Subsystems
 #include "src/localization/localization.h"
-
 #include "src/strategy/strategy.h"
-
+#include "src/movement/movement.h"
 #include "src/control/control.h"
 
 // Utilities
@@ -70,7 +69,7 @@ void main_loop() {
   static double right_distance;
   static double left_speed;
   static double right_speed;
-  static gaussian_location_t next_location;
+  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 
   // Get sensor data
   readSensors(sensor_data);
@@ -91,7 +90,7 @@ void main_loop() {
   //strategy(&robot_location, &robot_maze_state, &next_location);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-  //calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
+  calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
