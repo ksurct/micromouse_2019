@@ -78,10 +78,10 @@ void main_loop() {
   //readSensors(sensor_data);
 
   // Get distance travelled from control subsystem
-//  distanceTravelled(&left_distance, &right_distance);
+  distanceTravelled(&left_distance, &right_distance);
 
   // Run distances through localization
-//  localizeMotionStep(left_distance, right_distance);
+  localizeMotionStep(left_distance, right_distance);
   
   // Update maze with sensor readings
   //mazeMapping(sensor_data);
@@ -93,16 +93,16 @@ void main_loop() {
   //strategy(&robot_location, &robot_maze_state, &next_location);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-//  calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
+  calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
-//  Serial.print("left: ");
-//  Serial.print(left_speed);
-//  Serial.print(", right: ");
-//  Serial.print(right_speed);
-//  Serial.println();
+  // Serial.print("left: ");
+  // Serial.print(left_speed);
+  // Serial.print(", right: ");
+  // Serial.print(right_speed);
+  // Serial.println();
 
   // Set speed using the motor controllers (pid loop)
-  setSpeedPID(100, -100);
+  setSpeedPID(left_speed, right_speed);
 
 }
 
