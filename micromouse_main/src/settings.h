@@ -61,21 +61,12 @@
 #define STRAIGHT_PROFILE_SLOPE         5    // dummy value
 #define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
 
-<<<<<<< HEAD
-#define TURN_TAU_P      0                   // dummy value
-#define TURN_TAU_I      0                   // dummy value
-#define TURN_TAU_D      0                   // dummy value
-#define TURN_PROFILE_STABLE_SPEED  100      // dummy value
-#define TURN_PROFILE_SLOPE         500      // dummy value
-#define TURN_PROFILE_INTERCEPT     10       // dummy value
-=======
 #define TURN_TAU_P      0                   // unused
 #define TURN_TAU_I      0                   // unused
 #define TURN_TAU_D      0                   // unused
 #define TURN_PROFILE_STABLE_SPEED  100
 #define TURN_PROFILE_SLOPE         500
 #define TURN_PROFILE_INTERCEPT     10
->>>>>>> movement
 
 // Control
 #define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
