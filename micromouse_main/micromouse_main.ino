@@ -72,7 +72,7 @@ void main_loop() {
   static double right_distance;
   static double left_speed;
   static double right_speed;
-  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 264.0};
+  static gaussian_location_t next_location = {.x_mu = 263.0, .y_mu = 84.0};
 
   // Get sensor data
   //readSensors(sensor_data);
@@ -95,11 +95,13 @@ void main_loop() {
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
-  // Serial.print("left: ");
-  // Serial.print(left_speed);
-  // Serial.print(", right: ");
-  // Serial.print(right_speed);
-  // Serial.println();
+  Serial.print("");
+  Serial.print(robot_location.x_mu);
+  Serial.print(", ");
+  Serial.print(robot_location.y_mu);
+  Serial.print(", ");
+  Serial.print(robot_location.theta_mu);
+  Serial.println(";");
 
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
