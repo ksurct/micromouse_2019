@@ -36,9 +36,9 @@ void setup() {
   Serial.begin(115200);
 
   // Setup Sensors
-  if (! sensorSetup()){
-    Serial.println("Error connecting to sensors!");
-  }
+  // if (! sensorSetup()){
+  //   Serial.println("Error connecting to sensors!");
+  // }
 
   // Setup Motors
   motorSetup();
@@ -56,6 +56,9 @@ void setup() {
   // Initialize Control subsystem
   initializeControl();
 
+  Serial.println("Waiting...");
+  delay(2000);
+
   // // Start main loop
   Timer1.attachInterrupt(main_loop).start(MAIN_LOOP_TIME);
 }
@@ -72,13 +75,13 @@ void main_loop() {
   static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 
   // Get sensor data
-  readSensors(sensor_data);
+  //readSensors(sensor_data);
 
   // Get distance travelled from control subsystem
-  distanceTravelled(&left_distance, &right_distance);
+//  distanceTravelled(&left_distance, &right_distance);
 
   // Run distances through localization
-  localizeMotionStep(left_distance, right_distance);
+//  localizeMotionStep(left_distance, right_distance);
   
   // Update maze with sensor readings
   //mazeMapping(sensor_data);
@@ -90,10 +93,16 @@ void main_loop() {
   //strategy(&robot_location, &robot_maze_state, &next_location);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-  calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
+//  calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
+
+//  Serial.print("left: ");
+//  Serial.print(left_speed);
+//  Serial.print(", right: ");
+//  Serial.print(right_speed);
+//  Serial.println();
 
   // Set speed using the motor controllers (pid loop)
-  setSpeedPID(left_speed, right_speed);
+  setSpeedPID(100, -100);
 
 }
 
