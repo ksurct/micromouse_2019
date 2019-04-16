@@ -45,7 +45,7 @@
 
 // Globals
 double directionToRAD[4] = { 3*PI/2, 0, PI/2, PI };
-double directionToXY[4][2] = { { 0, -1 }, { 1, 0 }, { 1, 0 }, { -1, 0 } };
+double directionToXY[4][2] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
 
 gaussian_location_t prev_location;
 RobotState prev_state;
@@ -126,7 +126,7 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
 
     bool same_state = (current_state == prev_state);
 
-    // printf("State : %d, Same: %d, Direction: %d\n\n", current_state, same_state, direction);
+    // printf("State : %d, Same: %d, Direction: %d\n", current_state, same_state, direction);
 
     switch (current_state) {
         case PERFECT:
@@ -151,6 +151,7 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
                 axis_x = prev_location.x_mu;
                 axis_y = prev_location.y_mu;
             }
+            // printf("same state: %d, axis_x: %f, axis_y: %f direction: %d\n", same_state, axis_x, axis_y, direction);
 
             // Direction does not depend on x, set to stay the same as previous location to keep same axis for cte
             if (directionToXY[direction][0] == 0)
@@ -163,6 +164,8 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
                 intermediate_location.y_mu = axis_y;
             else // Direction does depend on y, project to axis by setting to next location
                 intermediate_location.y_mu = next_location->y_mu;
+
+            // printf("i location: (%f, %f, %f)\n", intermediate_location.x_mu, intermediate_location.y_mu, intermediate_location.theta_mu);
 
             straightController(current_location, &intermediate_location, left_speed, right_speed, direction, same_state);
 
@@ -363,12 +366,15 @@ double turnSpeedProfile(double thetaError) {
 
     // Implement the function in the block comment above
     if (0 < thetaError && thetaError <= PI) {
+        // printf("thetaError: %f\n", thetaError);
+        // printf("Turn: %f\n", (TURN_PROFILE_SLOPE * thetaError) + TURN_PROFILE_INTERCEPT);
         return min((TURN_PROFILE_SLOPE * thetaError) + TURN_PROFILE_INTERCEPT, TURN_PROFILE_STABLE_SPEED);
     } else if (PI < thetaError && thetaError < TWO_PI) {
-        // printf("thetaError: %f", thetaError);
+        // printf("thetaError: %f\n", thetaError);
         // printf("Turn: %f\n", (TURN_PROFILE_SLOPE * (thetaError - TWO_PI)) - TURN_PROFILE_INTERCEPT);
         return max((TURN_PROFILE_SLOPE * (thetaError - TWO_PI)) - TURN_PROFILE_INTERCEPT, -1 * TURN_PROFILE_STABLE_SPEED);
     } else {
+        // printf("Turn: 0");
         return 0;
     }
 }

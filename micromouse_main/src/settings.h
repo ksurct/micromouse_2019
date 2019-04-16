@@ -62,9 +62,9 @@
 #define TURN_TAU_P      0                   // dummy value
 #define TURN_TAU_I      0                   // dummy value
 #define TURN_TAU_D      0                   // dummy value
-#define TURN_PROFILE_STABLE_SPEED  100  // dummy value
-#define TURN_PROFILE_SLOPE         10    // dummy value
-#define TURN_PROFILE_INTERCEPT     10     // dummy value
+#define TURN_PROFILE_STABLE_SPEED  100      // dummy value
+#define TURN_PROFILE_SLOPE         100      // dummy value
+#define TURN_PROFILE_INTERCEPT     10       // dummy value
 
 // Control
 #define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
