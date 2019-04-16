@@ -49,22 +49,24 @@
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
-#define TOLERANCE_MM    10              //dummy value (in mm)
-#define TOLERANCE_RAD   radians(10)     //dummy value (in radians)
+#define INNER_TOLERANCE_MM    3             //dummy value (in mm)
+#define INNER_TOLERANCE_RAD   radians(3)    //dummy value (in radians)
+#define OUTER_TOLERANCE_MM    10            //dummy value (in mm)
+#define OUTER_TOLERANCE_RAD   radians(10)   //dummy value (in radians)
 
 #define STRAIGHT_TAU_P  5                   // dummy value
 #define STRAIGHT_TAU_I  0                   // dummy value
 #define STRAIGHT_TAU_D  0.5                 // dummy value
-#define STRAIGHT_PROFILE_STABLE_SPEED  150  // dummy value
-#define STRAIGHT_PROFILE_SLOPE         5   // dummy value
+#define STRAIGHT_PROFILE_STABLE_SPEED  100  // dummy value
+#define STRAIGHT_PROFILE_SLOPE         5    // dummy value
 #define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
 
-#define TURN_TAU_P      0                   // dummy value
-#define TURN_TAU_I      0                   // dummy value
-#define TURN_TAU_D      0                   // dummy value
-#define TURN_PROFILE_STABLE_SPEED  100      // dummy value
-#define TURN_PROFILE_SLOPE         100      // dummy value
-#define TURN_PROFILE_INTERCEPT     10       // dummy value
+#define TURN_TAU_P      0                   // unused
+#define TURN_TAU_I      0                   // unused
+#define TURN_TAU_D      0                   // unused
+#define TURN_PROFILE_STABLE_SPEED  100
+#define TURN_PROFILE_SLOPE         500
+#define TURN_PROFILE_INTERCEPT     10
 
 // Control
 #define CONTROL_LOOP_TIME   10000   // Delay between start times of control loop in microseconds
