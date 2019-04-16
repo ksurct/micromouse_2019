@@ -10,7 +10,7 @@
 #define DEBUG false
 
 // Main
-#define MAIN_LOOP_TIME 500000 // Delay between the start of each main_loop call in microseconds
+#define MAIN_LOOP_TIME 10000    // Delay between the start of each main_loop call in microseconds
 
 // Maze Specifications
 #define MAZE_SIZE       16          // If square, the length each side of the maze
