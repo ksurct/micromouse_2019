@@ -33,7 +33,7 @@ bool goTo(gaussian_location_t* final_loc, int max_steps, bool debug) {
         printf("Step\t    DL\t\t    DR\t\t     X\t\t     Y\t\t  theta\n");
         
         printf("Start,");
-        printf("\t%f,\t%f,", 0, 0);
+        printf("\t%f,\t%f,", 0.0, 0.0);
         printf("\t%f,\t%f,\t%f;\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
     }
 
@@ -59,12 +59,12 @@ bool goTo(gaussian_location_t* final_loc, int max_steps, bool debug) {
             break;
         }
     } while(true);
-    // } while (!IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, TOLERANCE_MM) ||
-    //          !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, TOLERANCE_MM));
+    // } while (!IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, OUTER_TOLERANCE_MM) ||
+    //          !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, OUTER_TOLERANCE_MM));
 
     // if not at goal
-    if ( !IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, TOLERANCE_MM) ||
-         !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, TOLERANCE_MM) )
+    if ( !IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, OUTER_TOLERANCE_MM) ||
+         !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, OUTER_TOLERANCE_MM) )
             return false;
     
     return true;
@@ -127,7 +127,7 @@ TEST_FUNC_BEGIN {
 
     // Initial location
     robot_location.x_mu = cellNumberToCoordinateDistance(0);
-    robot_location.y_mu = cellNumberToCoordinateDistance(0) + (TOLERANCE_MM-1);
+    robot_location.y_mu = cellNumberToCoordinateDistance(0) + (OUTER_TOLERANCE_MM-1);
     robot_location.theta_mu = directionToRAD[East];
 
     // Final location

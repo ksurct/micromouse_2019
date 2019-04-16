@@ -18,11 +18,11 @@
  *          v                                    |
  *   - - - -v- - - - - - - - - - - - - - - - - - | - - - -
  *          v                                    |       ^
- *          v                                    |       TOLERANCE_MM
+ *          v                                    |       OUTER_TOLERANCE_MM
  *          v                                    |       v
  *  --------I->->->->->->->->->->->->->->->->->->N-------- N.y
  *                                               |       ^
- *                                               |       TOLERANCE_MM
+ *                                               |       OUTER_TOLERANCE_MM
  *                                               |       v
  *   - - - - - - - - - - - - - - - - - - - - - - | - - - -
  *
@@ -49,9 +49,13 @@ double directionToXY[4][2] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
 
 gaussian_location_t prev_location;
 RobotState prev_state;
+Direction prev_direction;
 
 
 // Function Declarations
+bool canSwitchState(gaussian_location_t *current_location, gaussian_location_t *next_location);
+void getCurrentState(gaussian_location_t* current_location, gaussian_location_t* next_location,
+                        Direction *dir, RobotState *state);
 Direction chooseDirectionOutOfTolerance(double x_cte, double y_cte);
 Direction chooseDirectionWithinTolerance(double x_cte, double y_cte);
 void straightController(gaussian_location_t* current_location, gaussian_location_t* next_location,
@@ -78,50 +82,16 @@ void initializeMovement(gaussian_location_t* current_location) {
  * - left_speed and right_speed should be passed in with the current respective speeds*/
 void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* next_location,
                         double* left_speed, double* right_speed) {
-
-    // Overall changes
-    double x_cte = next_location->x_mu - current_location->x_mu;
-    double y_cte = next_location->y_mu - current_location->y_mu;
-
+    
     RobotState current_state;
     Direction direction;
-    
-    if (abs(x_cte) > TOLERANCE_MM && abs(y_cte) > TOLERANCE_MM) {
-        
-        // Determine the direction to go
-        direction = chooseDirectionOutOfTolerance(x_cte, y_cte);
 
-        // Are we facing that direction?
-        if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[direction], TOLERANCE_RAD)) {
-            current_state = OUT_XY_IN_THETA;
-        } else {
-            current_state = OUT_XY_OUT_THETA;
-        }
-
-    } else if (abs(x_cte) < TOLERANCE_MM && abs(y_cte) < TOLERANCE_MM) {
-        
-        current_state = PERFECT;
-
+    // Get the new current state if we are allowed to check
+    if (canSwitchState(current_location, next_location)) {
+        getCurrentState(current_location, next_location, &direction, &current_state);
     } else {
-
-        // Determine the direction to go
-        direction = chooseDirectionWithinTolerance(x_cte, y_cte);
-
-        // Are we facing that direction?
-        if (direction != East){
-            if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[direction], TOLERANCE_RAD)) {
-                current_state = IN_XY_IN_THETA;
-            } else {
-                current_state = IN_XY_OUT_THETA;
-            }
-        } else { // Special case because circles
-            if (((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - TOLERANCE_RAD))
-                    || ((current_location->theta_mu < TOLERANCE_RAD) && (current_location->theta_mu >= 0.0))) {
-                current_state = IN_XY_IN_THETA;
-            } else {
-                current_state = IN_XY_OUT_THETA;
-            }
-        }
+        current_state = prev_state;
+        direction = prev_direction;
     }
 
     bool same_state = (current_state == prev_state);
@@ -129,11 +99,13 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
     // printf("State : %d, Same: %d, Direction: %d\n", current_state, same_state, direction);
 
     switch (current_state) {
+        default:
         case PERFECT:
             // Stop
             *left_speed = 0;
             *right_speed = 0;
             break;
+
         case OUT_XY_IN_THETA:
             // Go Straight to get to within the tolerance
 
@@ -182,11 +154,6 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
         case IN_XY_IN_THETA:
             
             // Go Straight
-            // printf("Calling straightController(): %f %f %f %f %d %d\n",
-            //             current_location->x_mu, next_location->x_mu,
-            //             *left_speed, *right_speed,
-            //             direction, same_state);
-
             straightController(current_location, next_location, left_speed, right_speed, direction, same_state);
             break;
             
@@ -199,6 +166,140 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
 
     prev_location = *current_location;
     prev_state = current_state;
+    prev_direction = direction;
+}
+
+bool canSwitchState(gaussian_location_t *current_location, gaussian_location_t *next_location) {
+
+    // Overall changes
+    double x_cte = next_location->x_mu - current_location->x_mu;
+    double y_cte = next_location->y_mu - current_location->y_mu;
+
+    // Check for transition conditions
+    switch (prev_state) {
+        default:
+        case PERFECT:
+            return true;
+            break;
+
+        case OUT_XY_IN_THETA:
+            // To change states:
+            // either x or y needs to be within inner tolerance
+            if (abs(x_cte) < INNER_TOLERANCE_MM || abs(y_cte) < INNER_TOLERANCE_MM)
+                return true;
+            // or theta needs to be outside outer tolerance
+            if (prev_direction != East){
+                if (!IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[prev_direction], OUTER_TOLERANCE_RAD))
+                    return true;
+            } else { // Special case because circles
+                if ( !(((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - OUTER_TOLERANCE_RAD))
+                        || ((current_location->theta_mu < OUTER_TOLERANCE_RAD) && (current_location->theta_mu >= 0.0))))
+                    return true;
+            }
+            break;
+
+        case OUT_XY_OUT_THETA:
+            // To change states:
+            // either x or y needs to be within inner tolerance 
+            if (abs(x_cte) < INNER_TOLERANCE_MM || abs(y_cte) < INNER_TOLERANCE_MM)
+                return true;
+            // or theta needs to be inside inner tolerance
+            if (prev_direction != East){
+                if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[prev_direction], INNER_TOLERANCE_RAD))
+                    return true;
+            } else { // Special case because circles
+                if (((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - INNER_TOLERANCE_RAD))
+                        || ((current_location->theta_mu < INNER_TOLERANCE_RAD) && (current_location->theta_mu >= 0.0)))
+                    return true;
+            }
+            break;
+
+        case IN_XY_IN_THETA:
+            // To change states:
+            // both x and y must be outside of outer tolerance
+            if (abs(x_cte) > OUTER_TOLERANCE_MM && abs(y_cte) > OUTER_TOLERANCE_MM)
+                return true;
+            // or both x and y must be within inner tolerance
+            if (abs(x_cte) < INNER_TOLERANCE_MM || abs(y_cte) < INNER_TOLERANCE_MM)
+                return true;
+            // or theta needs to be outside outer tolerance
+            if (prev_direction != East){
+                if (!IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[prev_direction], OUTER_TOLERANCE_RAD))
+                    return true;
+            } else { // Special case because circles
+                if ( !(((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - OUTER_TOLERANCE_RAD))
+                        || ((current_location->theta_mu < OUTER_TOLERANCE_RAD) && (current_location->theta_mu >= 0.0))))
+                    return true;
+            }
+            break;
+
+        case IN_XY_OUT_THETA:
+            // To change states:
+            // both x and y must be outside of outer tolerance
+            if (abs(x_cte) > OUTER_TOLERANCE_MM && abs(y_cte) > OUTER_TOLERANCE_MM)
+                return true;
+            // or both x and y must be within inner tolerance
+            if (abs(x_cte) < INNER_TOLERANCE_MM || abs(y_cte) < INNER_TOLERANCE_MM)
+                return true;
+            // or theta needs to be within inner tolerance
+            if (prev_direction != East){
+                if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[prev_direction], INNER_TOLERANCE_RAD))
+                    return true;
+            } else { // Special case because circles
+                if (((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - INNER_TOLERANCE_RAD))
+                        || ((current_location->theta_mu < INNER_TOLERANCE_RAD) && (current_location->theta_mu >= 0.0)))
+                    return true;
+            }
+            break;
+    }
+    return false;
+}
+
+
+void getCurrentState(gaussian_location_t* current_location, gaussian_location_t* next_location,
+                        Direction *dir, RobotState *state) {
+    
+    // Overall changes
+    double x_cte = next_location->x_mu - current_location->x_mu;
+    double y_cte = next_location->y_mu - current_location->y_mu;
+    
+    if (abs(x_cte) > OUTER_TOLERANCE_MM && abs(y_cte) > OUTER_TOLERANCE_MM) {
+        
+        // Determine the direction to go
+        *dir = chooseDirectionOutOfTolerance(x_cte, y_cte);
+
+        // Are we facing that direction?
+        if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[*dir], OUTER_TOLERANCE_RAD)) {
+            *state = OUT_XY_IN_THETA;
+        } else {
+            *state = OUT_XY_OUT_THETA;
+        }
+
+    } else if (abs(x_cte) < OUTER_TOLERANCE_MM && abs(y_cte) < OUTER_TOLERANCE_MM) {
+        
+        *state = PERFECT;
+
+    } else {
+
+        // Determine the direction to go
+        *dir = chooseDirectionWithinTolerance(x_cte, y_cte);
+
+        // Are we facing that direction?
+        if (*dir != East){
+            if (IS_BETWEEN_ERROR(current_location->theta_mu, directionToRAD[*dir], OUTER_TOLERANCE_RAD)) {
+                *state = IN_XY_IN_THETA;
+            } else {
+                *state = IN_XY_OUT_THETA;
+            }
+        } else { // Special case because circles
+            if (((current_location->theta_mu <= TWO_PI) && (current_location->theta_mu > TWO_PI - OUTER_TOLERANCE_RAD))
+                    || ((current_location->theta_mu < OUTER_TOLERANCE_RAD) && (current_location->theta_mu >= 0.0))) {
+                *state = IN_XY_IN_THETA;
+            } else {
+                *state = IN_XY_OUT_THETA;
+            }
+        }
+    }
 }
 
 Direction chooseDirectionOutOfTolerance(double x_cte, double y_cte) {
@@ -303,10 +404,6 @@ double calculateDistanceAway(gaussian_location_t* cur, gaussian_location_t* next
  * ===========================|===========> distance_away
  */
 double straightSpeedProfile(double distance_away) {
-
-    // If within tolerance, don't move, I don't think is possible...
-    if (abs(distance_away) < TOLERANCE_MM)
-        return 0;
 
     // Implement the function in the block comment above
     if (distance_away > 0) {
