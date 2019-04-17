@@ -42,7 +42,8 @@ gaussian_location_t* localizeMeasureStep(sensor_reading_t* sensor_data);
 /*----------- Private Functions -----------*/
 void calculateMotion(gaussian_location_t* motion, double left_distance, double right_distance);
 void rotateCovariance(double rotate_by, double* x_sigma, double* y_sigma, double* xy_sigma);
-void addMotion(gaussian_location_t* motion);
+void addMotion(gaussian_location_t* current_location, gaussian_location_t* motion,
+                    gaussian_location_t* final_location);
 
 
 #endif //_LOCALIZATION_H_

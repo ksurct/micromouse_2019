@@ -107,7 +107,13 @@ TEST_FUNC_BEGIN {
     ;
 
     // Test mazeMapping
-    // TEST_FAIL("not all tests written yet!!!");
+    initializeLocalization();
+    
+    sensor_reading_t sensor_test_data[NUM_SENSORS];
+
+    mazeMapping(sensor_test_data);
+    
+    TEST_FAIL("not all tests written yet!!!");
 
     // Test localizeMeasureStep
     // TEST_FAIL("not all tests written yet!!!");

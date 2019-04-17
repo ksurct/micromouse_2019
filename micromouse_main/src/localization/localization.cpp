@@ -19,6 +19,16 @@
 probabilistic_maze_t robot_maze_state;
 gaussian_location_t robot_location;
 
+/* Sensor offsets (Inverted y coordinates) */
+
+gaussian_location_t sensor_offsets[NUM_SENSORS] = {
+    (gaussian_location_t){ .x_mu = -32.5,  .y_mu = -35.0,  .theta_mu = -PI/2   },
+    (gaussian_location_t){ .x_mu = 32.5,   .y_mu = -35.0,  .theta_mu = -PI/2   },
+    (gaussian_location_t){ .x_mu = 46.0,   .y_mu = 0.0,    .theta_mu = 0.0     },
+    (gaussian_location_t){ .x_mu = 32.5,   .y_mu = 35.0,   .theta_mu = PI/2    },
+    (gaussian_location_t){ .x_mu = -32.5,  .y_mu = 35.0,   .theta_mu = PI/2    }
+};
+
 
 /*----------- Public Functions -----------*/
 
@@ -47,13 +57,25 @@ gaussian_location_t* localizeMotionStep(double left_distance, double right_dista
     calculateMotion(&motion, left_distance, right_distance);
     
     // Update the current location and covariance matrix by adding in the distance travelled
-    addMotion(&motion);
+    addMotion(&robot_location, &motion, &robot_location);
+
+    return &robot_location;
 }
 
 /* Maze Mapping
  * - Updates the global robot_maze_state based on the believed current position and the sensor data recorded */
 probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data) {
-    // dothething();
+    
+    printf("Robot:   \t(%f,\t%f,\t%f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
+    
+    // calculate the sensor locations
+    gaussian_location_t sensor_locations[NUM_SENSORS];
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        addMotion(&robot_location, &sensor_offsets[i], &sensor_locations[i]);
+        printf("Sensor %d:\t(%f,\t%f,\t%f)\n", i, sensor_locations[i].x_mu, sensor_locations[i].y_mu, sensor_locations[i].theta_mu);
+    }
+    
+    return &robot_maze_state;
 }
 
 /* Localize Measure Step
@@ -138,12 +160,13 @@ void rotateCovariance(double rotate_by, double* x_sigma, double* y_sigma, double
     *xy_sigma = -1 * *xy_sigma; // our axis are setup inverted in the y direction
 }
 
-/* Add in the mean of motion to the mean of robot_location */
-void addMotion(gaussian_location_t* motion) {
+/* Add in the mean of motion to the mean of current_location to get the final location */
+void addMotion(gaussian_location_t* current_location, gaussian_location_t* motion,
+                    gaussian_location_t* final_location) {
 
 /* Inverse the input to normal coordinates */
     // theta1 = 2*pi - theta1;
-    robot_location.theta_mu = TWO_PI - robot_location.theta_mu;
+    final_location->theta_mu = TWO_PI - current_location->theta_mu;
     // theta2 = 2*pi - theta2;
     motion->theta_mu = TWO_PI - motion->theta_mu;
     // y2 = -1 * y2;
@@ -152,31 +175,31 @@ void addMotion(gaussian_location_t* motion) {
 
 /* Calculate the change in x and y from rotating by the global theta */
     // x_change = x2 .* cos(theta1) - y2 .* sin(theta1);
-    double x_delta = (motion->x_mu * cos(robot_location.theta_mu))
-                        - (motion->y_mu * sin(robot_location.theta_mu));
+    double x_delta = (motion->x_mu * cos(final_location->theta_mu))
+                        - (motion->y_mu * sin(final_location->theta_mu));
     // y_change = x2 .* sin(theta1) + y2 .* cos(theta1);
-    double y_delta = (motion->x_mu * sin(robot_location.theta_mu))
-                        + (motion->y_mu * cos(robot_location.theta_mu));
+    double y_delta = (motion->x_mu * sin(final_location->theta_mu))
+                        + (motion->y_mu * cos(final_location->theta_mu));
     // y_change = -1 .* y_change;
     y_delta = -1 * y_delta; // Account for inverse y axis
     
 /* Calculate final x and y location */
     // xf = x1 + x_change;
-    robot_location.x_mu = robot_location.x_mu + x_delta;
+    final_location->x_mu = current_location->x_mu + x_delta;
     // yf = y1 + y_change;
-    robot_location.y_mu = robot_location.y_mu + y_delta;
+    final_location->y_mu = current_location->y_mu + y_delta;
 
  /* Calculate the final theta direction */
     // thetaf = theta1 + theta2;
-    robot_location.theta_mu = robot_location.theta_mu + motion->theta_mu;
+    final_location->theta_mu = final_location->theta_mu + motion->theta_mu;
 
 
 /* Inverse final theta output */
     // thetaf = 2*pi - thetaf;
-    robot_location.theta_mu = TWO_PI - robot_location.theta_mu;
+    final_location->theta_mu = TWO_PI - final_location->theta_mu;
 
 /* limit final theta between 0 and 2 pi */
-    while (robot_location.theta_mu < 0) { robot_location.theta_mu += TWO_PI; }
-    while (robot_location.theta_mu >= TWO_PI) { robot_location.theta_mu -= TWO_PI; }
+    while (final_location->theta_mu < 0) { final_location->theta_mu += TWO_PI; }
+    while (final_location->theta_mu >= TWO_PI) { final_location->theta_mu -= TWO_PI; }
 
 }
