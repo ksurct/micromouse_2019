@@ -109,8 +109,15 @@ TEST_FUNC_BEGIN {
     // Test mazeMapping
     initializeLocalization();
     
-    sensor_reading_t sensor_test_data[NUM_SENSORS];
+    sensor_reading_t sensor_test_data[NUM_SENSORS] = {
+        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
+        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
+        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
+        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
+        (sensor_reading_t){ .state = GOOD, .distance = 200.0 }
+    };
 
+    robot_location.theta_mu = 0;
     mazeMapping(sensor_test_data);
     
     TEST_FAIL("not all tests written yet!!!");

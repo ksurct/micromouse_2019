@@ -40,6 +40,10 @@
 #define Y_VARIANCE      1   //dummy value
 #define THETA_VARIANCE  1   //dummy value
 
+#define TOO_FAR_DISTANCE    100 // the distance that of walls that we update given a TOO_FAR measurement (in mm)
+#define TOO_CLOSE_DISTANCE  10  // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
+#define SENSOR_VARIANCE     5   //dummy value (in mm)
+
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
