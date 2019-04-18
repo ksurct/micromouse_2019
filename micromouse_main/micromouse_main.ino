@@ -25,18 +25,19 @@
 
 // Function Declarations
 void setup(void);
+void start_loop(void);
 void main_loop(void);
 
 
 /* Entry point to the code for the robot, all initialization
- * of subsystems should be done here */
+   of subsystems should be done here */
 void setup() {
 
   // Initialize Serial
   Serial.begin(115200);
 
   // Setup Sensors
-  if (! sensorSetup()){
+  if (! sensorSetup()) {
     Serial.println("Error connecting to sensors!");
   }
 
@@ -56,10 +57,58 @@ void setup() {
   // Initialize Control subsystem
   initializeControl();
 
+  // Wait 2 seconds
+  delay(2000);
+
+  Timer1.attachInterrupt(start_loop).start(MAIN_LOOP_TIME);
+
+  // // Start start loop
+  while (robot_location.theta_mu < 3*PI/2) {
+    Serial.println("Test");
+    Serial.println(robot_location.theta_mu);
+  }
+  Serial.println("Should have stopped");
+  Timer1.stop();
+  
   // // Start main loop
   Timer1.attachInterrupt(main_loop).start(MAIN_LOOP_TIME);
 }
 
+void start_loop() {
+
+  // Initialize variables
+  static sensor_reading_t sensor_data[NUM_SENSORS];
+  static double left_distance;
+  static double right_distance;
+  static double left_speed;
+  static double right_speed;
+  //static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0}; -REMOVE
+
+  // Get sensor data
+  //readSensors(sensor_data);
+
+  // Get distance travelled from control subsystem
+  distanceTravelled(&left_distance, &right_distance);
+
+  // Run distances through localization
+  localizeMotionStep(left_distance, right_distance);
+
+  // Update maze with sensor readings
+  //mazeMapping(sensor_data);
+
+  // Interpolate sensor data into the localization
+  //localizeMeasureStep(sensor_data);
+
+  // Determine next cell to go to (strategy step)
+  //strategy(&robot_location, &robot_maze_state, &next_location); -REMOVE
+
+  // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
+  //calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed); -REMOVE
+
+  // Set speed using the motor controllers (pid loop)
+  setSpeedPID(TURN_PROFILE_STABLE_SPEED, -TURN_PROFILE_STABLE_SPEED);
+
+}
 
 void main_loop() {
 
@@ -72,14 +121,14 @@ void main_loop() {
   static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 
   // Get sensor data
-  readSensors(sensor_data);
+  //readSensors(sensor_data);
 
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
 
   // Run distances through localization
   localizeMotionStep(left_distance, right_distance);
-  
+
   // Update maze with sensor readings
   //mazeMapping(sensor_data);
 
@@ -88,7 +137,7 @@ void main_loop() {
 
   // Determine next cell to go to (strategy step)
   //strategy(&robot_location, &robot_maze_state, &next_location);
-  
+
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
@@ -98,6 +147,6 @@ void main_loop() {
 }
 
 /* This function is not in use because we would like to control the timing that the loop is called */
-void loop(){
+void loop() {
   // do not use
 }
