@@ -40,12 +40,19 @@
 #define Y_VARIANCE      1   //dummy value
 #define THETA_VARIANCE  1   //dummy value
 
+#define TOO_FAR_DISTANCE    125.0   // the distance that of walls that we update given a TOO_FAR measurement (in mm)
+#define TOO_CLOSE_DISTANCE  5.0     // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
+
+#define SENSOR_THRESHOLD_RANGE  10      // The plus or minus amount for a measurement that should result in the increase of a walls exists
+#define WALL_UPDATE_AMOUNT      0.05    // The amount to increase or decrease a wall's probability of existing
+#define WALL_UPDATE             0.75    // The amount to multiply by to increase or decrease a wall's probability of existing
+
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
 #define GOAL_CELL_X     7       // Goal cell x coordinate
 #define GOAL_CELL_Y     7       // Goal cell y coordinate
-#define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
+#define WALL_THRESHOLD  0.5     // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
