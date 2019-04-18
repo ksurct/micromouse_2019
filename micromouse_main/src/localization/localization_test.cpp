@@ -3,11 +3,33 @@
 #include "localization_test_data.h"
 #include "../testing.h"
 #include "../settings.h"
+#include "../util/conversions.h"
 
 
 #define IS_BETWEEN_ERROR(x,y,e) (((x) < (y) + (e)) && ((x) > (y) - (e)))
 #define ACCEPTABLE_ERROR 0.001
 
+void print_maze_state() {
+    printf("\n\nMaze State:\n");
+    for (int y = 0; y < 5; y++) {
+        for (int x = 0; x < 5; x++) {
+            printf("|XXXXXXX| %.3f\t", robot_maze_state.cells[x][y].north->exists);
+        }
+        printf("|\n|");
+        for (int i = 0; i < 79; i++)
+            printf("-");
+        printf("|\n");
+
+        for (int x = 0; x < 5; x++) {
+            printf("| %.3f\t|\t", robot_maze_state.cells[x][y].west->exists);
+        }
+        printf("|\n|");
+
+        for (int i = 0; i < 79; i++)
+            printf("-");
+        printf("|\n");
+    }
+}
 
 TEST_FUNC_BEGIN {
     
@@ -110,16 +132,30 @@ TEST_FUNC_BEGIN {
     initializeLocalization();
     
     sensor_reading_t sensor_test_data[NUM_SENSORS] = {
-        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
-        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
-        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
-        (sensor_reading_t){ .state = GOOD, .distance = 200.0 },
-        (sensor_reading_t){ .state = GOOD, .distance = 200.0 }
+        (sensor_reading_t){ .state = TOO_FAR, .distance = 51.5 },
+        (sensor_reading_t){ .state = TOO_FAR, .distance = 51.5 },
+        (sensor_reading_t){ .state = TOO_FAR, .distance = 51.5 },
+        (sensor_reading_t){ .state = TOO_CLOSE, .distance = 0.0 },
+        (sensor_reading_t){ .state = TOO_FAR, .distance = 0.0 }
     };
 
+    robot_location.x_mu = cellNumberToCoordinateDistance(1) + CELL_LENGTH;
+    robot_location.y_mu = cellNumberToCoordinateDistance(1) + 50;
     robot_location.theta_mu = 0;
-    mazeMapping(sensor_test_data);
     
+    //for (int i = 0; i < 6; i++) {
+        mazeMapping(sensor_test_data);
+    //}
+
+    printf("Robot_location: (%.3f, %.3f, %.3f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
+
+    printf("North: %f\n", robot_maze_state.cells[1][1].north->exists);
+    printf("East: %f\n", robot_maze_state.cells[1][1].east->exists);
+    printf("South: %f\n", robot_maze_state.cells[1][1].south->exists);
+    printf("West: %f\n", robot_maze_state.cells[1][1].west->exists);
+    
+    print_maze_state();
+
     TEST_FAIL("not all tests written yet!!!");
 
     // Test localizeMeasureStep

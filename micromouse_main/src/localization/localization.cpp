@@ -33,7 +33,7 @@ gaussian_location_t sensor_offsets[NUM_SENSORS] = {
 // Private Function Declarations
 bool validateMeasurement(sensor_reading_t *measurement);
 void processMeasurement(gaussian_location_t* location, sensor_reading_t *measurement);
-void updateMazeWall(probabilistic_wall_t* wall);
+void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t * reading);
 
 
 /*----------- Public Functions -----------*/
@@ -224,6 +224,13 @@ bool validateMeasurement(sensor_reading_t *measurement) {
 /* update robot_maze_state based on the given sensor reading */
 void processMeasurement(gaussian_location_t* location, sensor_reading_t *measurement) {
     
+    // Use defaults for TOO_FAR and TOO_CLOSE STATES
+    if (measurement->state == TOO_FAR)
+        measurement->distance = TOO_FAR_DISTANCE;
+    
+    if (measurement->state == TOO_CLOSE)
+        measurement->distance = TOO_CLOSE_DISTANCE;
+
     // Ray cast to find places where we hit a wall and update each wall we hit
 
     //which box of the map we're in
@@ -270,51 +277,80 @@ void processMeasurement(gaussian_location_t* location, sensor_reading_t *measure
         percent = (edgeCellY + (CELL_LENGTH + WALL_THICKNESS) - location->y_mu) / (CELL_LENGTH + WALL_THICKNESS);
         sideDistY = percent * deltaDistY;
     }
+    
     printf("sideDist:\t(%f,\t%f)\n", sideDistX, sideDistY);
     printf("step:\t\t(%d,\t%d)\n", stepX, stepY);
 
     printf("\n");
     printf("State: %d, Distance: %d\n", measurement->state, measurement->distance);
 
-    // Traverse the for length of the measurement and still within the maze
-    while ( (sideDistX < measurement->distance || sideDistY < measurement->distance)
+    // Traverse the for length of the measurement + threshold and still within the maze
+    while ( (sideDistX < measurement->distance + SENSOR_THRESHOLD_RANGE || sideDistY < measurement->distance + SENSOR_THRESHOLD_RANGE)
                 && !(cellX < 0 || cellX >= (MAZE_WIDTH) || cellY < 0 || cellY >= (MAZE_HEIGHT))) {
         
         //jump to next map square, in x-direction, OR in y-direction
         if (sideDistX < sideDistY) { // x-direction
-            
-            sideDistX += deltaDistX; // Set to next x collision distance
 
-            if (stepX > 0) { // Update East and go East
+            if (stepX > 0) { // Update East and move East
                 printf("%d %d east\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].east);
-                cellX += stepX;
-            } else { // Update West and go West
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].east, sideDistX, measurement);
+                cellX++;
+            } else { // Update West and move West
                 printf("%d %d west\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].west);
-                cellX += stepX;
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].west, sideDistX, measurement);
+                cellX--;
             }
+
+            sideDistX += deltaDistX; // Set to next x collision distance
         } else { // y-direction
             
-            sideDistY += deltaDistY; // Set to next y collision distance
-            
-            if (stepY > 0) { // Update South and go South
+            if (stepY > 0) { // Update South and move South
                 printf("%d %d south\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].south);
-                cellY += stepY;
-            } else { // Update North and go North
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].south, sideDistY, measurement);
+                cellY++;
+            } else { // Update North and move North
                 printf("%d %d north\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].north);
-                cellY += stepY;
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].north, sideDistY, measurement);
+                cellY--;
             }
+            
+            sideDistY += deltaDistY; // Set to next y collision distance
         }
-    } 
+    }
 
     printf("\n");
 }
 
 
-// Raycast has hit this wall, update it accordingly
-void updateMazeWall(probabilistic_wall_t* wall) {
+/* Raycast has hit a wall at distance_hit away from the original sensor measurement
+ * - Note: order of operations does matter for multiplicative but not for additive */
+void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t* measurement) {
 
+    // Additive implementation
+    // if (measurement->distance - SENSOR_THRESHOLD_RANGE < distance_hit &&
+    //         distance_hit < measurement->distance + SENSOR_THRESHOLD_RANGE) {
+    //     // hit should increase wall value if state is GOOD or TOO_CLOSE
+    //     if (measurement->state == GOOD || measurement->state == TOO_CLOSE)
+    //         wall->exists += WALL_UPDATE_AMOUNT;
+    // } else {
+    //     // hit should decrease wall value if state is GOOD or TOO_FAR
+    //     if (measurement->state == GOOD || measurement->state == TOO_FAR)
+    //         wall->exists -= WALL_UPDATE_AMOUNT;
+    // }
+
+    // Multiplicative implementation
+    if (measurement->distance - SENSOR_THRESHOLD_RANGE < distance_hit &&
+            distance_hit < measurement->distance + SENSOR_THRESHOLD_RANGE) {
+        // hit should increase wall value if state is GOOD or TOO_CLOSE
+        if (measurement->state == GOOD || measurement->state == TOO_CLOSE)
+            wall->exists = (1.0 - ((1.0 - wall->exists) * WALL_UPDATE));
+    } else {
+        // hit should decrease wall value if state is GOOD or TOO_FAR
+        if (measurement->state == GOOD || measurement->state == TOO_FAR)
+            wall->exists = wall->exists * WALL_UPDATE;
+    }
+
+    // bound the value of wall->exists by 1.0 and 0.0
+    if (wall->exists > 1.0) wall->exists = 1.0;
+    if (wall->exists < 0.0) wall->exists = 0.0;
 }
