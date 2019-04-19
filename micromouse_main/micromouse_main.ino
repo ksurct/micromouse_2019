@@ -93,11 +93,8 @@ void start_loop() {
   // Run distances through localization
   localizeMotionStep(left_distance, right_distance);
 
-  // Update maze with sensor readings
-  //mazeMapping(sensor_data);
-
-  // Interpolate sensor data into the localization
-  //localizeMeasureStep(sensor_data);
+  // Update maze and location with sensor readings
+  //mazeMappingAndMeasureStep(sensor_data);
 
   // Determine next cell to go to (strategy step)
   //strategy(&robot_location, &robot_maze_state, &next_location); -REMOVE
@@ -130,7 +127,7 @@ void main_loop() {
   localizeMotionStep(left_distance, right_distance);
 
   // Update maze with sensor readings
-  //mazeMapping(sensor_data);
+  //mazeMappingAndMeasureStep(sensor_data);
 
   // Interpolate sensor data into the localization
   //localizeMeasureStep(sensor_data);

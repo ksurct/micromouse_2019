@@ -44,8 +44,10 @@
 #define TOO_CLOSE_DISTANCE  5.0     // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
 
 #define WALL_HIT_THRESHOLD  10      // The plus or minus amount for a measurement that should result in the increase of a walls exists
-#define WALL_UPDATE_AMOUNT      0.05    // The amount to increase or decrease a wall's probability of existing
-#define WALL_UPDATE             0.75    // The amount to multiply by to increase or decrease a wall's probability of existing
+#define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
+#define WALL_UPDATE         0.9     // The amount to multiply by to increase or decrease a wall's probability of existing
+
+#define NEW_LOCATION_WEIGHT 0.1
 
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
