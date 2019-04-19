@@ -93,7 +93,7 @@ probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data) {
 /* Localize Measure Step
  * - Updates the global robot_location based on current position, current map state and the sensor data recorded */
 gaussian_location_t* localizeMeasureStep(sensor_reading_t* sensor_data) {
-    // dothething();
+    
 }
 
 
@@ -285,7 +285,7 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
     // printf("State: %d, Distance: %d\n", measurement->state, measurement->distance);
 
     // Traverse the for length of the measurement + threshold and still within the maze
-    while ( (sideDistX < measurement->distance + SENSOR_THRESHOLD_RANGE || sideDistY < measurement->distance + SENSOR_THRESHOLD_RANGE)
+    while ( (sideDistX < measurement->distance + WALL_HIT_THRESHOLD || sideDistY < measurement->distance + WALL_HIT_THRESHOLD)
                 && !(cellX < 0 || cellX >= (MAZE_WIDTH) || cellY < 0 || cellY >= (MAZE_HEIGHT))) {
         
         //jump to next map square, in x-direction, OR in y-direction
@@ -327,8 +327,8 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
 void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t* measurement) {
 
     // Additive implementation
-    // if (measurement->distance - SENSOR_THRESHOLD_RANGE < distance_hit &&
-    //         distance_hit < measurement->distance + SENSOR_THRESHOLD_RANGE) {
+    // if (measurement->distance - WALL_HIT_THRESHOLD < distance_hit &&
+    //         distance_hit < measurement->distance + WALL_HIT_THRESHOLD) {
     //     // hit should increase wall value if state is GOOD or TOO_CLOSE
     //     if (measurement->state == GOOD || measurement->state == TOO_CLOSE)
     //         wall->exists += WALL_UPDATE_AMOUNT;
@@ -339,8 +339,8 @@ void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_read
     // }
 
     // Multiplicative implementation
-    if (measurement->distance - SENSOR_THRESHOLD_RANGE < distance_hit &&
-            distance_hit < measurement->distance + SENSOR_THRESHOLD_RANGE) {
+    if (measurement->distance - WALL_HIT_THRESHOLD < distance_hit &&
+            distance_hit < measurement->distance + WALL_HIT_THRESHOLD) {
         // hit should increase wall value if state is GOOD or TOO_CLOSE
         if (measurement->state == GOOD || measurement->state == TOO_CLOSE)
             wall->exists = (1.0 - ((1.0 - wall->exists) * WALL_UPDATE));
