@@ -23,6 +23,10 @@ void setup() {
   // Initialize Serial
   Serial.begin(115200);
 
+  delay(500);
+
+  Serial.println("\n\nRESET ARDUINO\n");
+
   // Setup Sensors 
   if (!sensorSetup()){
     Serial.println("Error connecting to sensors!");

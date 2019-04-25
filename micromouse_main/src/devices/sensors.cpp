@@ -60,10 +60,6 @@ volatile sensor_t sensors[NUM_SENSORS] = {
 /* Tells the multiplexer which sensor we would like to select */
 void tcaselect(unsigned char i) {
     if (i > 7) return;
-
-    digitalWrite(I2C_RESET_PIN, LOW);
-    delay(1);
-    digitalWrite(I2C_RESET_PIN, HIGH);
     
     Wire.beginTransmission(TCAADDR);
     Wire.write(1 << i);
@@ -81,17 +77,6 @@ void sensorISR4() { sensors[4].needsUpdated = true; }
 bool sensorSetup() {
 
     bool found = true;
-
-    // Setup Reset pin
-    pinMode(I2C_RESET_PIN, OUTPUT);
-    digitalWrite(I2C_RESET_PIN, HIGH);
-    digitalWrite(I2C_RESET_PIN, LOW);
-    digitalWrite(I2C_RESET_PIN, HIGH);
-
-    pinMode(3, OUTPUT);
-    digitalWrite(3, HIGH);
-
-    Wire.setClock(10000); // Slow down the clock from 100 kHz to 10 kHz
 
     Wire.begin(); // Important, we need this for tcaselect to work!
 
@@ -125,38 +110,25 @@ void readSensors(sensor_reading_t* sensor_data) {
 
     Serial.println("readSensors called");
     for (int i = 0; i < NUM_SENSORS; i++) {
-        tcaselect(sensors[i].address);
-        digitalWrite(3, LOW);
-        delay(1);
-        digitalWrite(3, HIGH);
-        Serial.print("Reading ");
-        Serial.print(i);
-        Serial.print(": ");
-        Serial.print(vl6180x.readRange());
-        Serial.print(" Status: ");
-        Serial.println(parseError(vl6180x.readRangeStatus()));
-        Serial.println("Hello Isaiah!");
-        delay(50);
+        if (sensors[i].setup) {
+            tcaselect(sensors[i].address);
+            Serial.print("Reading ");
+            Serial.print(i);
+            Serial.print(": ");
+            sensor_data[i].distance = vl6180x.readRange();
+            Serial.print(sensor_data[i].distance);
+            Serial.print(" Status: ");
+            sensor_data[i].state = parseError(vl6180x.readRangeStatus());
+            Serial.println(sensor_data[i].state);
+        } else {
+            sensor_data[i].distance = 0;
+            sensor_data[i].state = error;
+            Serial.print("Sensor ");
+            Serial.print(i);
+            Serial.println(" not setup");
+        }
     }
-
-    // for (int i = 0; i < NUM_SENSORS; i++) {
-        
-    //     Serial.println("Testing sensor");
-    //     if (sensors[i].needsUpdated && sensors[i].setup) {
-            
-    //         tcaselect(sensors[i].address);
-    //         Serial.println("Selected Sensor");
-    //         sensor_data[i].distance = vl6180x.readRange();
-    //         Serial.print("Reading: ");
-    //         Serial.println(sensor_data[i].distance);
-    //         sensor_data[i].state = parseError(vl6180x.readRangeStatus());
-    //         sensors[i].needsUpdated = false;
-
-    //     } else {
-    //         sensor_data[i].distance = -1;
-    //         sensor_data[i].state = waiting;
-    //     }
-    // }
+    Serial.println("Finished readSensors\n");
 }
 
 sensor_state_t parseError(unsigned char status) {

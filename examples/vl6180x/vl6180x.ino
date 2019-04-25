@@ -23,21 +23,13 @@ void setup() {
   pinMode(RESET_PIN, OUTPUT);
   
   
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(500);
 
   // wait for serial port to open on native usb devices
-//  while (!Serial) {
-//    delay(1);
-//  }
-
-  tcaselect(0);
-  Serial.println("Adafruit VL6180x test!");
-  if (! vl.begin()) {
-    Serial.println("Failed to find sensor");
-    while (1);
+  while (!Serial) {
+    delay(1);
   }
-  Serial.println("Sensor on port 0 found!");
 
   tcaselect(1);
   Serial.println("Adafruit VL6180x test!");
@@ -45,22 +37,28 @@ void setup() {
     Serial.println("Failed to find sensor");
     while (1);
   }
-  Serial.println("Sensor on port 7 found!");
+  Serial.println("Sensor on port 1 found!");
+
+  tcaselect(2);
+  Serial.println("Adafruit VL6180x test!");
+  if (! vl.begin()) {
+    Serial.println("Failed to find sensor");
+    while (1);
+  }
+  Serial.println("Sensor on port 2 found!");
 }
 
 void loop() {
 
-  tcaselect(2);
-  
-  float lux = vl.readLux(VL6180X_ALS_GAIN_5);
-
-  //Serial.print("Lux: "); Serial.println(lux);
+  tcaselect(1);
   
   uint8_t range = vl.readRange();
   uint8_t status = vl.readRangeStatus();
 
+  Serial.print("Port 1: ");
+
   if (status == VL6180X_ERROR_NONE) {
-    Serial.print("Port 2: "); Serial.println(range);
+    Serial.println(range);
   }
 
   // Some error occurred, print it out!
@@ -94,17 +92,15 @@ void loop() {
   }
   delay(50);
 
-  tcaselect(7);
-
-  lux = vl.readLux(VL6180X_ALS_GAIN_5);
-
-  //Serial.print("Lux: "); Serial.println(lux);
+  tcaselect(2);
   
   range = vl.readRange();
   status = vl.readRangeStatus();
 
+  Serial.print("Port 2: ");
+
   if (status == VL6180X_ERROR_NONE) {
-    Serial.print("Port 7: "); Serial.println(range);
+    Serial.println(range);
   }
 
   // Some error occurred, print it out!
