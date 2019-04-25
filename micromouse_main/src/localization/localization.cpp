@@ -99,7 +99,8 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
 
 
 /* Update the robot's location based on the sensor_data and the new maze */
-    gaussian_location_t new_location;
+
+    gaussian_location_t sensor_location;
     
     // just use the sensor data and average out x and y location
     double sumX = 0; double sumY = 0;
@@ -117,7 +118,7 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
             // Shift the robot_location by shift_forward in the direction of the sensor's location and add to sum
             sumX += (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu;
             sumY += (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu;
-            printf("new_location: ( %f, %f )", (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu, (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu);
+            printf("sensor_location: ( %f, %f )", (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu, (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu);
             // printf("Sums: ( %f, %f )", sumX, sumY);
 
             count++;
@@ -127,18 +128,48 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
 
     // average the x and y values
     if (count > 0) {
-        new_location.x_mu = (sumX / count);
-        new_location.y_mu = (sumY / count);
+        sensor_location.x_mu = (sumX / count);
+        sensor_location.y_mu = (sumY / count);
+    } else {
+        sensor_location.x_mu = robot_location.x_mu;
+        sensor_location.y_mu = robot_location.y_mu;
     }
 
-    printf("new_location: (%f, %f)\n", new_location.x_mu, new_location.y_mu);
+    printf("sensor_location: (%f, %f)\n", sensor_location.x_mu, sensor_location.y_mu);
 
     // Perform a weighted average between the new location and the old location
-    robot_location.x_mu = (NEW_LOCATION_WEIGHT * new_location.x_mu) + ((1 - NEW_LOCATION_WEIGHT) * robot_location.x_mu);
-    robot_location.y_mu = (NEW_LOCATION_WEIGHT * new_location.y_mu) + ((1 - NEW_LOCATION_WEIGHT) * robot_location.y_mu);
+    robot_location.x_mu = (SENSOR_LOCATION_WEIGHT * sensor_location.x_mu) + ((1 - SENSOR_LOCATION_WEIGHT) * robot_location.x_mu);
+    robot_location.y_mu = (SENSOR_LOCATION_WEIGHT * sensor_location.y_mu) + ((1 - SENSOR_LOCATION_WEIGHT) * robot_location.y_mu);
 
     // Create a reading for theta during special circumstances(such as both readings on one side hitting a wall)
     
+    // both left side sensors
+    if (sensor_data[0].state == GOOD && sensor_data[1].state == GOOD && 
+        sensor_hit_data[0].side == sensor_hit_data[1].side) {
+
+        
+    }
+
+    // both right side sensors
+    if (sensor_data[3].state == GOOD && sensor_data[4].state == GOOD && 
+        sensor_hit_data[3].side == sensor_hit_data[4].side) {
+        
+    }
+
+
+    // both top sensors
+    if (sensor_data[1].state == GOOD && sensor_data[3].state == GOOD && 
+        sensor_hit_data[1].side == sensor_hit_data[3].side) {
+        
+    }
+
+
+    // both bottom sensors
+    if (sensor_data[0].state == GOOD && sensor_data[4].state == GOOD && 
+        sensor_hit_data[0].side == sensor_hit_data[4].side) {
+        
+    }
+
 
 }
 

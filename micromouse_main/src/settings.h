@@ -47,7 +47,7 @@
 #define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
 #define WALL_UPDATE         0.9     // The amount to multiply by to increase or decrease a wall's probability of existing
 
-#define NEW_LOCATION_WEIGHT 0.1
+#define SENSOR_LOCATION_WEIGHT 0.1  // The higher this value, the more we trust our sensor's input
 
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate

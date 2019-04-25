@@ -133,8 +133,8 @@ TEST_FUNC_BEGIN {
     initializeLocalization();
     
     sensor_reading_t sensor_test_data[NUM_SENSORS] = {
-        (sensor_reading_t){ .state = GOOD, .distance = 100 },
-        (sensor_reading_t){ .state = GOOD, .distance = 100 },
+        (sensor_reading_t){ .state = TOO_FAR, .distance = 100 },
+        (sensor_reading_t){ .state = TOO_FAR, .distance = 100 },
         (sensor_reading_t){ .state = TOO_FAR, .distance = 51.5 },
         (sensor_reading_t){ .state = TOO_CLOSE, .distance = 0.0 },
         (sensor_reading_t){ .state = TOO_FAR, .distance = 0.0 }
