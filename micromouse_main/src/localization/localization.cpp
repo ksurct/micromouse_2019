@@ -90,7 +90,7 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
     for (int i = 0; i < NUM_SENSORS; i++) {
         
         addMotion(&robot_location, &sensor_offsets[i], &sensor_locations[i]);
-        printf("Sensor %d:\t(%f,\t%f,\t%f)\n", i, sensor_locations[i].x_mu, sensor_locations[i].y_mu, sensor_locations[i].theta_mu);            
+        // printf("Sensor %d:\t(%f,\t%f,\t%f)\n", i, sensor_locations[i].x_mu, sensor_locations[i].y_mu, sensor_locations[i].theta_mu);            
 
         if (validateMeasurement(&sensor_data[i])) {
             processMeasurementMapping(&sensor_locations[i], &sensor_data[i], &sensor_hit_data[i]);
@@ -106,24 +106,24 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
     double sumX = 0; double sumY = 0;
     char count = 0;
     for (int i = 0; i < NUM_SENSORS; i++) {
-        printf("Sensor: %d, ", i);
+        // printf("Sensor: %d, ", i);
         // Don't update robot_location on anything thats not good or outside the hit threshold
         if (sensor_data[i].state == GOOD && 
                 ((sensor_hit_data[i].distance_hit < sensor_data[i].distance + WALL_HIT_THRESHOLD) 
                 && (sensor_hit_data[i].distance_hit > sensor_data[i].distance - WALL_HIT_THRESHOLD))) {
 
             double shift_forward = sensor_hit_data[i].distance_hit - sensor_data[i].distance;
-            printf("shift_forward: %f, ", shift_forward);
+            // printf("shift_forward: %f, ", shift_forward);
 
             // Shift the robot_location by shift_forward in the direction of the sensor's location and add to sum
             sumX += (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu;
             sumY += (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu;
-            printf("sensor_location: ( %f, %f )", (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu, (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu);
+            // printf("sensor_location: ( %f, %f )", (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu, (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu);
             // printf("Sums: ( %f, %f )", sumX, sumY);
 
             count++;
         }
-        printf("\n");
+        // printf("\n");
     }
 
     // average the x and y values
@@ -135,7 +135,7 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
         sensor_location.y_mu = robot_location.y_mu;
     }
 
-    printf("sensor_location: (%f, %f)\n", sensor_location.x_mu, sensor_location.y_mu);
+    // printf("sensor_location: (%f, %f)\n", sensor_location.x_mu, sensor_location.y_mu);
 
     // Perform a weighted average between the new location and the old location
     robot_location.x_mu = (SENSOR_LOCATION_WEIGHT * sensor_location.x_mu) + ((1 - SENSOR_LOCATION_WEIGHT) * robot_location.x_mu);
@@ -359,7 +359,7 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
     // printf("step:\t\t(%d,\t%d)\n", stepX, stepY);
 
     // printf("\n");
-    printf("State: %d, Distance: %d\n", measurement->state, measurement->distance);
+    // printf("State: %d, Distance: %d\n", measurement->state, measurement->distance);
 
     // In case we don't hit a wall
     if (sideDistX < sideDistY){
@@ -382,12 +382,12 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         if (sideDistX < sideDistY) { // x-direction
 
             if (stepX > 0) { // Update East and move East
-                printf("%d %d east\n", cellX, cellY);
+                // printf("%d %d east\n", cellX, cellY);
                 updateMazeWall(robot_maze_state.cells[cellX][cellY].east, sideDistX, measurement);
                 hit_data->wall = robot_maze_state.cells[cellX][cellY].east;
                 cellX++;
             } else { // Update West and move West
-                printf("%d %d west\n", cellX, cellY);
+                // printf("%d %d west\n", cellX, cellY);
                 updateMazeWall(robot_maze_state.cells[cellX][cellY].west, sideDistX, measurement);
                 hit_data->wall = robot_maze_state.cells[cellX][cellY].west;
                 cellX--;
@@ -401,12 +401,12 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         } else { // y-direction
             
             if (stepY > 0) { // Update South and move South
-                printf("%d %d south\n", cellX, cellY);
+                // printf("%d %d south\n", cellX, cellY);
                 updateMazeWall(robot_maze_state.cells[cellX][cellY].south, sideDistY, measurement);
                 hit_data->wall = robot_maze_state.cells[cellX][cellY].south;
                 cellY++;
             } else { // Update North and move North
-                printf("%d %d north\n", cellX, cellY);
+                // printf("%d %d north\n", cellX, cellY);
                 updateMazeWall(robot_maze_state.cells[cellX][cellY].north, sideDistY, measurement);
                 hit_data->wall = robot_maze_state.cells[cellX][cellY].north;
                 cellY--;
@@ -420,7 +420,7 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         }
     }
 
-    printf("\n");
+    // printf("\n");
 }
 
 

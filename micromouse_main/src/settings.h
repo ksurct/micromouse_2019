@@ -10,7 +10,7 @@
 #define DEBUG false
 
 // Main
-#define MAIN_LOOP_TIME 10000    // Delay between the start of each main_loop call in microseconds
+#define MAIN_LOOP_TIME 100    // Delay between the start of each main_loop call in microseconds
 
 // Maze Specifications
 #define MAZE_SIZE       16          // If square, the length each side of the maze
@@ -106,16 +106,18 @@
 #define I2C_RESET_PIN   31
 #define TCAADDR         0x70
 #define NUM_SENSORS     5
-#define SENSOR_0_ADDR   0x00
-#define SENSOR_0_PIN    22
-#define SENSOR_1_ADDR   0x01
-#define SENSOR_1_PIN    33
+#define SENSOR_0_ADDR   0x03
+#define SENSOR_1_ADDR   0x00
 #define SENSOR_2_ADDR   0x02
-#define SENSOR_2_PIN    41
-#define SENSOR_3_ADDR   0x03
-#define SENSOR_3_PIN    53
+#define SENSOR_3_ADDR   0x01
 #define SENSOR_4_ADDR   0x04
-#define SENSOR_4_PIN    29
+
+// Actual
+#define SENSOR_0_ADDR   0x01
+#define SENSOR_1_ADDR   0x03
+#define SENSOR_2_ADDR   0x02
+#define SENSOR_3_ADDR   0x00
+#define SENSOR_4_ADDR   0x04
 
 
 #endif //_SETTINGS_H_

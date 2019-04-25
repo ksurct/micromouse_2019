@@ -1,5 +1,6 @@
 /* strategy.cpp */
 
+#
 
 #include "strategy.h"
 #include "../types.h"
@@ -9,6 +10,7 @@
 #include <stdlib.h>
 #include <queue>
 
+#define IS_CELL_OUT_OF_BOUNDS(cell) ((cell).x < 0 || (cell).x >= (MAZE_WIDTH) || (cell).y < 0 || (cell).y >= (MAZE_HEIGHT))
 
 /* Simple representation of a cell
  *  - For use with probabilistic_maze_t */
@@ -28,7 +30,7 @@ void setAllDiscoveredToFalse(void);
 
 
 // Global declarations
-static cell_t goal_cell = {
+cell_t goal_cell = {
     .x = GOAL_CELL_X,
     .y = GOAL_CELL_Y
 };
@@ -65,8 +67,6 @@ void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* maze_st
     // Convert to a gaussian_location_t that edits the next_location
     convertCellToLocation(&next_cell, next_location);
 }
-
-#define IS_CELL_OUT_OF_BOUNDS(cell) ((cell).x < 0 || (cell).x >= (MAZE_WIDTH) || (cell).y < 0 || (cell).y >= (MAZE_HEIGHT))
 
 /* floodfill
  * Implements the floodfill algorithm on the 2d-array values with breadth first search
