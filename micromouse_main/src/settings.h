@@ -10,7 +10,7 @@
 #define DEBUG false
 
 // Main
-#define MAIN_LOOP_TIME 100    // Delay between the start of each main_loop call in microseconds
+#define MAIN_LOOP_TIME 100    // Delay between the start of each main_loop call in milliseconds
 
 // Maze Specifications
 #define MAZE_SIZE       16          // If square, the length each side of the maze
@@ -25,13 +25,13 @@
 #define WHEEL_BASE_LENGTH       99.5         //dummy value (in mm)
 
 // Localization
-#define INIT_X_MU           84.0    //dummy value (in mm)
-#define INIT_X_SIGMA        10.0    //dummy value (in mm)
-#define INIT_XY_SIGMA       0       //dummy value (in mm)
-#define INIT_Y_MU           84.0    //dummy value (in mm)
-#define INIT_Y_SIGMA        10.0    //dummy value (in mm)
-#define INIT_THETA_MU       0.0     //dummy value (in mm)
-#define INIT_THETA_SIGMA    10.0    //dummy value (in mm)
+#define INIT_X_MU           84.0
+#define INIT_X_SIGMA        20.0
+#define INIT_XY_SIGMA       0
+#define INIT_Y_MU           84.0
+#define INIT_Y_SIGMA        20.0
+#define INIT_THETA_MU       radians(180)
+#define INIT_THETA_SIGMA    radians(10)
 
 #define ENCODER_VARIANCE_BASE   2.0
 #define ENCODER_VARIANCE_PER_MM 0.2
@@ -106,13 +106,6 @@
 #define I2C_RESET_PIN   31
 #define TCAADDR         0x70
 #define NUM_SENSORS     5
-#define SENSOR_0_ADDR   0x03
-#define SENSOR_1_ADDR   0x00
-#define SENSOR_2_ADDR   0x02
-#define SENSOR_3_ADDR   0x01
-#define SENSOR_4_ADDR   0x04
-
-// Actual
 #define SENSOR_0_ADDR   0x01
 #define SENSOR_1_ADDR   0x03
 #define SENSOR_2_ADDR   0x02

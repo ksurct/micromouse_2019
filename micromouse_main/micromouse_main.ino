@@ -1,9 +1,6 @@
 /* Micromouse 2019 */
 
 
-// Libraries
-#include <DueTimer.h>
-
 // General
 #include "src/settings.h"
 #include "src/types.h"
@@ -22,7 +19,15 @@
 // Utilities
 #include "src/util/conversions.h"
 
+
+// Globals
 unsigned long timer;
+gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
+void (*current_loop)(void);
+
+// Function Declarations
+void main_loop(void);
+
 
 /* Entry point to the code for the robot, all initialization
    of subsystems should be done here */
@@ -63,26 +68,34 @@ void setup() {
   // Initialize Control subsystem
   initializeControl();
 
+  // Initialize timer and starting loop
   timer = millis();
 
-//  Serial.println("Starting start loop");
-//  Timer1.attachInterrupt(start_loop).start(MAIN_LOOP_TIME);
-//  Serial.println("Loop Started");
+  current_loop = &main_loop;
 
-  // // Start start loop
-  //while (robot_location.theta_mu < 3*PI/2) {
-    // Serial.println("Test");
-    // Serial.println(robot_location.theta_mu);
-  //}
-  //Serial.println("Should have stopped");
-  //Timer1.stop();
-  
-  // // Start main loop
-  //Timer1.attachInterrupt(main_loop).start(MAIN_LOOP_TIME);
 }
 
 /* This function is not in use because we would like to control the timing that the loop is called */
 void loop() {
+  // Track if we go over the allocated time for a loop
+  static unsigned long start_of_loop;
+
+  
+  if (millis() - timer > MAIN_LOOP_TIME) {
+    start_of_loop = millis();
+
+    current_loop();
+
+    // Reset timer
+    while (millis() - timer > MAIN_LOOP_TIME) {
+      timer += MAIN_LOOP_TIME;
+      Serial.println(timer);
+    }
+    Serial.println();
+  }
+}
+
+void main_loop(void) {
   // Initialize variables
   static sensor_reading_t sensor_data[NUM_SENSORS];
   static double left_distance;
@@ -91,36 +104,24 @@ void loop() {
   static double right_speed;
   static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 
-//  Serial.println(millis());
-//  Serial.println(timer);
-  
-  if (millis() - timer > MAIN_LOOP_TIME) {
-    Serial.println(millis());
-    // Get sensor data
-    readSensors(sensor_data);
-  
-    // Get distance travelled from control subsystem
-    distanceTravelled(&left_distance, &right_distance);
-  
-    // Run distances through localization
-    localizeMotionStep(left_distance, right_distance);
-  
-    // Update maze with sensor readings
-    mazeMappingAndMeasureStep(sensor_data);
-  
-    // Determine next cell to go to (strategy step)
-    //strategy(&robot_location, &robot_maze_state, &next_location);
-  
-    // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-    calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
-  
-    // Set speed using the motor controllers (pid loop)
-    setSpeedPID(left_speed, right_speed);
+  // Get sensor data
+  readSensors(sensor_data);
 
-    // Reset timer
-    Serial.println(millis());
-    Serial.println(timer);
-    Serial.println();
-    timer += MAIN_LOOP_TIME;
-  }
+  // Get distance travelled from control subsystem
+  distanceTravelled(&left_distance, &right_distance);
+
+  // Run distances through localization
+  localizeMotionStep(left_distance, right_distance);
+
+  // Update maze and robot location with sensor readings
+  mazeMappingAndMeasureStep(sensor_data);
+
+  // Determine next cell to go to (strategy step)
+  //strategy(&robot_location, &robot_maze_state, &next_location); // TODO: Need to fix this to work on Arduino
+  
+  // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
+  calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
+
+  // Set speed using the motor controllers (pid loop)
+  setSpeedPID(left_speed, right_speed);
 }
