@@ -5,10 +5,10 @@
 #include "strategy.h"
 #include "../types.h"
 #include "../settings.h"
+#include "../util/queue.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <queue>
 
 #define IS_CELL_OUT_OF_BOUNDS(cell) ((cell).x < 0 || (cell).x >= (MAZE_WIDTH) || (cell).y < 0 || (cell).y >= (MAZE_HEIGHT))
 
@@ -77,8 +77,14 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
     resetValues();
     setAllDiscoveredToFalse();
 
-    std::queue<cell_t> q;
-    std::queue<cell_t> next_q;
+    queue<cell_t, MAZE_WIDTH * MAZE_HEIGHT> q(cell_t {
+        .x = 0,
+        .y = 0
+    });
+    queue<cell_t, MAZE_WIDTH * MAZE_HEIGHT> next_q(cell_t {
+        .x = 0,
+        .y = 0
+    });
 
     discovered[cell.x][cell.y] = true;
 
@@ -91,8 +97,7 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
             value++;
         }
 
-        cell = q.front();
-        q.pop();
+        cell = q.pop();
 
         // Update the cell
         if (IS_CELL_OUT_OF_BOUNDS(cell)) {
