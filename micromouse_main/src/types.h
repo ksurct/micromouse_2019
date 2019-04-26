@@ -12,5 +12,7 @@
 
 #include "devices/sensor_reading.h"
 
+#include "util/direction.h"
+
 
 #endif //_TYPES_H_

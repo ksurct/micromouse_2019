@@ -22,7 +22,10 @@
 // Robot
 #define WHEEL_RADIUS            16          // Wheel radius in mm
 #define TICKS_PER_REVOLUTION    1808.3333   // Number to encoder ticks per one revolution of a wheel
-#define WHEEL_BASE_LENGTH       99.5         //dummy value (in mm)
+#define WHEEL_BASE_LENGTH       99.5        // Distance from wheel to wheel
+#define SENSOR_X_OFFSET         32.5        // Distance from center of robot to side sensors on local x axis
+#define SENSOR_Y_OFFSET         35.0        // Distance from center of robot to side sensors on local y axis
+#define SENSOR_FRONT_OFFSET     46.0        // Distance from center of robot to front sensor along x axis
 
 // Localization
 #define INIT_X_MU           84.0

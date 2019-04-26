@@ -117,7 +117,7 @@ void main_loop(void) {
   mazeMappingAndMeasureStep(sensor_data);
 
   // Determine next cell to go to (strategy step)
-  strategy(&robot_location, &robot_maze_state, &next_location); // TODO: Need to fix this to work on Arduino
+  //strategy(&robot_location, &robot_maze_state, &next_location); // TODO: Need to fix this to work on Arduino
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
