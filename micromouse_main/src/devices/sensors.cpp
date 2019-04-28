@@ -16,6 +16,7 @@ typedef struct {
 
 
 // Function declarations
+void printSensorData(sensor_reading_t* sensor_data);
 sensor_state_t parseError(unsigned char status);
 
 
@@ -49,6 +50,10 @@ sensor_t sensors[NUM_SENSORS] = {
 void tcaselect(unsigned char i) {
     if (i > 7) return;
     
+    digitalWrite(I2C_RESET_PIN, LOW);
+    delay(1);
+    digitalWrite(I2C_RESET_PIN, HIGH);
+    
     Wire.beginTransmission(TCAADDR);
     Wire.write(1 << i);
     Wire.endTransmission();
@@ -71,14 +76,15 @@ bool sensorSetup() {
             sensors[i].setup = true;
         }
 
-        // DEBUG Sensors
-        Serial.print("Sensor ");
-        Serial.print(i);
-        if (sensors[i].setup) {
-            Serial.println(" was found");
-        } else {
-            Serial.println(" was not found");
-        }
+        #ifdef DEBUG_SENSORS
+            Serial.print("DEBUG_SENSORS: Sensor ");
+            Serial.print(i);
+            if (sensors[i].setup) {
+                Serial.println(" was found");
+            } else {
+                Serial.println(" was not found");
+            }
+        #endif
     }
 
     delay(50);
@@ -98,15 +104,42 @@ void readSensors(sensor_reading_t* sensor_data) {
             sensor_data[i].distance = 255;
             sensor_data[i].state = ERROR;
         }
-
-        // Serial.print("Sensor ");
-        // Serial.print(i);
-        // Serial.print(": ");
-        // Serial.print(sensor_data[i].distance);
-        // Serial.print(" Status: ");
-        // Serial.println(sensor_data[i].state);
     }
-    // Serial.println();
+    
+    #ifdef DEBUG_SENSORS
+        printSensorData(sensor_data);
+    #endif
+}
+
+void printSensorData(sensor_reading_t* sensor_data){
+    
+    Serial.print("DEBUG_SENSORS: ");
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        switch(sensor_data[i].state) {
+            case GOOD:       // Successful reading
+                Serial.print("GOOD");
+                break;
+            case TOO_FAR:    // Object to far to detect
+                Serial.print("TOO_FAR");
+                break;
+            case TOO_CLOSE:  // Object to close to detect
+                Serial.print("TOO_CLOSE");
+                break;
+            case WAITING:    // Sensor has no measurement yet, disregard distance
+                Serial.print("WAITING");
+                break;
+            case ERROR:      // Error in reading, disregard distance
+                Serial.print("ERROR");
+                break;
+            default:
+                Serial.print("WHAT THE FREAK!!!");
+                break;
+        }
+        Serial.print(", ");
+        Serial.print(sensor_data[i].distance);
+        Serial.print(", ");
+    }
+    Serial.println();
 }
 
 sensor_state_t parseError(unsigned char status) {

@@ -6,12 +6,14 @@
 #include "src/types.h"
 
 // Devices
+#include "src/devices/leds.h"
 #include "src/devices/sensors.h"
 #include "src/devices/motors.h"
 #include "src/devices/encoders.h"
 
 // Subsystems
 #include "src/localization/localization.h"
+#include "src/localization/localization_serial.h"
 #include "src/strategy/strategy.h"
 #include "src/movement/movement.h"
 #include "src/control/control.h"
@@ -27,6 +29,7 @@ void (*current_loop)(void);
 
 // Function Declarations
 void main_loop(void);
+void robot_delay(unsigned long delay_time);
 
 
 /* Entry point to the code for the robot, all initialization
@@ -40,16 +43,20 @@ void setup() {
 
   Serial.println("\n\nKSURCT Micromouse TEAM for 2018-2019\n");
 
-  // Wait 2 seconds for human to go away
-  delay(2000);
+  // Setup LEDs
+  ledSetup();
+
+  // Wait 2 seconds for humans to go away
+  robot_delay(SETUP_TIME);
 
   // Setup Sensors
   success = sensorSetup();
   
   if (!success) {
-    Serial.println("Error connecting to sensors!");
+    Serial.println("DEBUG_SENSORS: Error connecting to sensors!");
+    setAllLEDSHigh();
   } else {
-    Serial.println("Sensors connected successfully");
+    Serial.println("DEBUG_SENSORS: Sensors connected successfully");
   }
 
   // Setup Motors
@@ -75,7 +82,7 @@ void setup() {
 
 }
 
-/* This function is not in use because we would like to control the timing that the loop is called */
+
 void loop() {
   // Track if we go over the allocated time for a loop
   static unsigned long start_of_loop;
@@ -89,9 +96,13 @@ void loop() {
     // Reset timer
     while (millis() - timer > MAIN_LOOP_TIME) {
       timer += MAIN_LOOP_TIME;
-      Serial.println(timer);
+
+      #ifdef DEBUG_TIMER
+        Serial.print("DEBUG_TIMER: Timer: ");
+        Serial.println(timer);
+      #endif
+
     }
-    Serial.println();
   }
 }
 
@@ -104,6 +115,9 @@ void main_loop(void) {
   static double right_speed;
   static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 
+  // Flash heartbeat
+  flashLED(1);
+
   // Get sensor data
   readSensors(sensor_data);
 
@@ -113,8 +127,20 @@ void main_loop(void) {
   // Run distances through localization
   localizeMotionStep(left_distance, right_distance);
 
+  #ifdef DEBUG_LOCALIZE_MOTION
+    printLocalizeMotion();
+  #endif
+
   // Update maze and robot location with sensor readings
   mazeMappingAndMeasureStep(sensor_data);
+
+  #ifdef DEBUG_LOCALIZE_MAPPING
+    //printLocalizeMapping();
+  #endif
+
+  #ifdef DEBUG_LOCALIZE_MEASURE
+    //printLocalizeMeasure();
+  #endif
 
   // Determine next cell to go to (strategy step)
   //strategy(&robot_location, &robot_maze_state, &next_location); // TODO: Need to fix this to work on Arduino
@@ -122,6 +148,29 @@ void main_loop(void) {
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
+  #ifdef DEBUG_MOVEMENT
+    //printSpeedData(left_speed, right_speed);
+  #endif
+
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
+}
+
+// Delay for time, time and flash leds
+void robot_delay(unsigned long delay_time) {
+  unsigned long end_time = millis() + delay_time;
+  
+  while (millis() < end_time ) {
+    toggleLED(1); delay(100); toggleLED(1);
+
+    toggleLED(2); delay(100); toggleLED(2);
+
+    toggleLED(3); delay(100); toggleLED(3);
+
+    toggleLED(2); delay(100); toggleLED(2);
+  }
+
+  setAllLEDSHigh();
+  delay(200);
+  setAllLEDSLow();
 }

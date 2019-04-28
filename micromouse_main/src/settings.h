@@ -7,7 +7,16 @@
 
 
 // General
-#define DEBUG false
+#define SETUP_TIME 2000     // Milliseconds to wait befor starting to run
+
+// Debugging, uncomment to print out relevant data
+//#define DEBUG_TIMER
+//#define DEBUG_SENSORS
+//#define DEBUG_ENCODERS
+#define DEBUG_LOCALIZE_MOTION
+//#define DEBUG_LOCALIZE_MAPPING
+//#define DEBUG_LOCALIZE_MEASURE
+//#define DEBUG_MOVEMENT
 
 // Main
 #define MAIN_LOOP_TIME 100    // Delay between the start of each main_loop call in milliseconds
@@ -19,7 +28,7 @@
 #define WALL_THICKNESS  12          // Thickness of the walls in mm
 #define CELL_LENGTH     168         // Length and width of each cell inside the walls in mm
 
-// Robot
+// Robot Specifications
 #define WHEEL_RADIUS            16          // Wheel radius in mm
 #define TICKS_PER_REVOLUTION    1808.3333   // Number to encoder ticks per one revolution of a wheel
 #define WHEEL_BASE_LENGTH       99.5        // Distance from wheel to wheel
@@ -114,6 +123,12 @@
 #define SENSOR_2_ADDR   0x02
 #define SENSOR_3_ADDR   0x00
 #define SENSOR_4_ADDR   0x04
+
+// LEDs
+#define NUM_LEDS    3
+#define LED_1_PIN   26
+#define LED_2_PIN   27
+#define LED_3_PIN   25
 
 
 #endif //_SETTINGS_H_
