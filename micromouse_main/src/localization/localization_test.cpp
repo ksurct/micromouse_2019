@@ -132,30 +132,29 @@ TEST_FUNC_BEGIN {
     // Test mazeMappingAndMeasureStep
     initializeLocalization();
     
-    sensor_reading_t sensor_test_data[NUM_SENSORS] = {
-        (sensor_reading_t){ .state = TOO_FAR,   .distance = 100 },
-        (sensor_reading_t){ .state = TOO_FAR,   .distance = 100 },
-        (sensor_reading_t){ .state = TOO_FAR,   .distance = 51  },
-        (sensor_reading_t){ .state = TOO_CLOSE, .distance = 0   },
-        (sensor_reading_t){ .state = TOO_FAR,   .distance = 0   }
-    };
+    sensor_reading_t sensor_test_data[NUM_SENSORS];
+    sensor_test_data[0] = (sensor_reading_t){ .state = GOOD, .distance = 50 };
+    sensor_test_data[1] = (sensor_reading_t){ .state = GOOD, .distance = 52 };
+    sensor_test_data[2] = (sensor_reading_t){ .state = TOO_FAR, .distance = 50 };
+    sensor_test_data[3] = (sensor_reading_t){ .state = GOOD, .distance = 88 };
+    sensor_test_data[4] = (sensor_reading_t){ .state = GOOD, .distance = 88 };
 
-    robot_location.x_mu = cellNumberToCoordinateDistance(0);
-    robot_location.y_mu = cellNumberToCoordinateDistance(0) + 44;
-    robot_location.theta_mu = 0.0;
+    robot_location.x_mu = 83.97;
+    robot_location.y_mu = 84.0;
+    robot_location.theta_mu = 3.14;
     
     mazeMappingAndMeasureStep(sensor_test_data);
 
-    // printf("Robot_location: (%.3f, %.3f, %.3f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
+    printf("Robot_location: (%.3f, %.3f, %.3f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
 
     // printf("North: %f\n", robot_maze_state.cells[1][1].north->exists);
     // printf("East: %f\n", robot_maze_state.cells[1][1].east->exists);
     // printf("South: %f\n", robot_maze_state.cells[1][1].south->exists);
     // printf("West: %f\n", robot_maze_state.cells[1][1].west->exists);
     
-    // print_maze_state();
+    print_maze_state();
 
-    //TEST_FAIL("not all tests written yet!!!");
+    TEST_FAIL("not all tests written yet!!!");
 
     // Test localizeMeasureStep
     // TEST_FAIL("not all tests written yet!!!");

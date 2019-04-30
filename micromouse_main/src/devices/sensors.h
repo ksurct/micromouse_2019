@@ -34,5 +34,7 @@ bool sensorSetup();
 /* Read from all the sensors */
 void readSensors(sensor_reading_t* sensor_data);
 
+void printSensorData(sensor_reading_t* sensor_data);
+
 
 #endif //_SENSORS_H_

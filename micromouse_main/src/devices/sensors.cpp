@@ -105,13 +105,10 @@ void readSensors(sensor_reading_t* sensor_data) {
             sensor_data[i].state = ERROR;
         }
     }
-    
-    #ifdef DEBUG_SENSORS
-        printSensorData(sensor_data);
-    #endif
+
 }
 
-void printSensorData(sensor_reading_t* sensor_data){
+void printSensorData(sensor_reading_t* sensor_data) {
     
     Serial.print("DEBUG_SENSORS: ");
     for (int i = 0; i < NUM_SENSORS; i++) {

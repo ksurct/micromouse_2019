@@ -53,11 +53,15 @@ void setup() {
   success = sensorSetup();
   
   if (!success) {
-    Serial.println("DEBUG_SENSORS: Error connecting to sensors!");
     setAllLEDSHigh();
-  } else {
-    Serial.println("DEBUG_SENSORS: Sensors connected successfully");
   }
+
+  #ifdef DEBUG_SENSORS
+    if (!success)
+      Serial.println("DEBUG_SENSORS: Error connecting to sensors!");
+    else
+      Serial.println("DEBUG_SENSORS: Sensors connected successfully");
+  #endif
 
   // Setup Motors
   motorSetup();
@@ -93,22 +97,34 @@ void loop() {
 
     current_loop();
 
+    #ifdef DEBUG_TIMER
+      Serial.print("DEBUG_TIMER: ");
+    #endif
+
     // Reset timer
     while (millis() - timer > MAIN_LOOP_TIME) {
       timer += MAIN_LOOP_TIME;
 
       #ifdef DEBUG_TIMER
-        Serial.print("DEBUG_TIMER: Timer: ");
-        Serial.println(timer);
+        Serial.print(timer);
+        Serial.print(", ");
       #endif
-
     }
+    #ifdef DEBUG_TIMER
+      Serial.println();
+    #endif
   }
 }
 
 void main_loop(void) {
   // Initialize variables
-  static sensor_reading_t sensor_data[NUM_SENSORS];
+  static sensor_reading_t sensor_data[NUM_SENSORS] = {
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 }
+  };
   static double left_distance;
   static double right_distance;
   static double left_speed;
@@ -118,8 +134,9 @@ void main_loop(void) {
   // Flash heartbeat
   flashLED(1);
 
-  // Get sensor data
-  readSensors(sensor_data);
+  #ifdef DEBUG_SENSORS
+    printSensorData(sensor_data);
+  #endif
 
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
@@ -135,7 +152,7 @@ void main_loop(void) {
   mazeMappingAndMeasureStep(sensor_data);
 
   #ifdef DEBUG_LOCALIZE_MAPPING
-    //printLocalizeMapping();
+    printLocalizeMapping();
   #endif
 
   #ifdef DEBUG_LOCALIZE_MEASURE
@@ -154,6 +171,9 @@ void main_loop(void) {
 
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
+
+  // Get sensor data
+  readSensors(sensor_data);
 }
 
 // Delay for time, time and flash leds

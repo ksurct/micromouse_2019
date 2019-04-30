@@ -13,7 +13,7 @@
 //#define DEBUG_TIMER
 //#define DEBUG_SENSORS
 //#define DEBUG_ENCODERS
-#define DEBUG_LOCALIZE_MOTION
+//#define DEBUG_LOCALIZE_MOTION
 //#define DEBUG_LOCALIZE_MAPPING
 //#define DEBUG_LOCALIZE_MEASURE
 //#define DEBUG_MOVEMENT
@@ -42,7 +42,7 @@
 #define INIT_XY_SIGMA       0
 #define INIT_Y_MU           84.0
 #define INIT_Y_SIGMA        20.0
-#define INIT_THETA_MU       radians(180)
+#define INIT_THETA_MU       PI
 #define INIT_THETA_SIGMA    radians(10)
 
 #define ENCODER_VARIANCE_BASE   2.0
@@ -75,7 +75,7 @@
 #define OUTER_TOLERANCE_MM    10            //dummy value (in mm)
 #define OUTER_TOLERANCE_RAD   radians(10)   //dummy value (in radians)
 
-#define STRAIGHT_TAU_P  5                   // dummy value
+#define STRAIGHT_TAU_P  2.5                   // dummy value
 #define STRAIGHT_TAU_I  0                   // dummy value
 #define STRAIGHT_TAU_D  0.5                 // dummy value
 #define STRAIGHT_PROFILE_STABLE_SPEED  100  // dummy value
