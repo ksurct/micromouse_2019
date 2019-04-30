@@ -1,6 +1,9 @@
 /* Micromouse 2019 */
 
 
+// Libraries
+#include <DueTimer.h>
+
 // General
 #include "src/settings.h"
 #include "src/types.h"
@@ -24,11 +27,12 @@
 
 // Globals
 unsigned long timer;
-gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
+gaussian_location_t next_location = {.x_mu = 263.0, .y_mu = 264.0};
 void (*current_loop)(void);
 
 // Function Declarations
-void main_loop(void);
+void sensor_loop(void);
+void control_loop(void);
 void robot_delay(unsigned long delay_time);
 
 
@@ -79,13 +83,15 @@ void setup() {
   // Initialize Control subsystem
   initializeControl();
 
+  // Start control_loop()
+  Timer2.attachInterrupt(control_loop).start(CONTROL_LOOP_TIME);
+
   // Initialize timer and starting loop
   timer = millis();
 
-  current_loop = &main_loop;
+  current_loop = &sensor_loop;
 
 }
-
 
 void loop() {
   // Track if we go over the allocated time for a loop
@@ -116,7 +122,7 @@ void loop() {
   }
 }
 
-void main_loop(void) {
+void sensor_loop(void) {
   // Initialize variables
   static sensor_reading_t sensor_data[NUM_SENSORS] = {
     (sensor_reading_t){ .state = ERROR,   .distance = 255 },
@@ -125,27 +131,15 @@ void main_loop(void) {
     (sensor_reading_t){ .state = ERROR,   .distance = 255 },
     (sensor_reading_t){ .state = ERROR,   .distance = 255 }
   };
-  static double left_distance;
-  static double right_distance;
-  static double left_speed;
-  static double right_speed;
-  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 
   // Flash heartbeat
   flashLED(1);
+  
+  // Get sensor data
+  readSensors(sensor_data);
 
   #ifdef DEBUG_SENSORS
     printSensorData(sensor_data);
-  #endif
-
-  // Get distance travelled from control subsystem
-  distanceTravelled(&left_distance, &right_distance);
-
-  // Run distances through localization
-  localizeMotionStep(left_distance, right_distance);
-
-  #ifdef DEBUG_LOCALIZE_MOTION
-    printLocalizeMotion();
   #endif
 
   // Update maze and robot location with sensor readings
@@ -160,8 +154,29 @@ void main_loop(void) {
   #endif
 
   // Determine next cell to go to (strategy step)
-  //strategy(&robot_location, &robot_maze_state, &next_location); // TODO: Need to fix this to work on Arduino
-  
+  //strategy(&robot_location, &robot_maze_state, &next_location);
+}
+
+void control_loop() {
+  // Initialize variables
+  static double left_distance;
+  static double right_distance;
+  static double left_speed;
+  static double right_speed;
+
+  // Heartbeat
+  toggleLED(2);
+
+  // Get distance travelled from control subsystem
+  distanceTravelled(&left_distance, &right_distance);
+
+  // Run distances through localization
+  localizeMotionStep(left_distance, right_distance);
+
+  #ifdef DEBUG_LOCALIZE_MOTION
+    printLocalizeMotion();
+  #endif
+
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
@@ -172,8 +187,8 @@ void main_loop(void) {
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
 
-  // Get sensor data
-  readSensors(sensor_data);
+  speedController();
+
 }
 
 // Delay for time, time and flash leds

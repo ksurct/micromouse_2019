@@ -1,9 +1,6 @@
 /* control.cpp */
 
 
-// Libraries
-#include <DueTimer.h>
-
 // General
 #include "control.h"
 #include "../settings.h"
@@ -42,7 +39,7 @@ void printEncoderData(double left_distance, double right_distance);
 void initializeControl(void) {
     setSpeedPID(0.0, 0.0);
 
-    Timer2.attachInterrupt(speedController).start(CONTROL_LOOP_TIME);
+    //Timer2.attachInterrupt(speedController).start(CONTROL_LOOP_TIME);
 }
 
 /* distance travelled
