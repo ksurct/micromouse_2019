@@ -10,7 +10,7 @@
 #define SETUP_TIME 2000     // Milliseconds to wait befor starting to run
 
 // Debugging, uncomment to print out relevant data
-//#define DEBUG_TIMER
+#define DEBUG_TIMER
 //#define DEBUG_SENSORS
 //#define DEBUG_ENCODERS
 //#define DEBUG_LOCALIZE_MOTION
@@ -19,7 +19,7 @@
 //#define DEBUG_MOVEMENT
 
 // Main
-#define MAIN_LOOP_TIME 100    // Delay between the start of each main_loop call in milliseconds
+#define MAIN_LOOP_TIME 250    // Delay between the start of each main_loop call in milliseconds
 
 // Maze Specifications
 #define MAZE_SIZE       16          // If square, the length each side of the maze

@@ -92,34 +92,12 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
         
         addMotion(&robot_location, &sensor_offsets[i], &sensor_locations[i]);
         // printf("Sensor %d:\t(%f,\t%f,\t%f)\n", i, sensor_locations[i].x_mu, sensor_locations[i].y_mu, sensor_locations[i].theta_mu);
-        // Serial.print("Sensor ");
-        // Serial.print(i);
-        // Serial.print(": (");
-        // Serial.print(sensor_locations[i].x_mu);
-        // Serial.print(",  ");
-        // Serial.print(sensor_locations[i].y_mu);
-        // Serial.print(",  ");
-        // Serial.print(sensor_locations[i].theta_mu);
-        // Serial.print(")");
-        // Serial.println();
 
         if (validateMeasurement(&sensor_data[i])) {
             processMeasurementMapping(&sensor_locations[i], &sensor_data[i], &sensor_hit_data[i], i);
         }
     }
 
-    // Serial.print("North: ");
-    // Serial.print(robot_maze_state.cells[0][0].north->exists);
-    // Serial.println();
-    // Serial.print("East: ");
-    // Serial.print(robot_maze_state.cells[0][0].east->exists);
-    // Serial.println();
-    // Serial.print("South: ");
-    // Serial.print(robot_maze_state.cells[0][0].south->exists);
-    // Serial.println();
-    // Serial.print("West: ");
-    // Serial.print(robot_maze_state.cells[0][0].west->exists);
-    // Serial.println();
 
 /* Update the robot's location based on the sensor_data and the new maze */
 
@@ -301,22 +279,6 @@ void rotateCovariance(double rotate_by, double* x_sigma, double* y_sigma, double
 void addMotion(gaussian_location_t* current_location, gaussian_location_t* motion,
                     gaussian_location_t* final_location) {
 
-    // printf("addMotion: current: (%f, %f, %f) ", current_location->x_mu, current_location->y_mu, current_location->theta_mu);
-    // printf("motion: (%f, %f, %f) ", motion->x_mu, motion->y_mu, motion->theta_mu);
-    // Serial.print("addMotion: current: (");
-    // Serial.print(current_location->x_mu);
-    // Serial.print(", ");
-    // Serial.print(current_location->y_mu);
-    // Serial.print(", ");
-    // Serial.print(current_location->theta_mu);
-    // Serial.print(") ");
-    // Serial.print("motion: ");
-    // Serial.print(motion->x_mu);
-    // Serial.print(", ");
-    // Serial.print(motion->y_mu);
-    // Serial.print(", ");
-    // Serial.print(motion->theta_mu);
-    // Serial.print(") ");
 
 /* Inverse the input to normal coordinates */
     // theta1 = 2*pi - theta1;
@@ -362,14 +324,6 @@ void addMotion(gaussian_location_t* current_location, gaussian_location_t* motio
     // y2 = -1 * y2;
     motion->y_mu = -1 * motion->y_mu;
 
-    // printf("final_location: (%f, %f, %f)\n", final_location->x_mu, final_location->y_mu, final_location->theta_mu);
-    // Serial.print("final_location: ");
-    // Serial.print(final_location->x_mu);
-    // Serial.print(", ");
-    // Serial.print(final_location->y_mu);
-    // Serial.print(", ");
-    // Serial.print(final_location->theta_mu);
-    // Serial.println(")");
 
 }
 
@@ -403,17 +357,10 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
     //the direction of the ray as a vector
     double rayDirX = cos(location->theta_mu);
     double rayDirY = sin(location->theta_mu);
-    // printf("rayDir: (%f, %f)\n", rayDirX, rayDirY);
-    // Serial.print("rayDir: (");
-    // Serial.print(rayDirX);
-    // Serial.print(", ");
-    // Serial.print(rayDirY);
-    // Serial.println(")");
 
     //length of ray from one x or y-side to next x or y-side
     double deltaDistX = abs(1 / rayDirX) * (CELL_LENGTH + WALL_THICKNESS);
     double deltaDistY = abs(1 / rayDirY) * (CELL_LENGTH + WALL_THICKNESS);
-    //printf("deltaDist:\t(%f,\t%f)\n", deltaDistX, deltaDistY);
 
     //what direction to step in x or y-direction (either +1 or -1)
     int stepX;
@@ -440,12 +387,6 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         percent = (edgeCellY + (CELL_LENGTH + WALL_THICKNESS) - location->y_mu) / (CELL_LENGTH + WALL_THICKNESS);
         sideDistY = percent * deltaDistY;
     }
-    
-    // printf("sideDist:\t(%f,\t%f)\n", sideDistX, sideDistY);
-    // printf("step:\t\t(%d,\t%d)\n", stepX, stepY);
-
-    // printf("\n");
-    // printf("State: %d, Distance: %d\n", measurement->state, measurement->distance);
 
     // In case we don't hit a wall
     if (sideDistX < sideDistY){
@@ -537,26 +478,12 @@ void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_read
             distance_hit < measurement->distance + WALL_HIT_THRESHOLD) {
         // hit should increase wall value if state is GOOD or TOO_CLOSE
         if (measurement->state == GOOD || measurement->state == TOO_CLOSE) {
-            // Serial.print("Increasing Sensor ");
-            // Serial.print(sensor_num);
-            // Serial.print(" before: ");
-            // Serial.print(wall->exists);
             wall->exists = (1.0 - ((1.0 - wall->exists) * WALL_UPDATE));
-            // Serial.print(" after: ");
-            // Serial.print(wall->exists);
-            // Serial.println();
         }
     } else {
         // hit should decrease wall value if state is GOOD or TOO_FAR
         if (measurement->state == GOOD || measurement->state == TOO_FAR) {
-            // Serial.print("Decreasing Sensor ");
-            // Serial.print(sensor_num);
-            // Serial.print(" before: ");
-            // Serial.print(wall->exists);
             wall->exists = wall->exists * WALL_UPDATE;
-            // Serial.print(" after: ");
-            // Serial.print(wall->exists);
-            // Serial.println();
         }
     }
 

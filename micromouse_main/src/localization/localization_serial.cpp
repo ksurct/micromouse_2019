@@ -40,5 +40,11 @@ void printLocalizeMapping() {
 }
 
 void printLocalizeMeasure() {
-    //doTheThing();    
+    Serial.print("DEBUG_LOCALIZE_MEASURE: ");
+    Serial.print(robot_location.x_mu);
+    Serial.print(", ");
+    Serial.print(robot_location.y_mu);
+    Serial.print(", ");
+    Serial.print(robot_location.theta_mu);
+    Serial.println();
 }
