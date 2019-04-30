@@ -9,7 +9,7 @@ void printLocalizeMotion();
 
 void printLocalizeMapping();
 
-void printLocalizeMotion();
+void printLocalizeMeasure();
 
 
 #endif //_LOCALIZATION_SERIAL_H_

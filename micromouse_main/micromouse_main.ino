@@ -156,7 +156,7 @@ void main_loop(void) {
   #endif
 
   #ifdef DEBUG_LOCALIZE_MEASURE
-    //printLocalizeMeasure();
+    printLocalizeMeasure();
   #endif
 
   // Determine next cell to go to (strategy step)
