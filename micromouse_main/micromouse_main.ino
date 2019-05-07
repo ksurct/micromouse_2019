@@ -24,7 +24,6 @@
 
 // Globals
 unsigned long timer;
-gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
 void (*current_loop)(void);
 
 // Function Declarations
@@ -91,29 +90,30 @@ void loop() {
   // Track if we go over the allocated time for a loop
   static unsigned long start_of_loop;
 
+  current_loop();
   
-  if (millis() - timer > MAIN_LOOP_TIME) {
-    start_of_loop = millis();
-
-    current_loop();
-
-    #ifdef DEBUG_TIMER
-      Serial.print("DEBUG_TIMER: ");
-    #endif
-
-    // Reset timer
-    while (millis() - timer > MAIN_LOOP_TIME) {
-      timer += MAIN_LOOP_TIME;
-
-      #ifdef DEBUG_TIMER
-        Serial.print(timer);
-        Serial.print(", ");
-      #endif
-    }
-    #ifdef DEBUG_TIMER
-      Serial.println();
-    #endif
-  }
+//  if (millis() - timer > MAIN_LOOP_TIME) {
+//    start_of_loop = millis();
+//
+//    current_loop();
+//
+//    #ifdef DEBUG_TIMER
+//      Serial.print("DEBUG_TIMER: ");
+//    #endif
+//
+//    // Reset timer
+//    while (millis() - timer > MAIN_LOOP_TIME) {
+//      timer += MAIN_LOOP_TIME;
+//
+//      #ifdef DEBUG_TIMER
+//        Serial.print(timer);
+//        Serial.print(", ");
+//      #endif
+//    }
+//    #ifdef DEBUG_TIMER
+//      Serial.println();
+//    #endif
+//  }
 }
 
 void main_loop(void) {
@@ -129,10 +129,13 @@ void main_loop(void) {
   static double right_distance;
   static double left_speed;
   static double right_speed;
-  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
+  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 264.0};
 
   // Flash heartbeat
   flashLED(1);
+
+  // Get sensor data
+  readSensors(sensor_data);
 
   #ifdef DEBUG_SENSORS
     printSensorData(sensor_data);
@@ -160,7 +163,7 @@ void main_loop(void) {
   #endif
 
   // Determine next cell to go to (strategy step)
-  //strategy(&robot_location, &robot_maze_state, &next_location); // TODO: Need to fix this to work on Arduino
+  //strategy(&robot_location, &robot_maze_state, &next_location);
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
@@ -171,9 +174,6 @@ void main_loop(void) {
 
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
-
-  // Get sensor data
-  readSensors(sensor_data);
 }
 
 // Delay for time, time and flash leds

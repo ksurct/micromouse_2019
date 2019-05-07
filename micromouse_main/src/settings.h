@@ -10,7 +10,7 @@
 #define SETUP_TIME 2000     // Milliseconds to wait befor starting to run
 
 // Debugging, uncomment to print out relevant data
-#define DEBUG_TIMER
+//#define DEBUG_TIMER
 //#define DEBUG_SENSORS
 //#define DEBUG_ENCODERS
 //#define DEBUG_LOCALIZE_MOTION
@@ -52,8 +52,8 @@
 #define Y_VARIANCE      1   //dummy value
 #define THETA_VARIANCE  1   //dummy value
 
-#define TOO_FAR_DISTANCE    125.0   // the distance that of walls that we update given a TOO_FAR measurement (in mm)
-#define TOO_CLOSE_DISTANCE  5.0     // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
+#define TOO_FAR_DISTANCE    250     // the distance that of walls that we update given a TOO_FAR measurement (in mm)
+#define TOO_CLOSE_DISTANCE  10      // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
 
 #define WALL_HIT_THRESHOLD  10      // The plus or minus amount for a measurement that should result in the increase of a walls exists
 #define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
@@ -64,15 +64,15 @@
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
-#define GOAL_CELL_X     7       // Goal cell x coordinate
-#define GOAL_CELL_Y     7       // Goal cell y coordinate
+#define GOAL_CELL_X     1       // Goal cell x coordinate
+#define GOAL_CELL_Y     1       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.5     // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
-#define INNER_TOLERANCE_MM    3             //dummy value (in mm)
-#define INNER_TOLERANCE_RAD   radians(3)    //dummy value (in radians)
-#define OUTER_TOLERANCE_MM    10            //dummy value (in mm)
+#define INNER_TOLERANCE_MM    10            //dummy value (in mm)
+#define INNER_TOLERANCE_RAD   radians(5)    //dummy value (in radians)
+#define OUTER_TOLERANCE_MM    20            //dummy value (in mm)
 #define OUTER_TOLERANCE_RAD   radians(10)   //dummy value (in radians)
 
 #define STRAIGHT_TAU_P  2.5                   // dummy value

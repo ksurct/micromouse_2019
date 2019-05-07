@@ -133,16 +133,21 @@ TEST_FUNC_BEGIN {
     initializeLocalization();
     
     sensor_reading_t sensor_test_data[NUM_SENSORS];
-    sensor_test_data[0] = (sensor_reading_t){ .state = GOOD, .distance = 50 };
-    sensor_test_data[1] = (sensor_reading_t){ .state = GOOD, .distance = 52 };
-    sensor_test_data[2] = (sensor_reading_t){ .state = TOO_FAR, .distance = 50 };
-    sensor_test_data[3] = (sensor_reading_t){ .state = GOOD, .distance = 88 };
-    sensor_test_data[4] = (sensor_reading_t){ .state = GOOD, .distance = 88 };
+    sensor_test_data[0] = (sensor_reading_t){ .state = GOOD, .distance = 41 };
+    sensor_test_data[1] = (sensor_reading_t){ .state = GOOD, .distance = 45  };
+    sensor_test_data[2] = (sensor_reading_t){ .state = TOO_FAR, .distance = 255 };
+    sensor_test_data[3] = (sensor_reading_t){ .state = GOOD, .distance = 47 };
+    sensor_test_data[4] = (sensor_reading_t){ .state = GOOD, .distance = 50 };
 
-    robot_location.x_mu = 83.97;
+    robot_location.x_mu = 84.03;
     robot_location.y_mu = 84.0;
-    robot_location.theta_mu = 3.14;
+    robot_location.theta_mu = 0.0;
+
+    //robot_maze_state.cells[0][0].south->exists = 1.0;
+    //robot_maze_state.cells[0][1].south->exists = 1.0;
     
+    // printf("Robot_location: (%.3f, %.3f, %.3f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
+
     mazeMappingAndMeasureStep(sensor_test_data);
 
     // printf("Robot_location: (%.3f, %.3f, %.3f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
