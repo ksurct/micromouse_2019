@@ -178,8 +178,8 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
             relative_forward = directionToRAD[sensor_hit_data[0].dir] + PI/2;
         }
         // printf("relative_forward: %f\n", relative_forward);
-        sensor_location.theta_mu += relative_forward + tan( (sensor_data[0].distance - sensor_data[1].distance) / (SENSOR_X_OFFSET * 2));
-        // printf("Thing 1: %f\n", relative_forward + tan( (sensor_data[0].distance - sensor_data[1].distance) / (SENSOR_X_OFFSET * 2)));
+        sensor_location.theta_mu += relative_forward - tan( (sensor_data[0].distance - sensor_data[1].distance) / (SENSOR_X_OFFSET * 2));
+        // printf("Thing 1: %f\n", relative_forward - tan( (sensor_data[0].distance - sensor_data[1].distance) / (SENSOR_X_OFFSET * 2)));
     }
 
     // both right side sensors

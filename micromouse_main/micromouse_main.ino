@@ -15,6 +15,7 @@
 #include "src/localization/localization.h"
 #include "src/localization/localization_serial.h"
 #include "src/strategy/strategy.h"
+#include "src/strategy/strategy_serial.h"
 #include "src/movement/movement.h"
 #include "src/control/control.h"
 
@@ -164,6 +165,10 @@ void main_loop(void) {
 
   // Determine next cell to go to (strategy step)
   //strategy(&robot_location, &robot_maze_state, &next_location);
+
+  #ifdef DEBUG_STRATEGY
+    printStrategy(&next_location);
+  #endif
   
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);

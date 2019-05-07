@@ -16,6 +16,7 @@
 //#define DEBUG_LOCALIZE_MOTION
 //#define DEBUG_LOCALIZE_MAPPING
 //#define DEBUG_LOCALIZE_MEASURE
+//#define DEBUG_STRATEGY
 //#define DEBUG_MOVEMENT
 
 // Main
@@ -59,7 +60,7 @@
 #define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
 #define WALL_UPDATE         0.9     // The amount to multiply by to increase or decrease a wall's probability of existing
 
-#define SENSOR_LOCATION_WEIGHT 0.1  // The higher this value, the more we trust our sensor's input
+#define SENSOR_LOCATION_WEIGHT 0.2  // The higher this value, the more we trust our sensor's input
 
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
@@ -78,14 +79,14 @@
 #define STRAIGHT_TAU_P  2.5                   // dummy value
 #define STRAIGHT_TAU_I  0                   // dummy value
 #define STRAIGHT_TAU_D  0.5                 // dummy value
-#define STRAIGHT_PROFILE_STABLE_SPEED  100  // dummy value
+#define STRAIGHT_PROFILE_STABLE_SPEED  75  // dummy value
 #define STRAIGHT_PROFILE_SLOPE         5    // dummy value
 #define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
 
 #define TURN_TAU_P      0                   // unused
 #define TURN_TAU_I      0                   // unused
 #define TURN_TAU_D      0                   // unused
-#define TURN_PROFILE_STABLE_SPEED  100
+#define TURN_PROFILE_STABLE_SPEED  75
 #define TURN_PROFILE_SLOPE         500
 #define TURN_PROFILE_INTERCEPT     10
 
