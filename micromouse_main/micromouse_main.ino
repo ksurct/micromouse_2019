@@ -1,21 +1,21 @@
 /* Micromouse 2019 */
 
 
-// Libraries
-#include <DueTimer.h>
-
 // General
 #include "src/settings.h"
 #include "src/types.h"
 
 // Devices
+#include "src/devices/leds.h"
 #include "src/devices/sensors.h"
 #include "src/devices/motors.h"
 #include "src/devices/encoders.h"
 
 // Subsystems
 #include "src/localization/localization.h"
+#include "src/localization/localization_serial.h"
 #include "src/strategy/strategy.h"
+#include "src/strategy/strategy_serial.h"
 #include "src/movement/movement.h"
 #include "src/control/control.h"
 
@@ -23,23 +23,45 @@
 #include "src/util/conversions.h"
 
 
+// Globals
+unsigned long timer;
+void (*current_loop)(void);
+
 // Function Declarations
-void setup(void);
-void start_loop(void);
 void main_loop(void);
+void robot_delay(unsigned long delay_time);
 
 
 /* Entry point to the code for the robot, all initialization
    of subsystems should be done here */
 void setup() {
 
+  bool success;
+
   // Initialize Serial
   Serial.begin(115200);
 
+  Serial.println("\n\nKSURCT Micromouse TEAM for 2018-2019\n");
+
+  // Setup LEDs
+  ledSetup();
+
+  // Wait 2 seconds for humans to go away
+  robot_delay(SETUP_TIME);
+
   // Setup Sensors
-  if (! sensorSetup()) {
-    Serial.println("Error connecting to sensors!");
+  success = sensorSetup();
+  
+  if (!success) {
+    setAllLEDSHigh();
   }
+
+  #ifdef DEBUG_SENSORS
+    if (!success)
+      Serial.println("DEBUG_SENSORS: Error connecting to sensors!");
+    else
+      Serial.println("DEBUG_SENSORS: Sensors connected successfully");
+  #endif
 
   // Setup Motors
   motorSetup();
@@ -57,35 +79,68 @@ void setup() {
   // Initialize Control subsystem
   initializeControl();
 
-  // Wait 2 seconds
-  delay(2000);
+  // Initialize timer and starting loop
+  timer = millis();
 
-  Timer1.attachInterrupt(start_loop).start(MAIN_LOOP_TIME);
+  current_loop = &main_loop;
 
-  // // Start start loop
-  while (robot_location.theta_mu < 3*PI/2) {
-    Serial.println("Test");
-    Serial.println(robot_location.theta_mu);
-  }
-  Serial.println("Should have stopped");
-  Timer1.stop();
+}
+
+
+void loop() {
+  // Track if we go over the allocated time for a loop
+  static unsigned long start_of_loop;
+
+  current_loop();
   
-  // // Start main loop
-  Timer1.attachInterrupt(main_loop).start(MAIN_LOOP_TIME);
+//  if (millis() - timer > MAIN_LOOP_TIME) {
+//    start_of_loop = millis();
+//
+//    current_loop();
+//
+//    #ifdef DEBUG_TIMER
+//      Serial.print("DEBUG_TIMER: ");
+//    #endif
+//
+//    // Reset timer
+//    while (millis() - timer > MAIN_LOOP_TIME) {
+//      timer += MAIN_LOOP_TIME;
+//
+//      #ifdef DEBUG_TIMER
+//        Serial.print(timer);
+//        Serial.print(", ");
+//      #endif
+//    }
+//    #ifdef DEBUG_TIMER
+//      Serial.println();
+//    #endif
+//  }
 }
 
-void start_loop() {
-
+void main_loop(void) {
   // Initialize variables
-  static sensor_reading_t sensor_data[NUM_SENSORS];
+  static sensor_reading_t sensor_data[NUM_SENSORS] = {
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 },
+    (sensor_reading_t){ .state = ERROR,   .distance = 255 }
+  };
   static double left_distance;
   static double right_distance;
   static double left_speed;
   static double right_speed;
-  //static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0}; -REMOVE
+  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 264.0};
+
+  // Flash heartbeat
+  flashLED(1);
 
   // Get sensor data
-  //readSensors(sensor_data);
+  readSensors(sensor_data);
+
+  #ifdef DEBUG_SENSORS
+    printSensorData(sensor_data);
+  #endif
 
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
@@ -93,60 +148,54 @@ void start_loop() {
   // Run distances through localization
   localizeMotionStep(left_distance, right_distance);
 
-  // Update maze with sensor readings
-  //mazeMapping(sensor_data);
+  #ifdef DEBUG_LOCALIZE_MOTION
+    printLocalizeMotion();
+  #endif
 
-  // Interpolate sensor data into the localization
-  //localizeMeasureStep(sensor_data);
+  // Update maze and robot location with sensor readings
+  mazeMappingAndMeasureStep(sensor_data);
 
-  // Determine next cell to go to (strategy step)
-  //strategy(&robot_location, &robot_maze_state, &next_location); -REMOVE
+  #ifdef DEBUG_LOCALIZE_MAPPING
+    printLocalizeMapping();
+  #endif
 
-  // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
-  //calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed); -REMOVE
-
-  // Set speed using the motor controllers (pid loop)
-  setSpeedPID(TURN_PROFILE_STABLE_SPEED, -TURN_PROFILE_STABLE_SPEED);
-
-}
-
-void main_loop() {
-
-  // Initialize variables
-  static sensor_reading_t sensor_data[NUM_SENSORS];
-  static double left_distance;
-  static double right_distance;
-  static double left_speed;
-  static double right_speed;
-  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 84.0};
-
-  // Get sensor data
-  //readSensors(sensor_data);
-
-  // Get distance travelled from control subsystem
-  distanceTravelled(&left_distance, &right_distance);
-
-  // Run distances through localization
-  localizeMotionStep(left_distance, right_distance);
-
-  // Update maze with sensor readings
-  //mazeMapping(sensor_data);
-
-  // Interpolate sensor data into the localization
-  //localizeMeasureStep(sensor_data);
+  #ifdef DEBUG_LOCALIZE_MEASURE
+    printLocalizeMeasure();
+  #endif
 
   // Determine next cell to go to (strategy step)
-  //strategy(&robot_location, &robot_maze_state, &next_location);
+  strategy(&robot_location, &robot_maze_state, &next_location);
 
+  #ifdef DEBUG_STRATEGY
+    printStrategy(&next_location);
+  #endif
+  
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
+  #ifdef DEBUG_MOVEMENT
+    //printSpeedData(left_speed, right_speed);
+  #endif
+
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
-
 }
 
-/* This function is not in use because we would like to control the timing that the loop is called */
-void loop() {
-  // do not use
+// Delay for time, time and flash leds
+void robot_delay(unsigned long delay_time) {
+  unsigned long end_time = millis() + delay_time;
+  
+  while (millis() < end_time ) {
+    toggleLED(1); delay(100); toggleLED(1);
+
+    toggleLED(2); delay(100); toggleLED(2);
+
+    toggleLED(3); delay(100); toggleLED(3);
+
+    toggleLED(2); delay(100); toggleLED(2);
+  }
+
+  setAllLEDSHigh();
+  delay(200);
+  setAllLEDSLow();
 }

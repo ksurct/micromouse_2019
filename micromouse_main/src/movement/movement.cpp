@@ -44,9 +44,6 @@
 
 
 // Globals
-double directionToRAD[4] = { 3*PI/2, 0, PI/2, PI };
-double directionToXY[4][2] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
-
 gaussian_location_t prev_location;
 RobotState prev_state;
 Direction prev_direction;

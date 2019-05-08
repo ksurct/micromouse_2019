@@ -13,6 +13,15 @@
 #include <stdio.h>
 
 
+typedef struct {
+    bool hit;               // Does the wall we hit exists?
+    double distance_hit;    // What was the furthest distance from the sensor to the hit
+    char side;              // Determines the orientation of the wall we hit, 0: parallel to x-axis, 1: parallel to y-axis
+    Direction dir;          // The direction from the robot to the wall hit
+    probabilistic_wall_t *wall;
+} hit_data_t;
+
+
 #define ENCODER_VARIANCE(d) (((ENCODER_VARIANCE_PER_MM) * abs(d)) + (ENCODER_VARIANCE_BASE))
 
 
@@ -23,17 +32,19 @@ gaussian_location_t robot_location;
 /* Sensor offsets (Inverted y coordinates) */
 
 gaussian_location_t sensor_offsets[NUM_SENSORS] = {
-    { .x_mu = -32.5,  .y_mu = -35.0,  .theta_mu = -PI/2   },
-    { .x_mu = 32.5,   .y_mu = -35.0,  .theta_mu = -PI/2   },
-    { .x_mu = 46.0,   .y_mu = 0.0,    .theta_mu = 0.0     },
-    { .x_mu = 32.5,   .y_mu = 35.0,   .theta_mu = PI/2    },
-    { .x_mu = -32.5,  .y_mu = 35.0,   .theta_mu = PI/2    }
+    { .x_mu = -SENSOR_X_OFFSET,     .y_mu = -SENSOR_Y_OFFSET,   .theta_mu = -PI/2   },    // Sensor 0 (Bottom left)
+    { .x_mu = SENSOR_X_OFFSET,      .y_mu = -SENSOR_Y_OFFSET,   .theta_mu = -PI/2   },    // Sensor 1 (Top left)
+    { .x_mu = SENSOR_FRONT_OFFSET,  .y_mu = 0.0,                .theta_mu = 0.0     },    // Sensor 2 (Front)
+    { .x_mu = SENSOR_X_OFFSET,      .y_mu = SENSOR_Y_OFFSET,    .theta_mu = PI/2    },    // Sensor 3 (Top right)
+    { .x_mu = -SENSOR_X_OFFSET,     .y_mu = SENSOR_Y_OFFSET,    .theta_mu = PI/2    }     // Sensor 4 (Bottom right)
 };
 
 // Private Function Declarations
 bool validateMeasurement(sensor_reading_t *measurement);
-void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *measurement);
-void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t * reading);
+void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *measurement, hit_data_t* hit_data, int sensor_num);
+void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t * reading, int sensor_num);
+void processMeasurementMeasure(gaussian_location_t* sensor_location, sensor_reading_t* measurement,
+                                    hit_data_t* hit_data, gaussian_location_t* new_location);
 
 
 /*----------- Public Functions -----------*/
@@ -70,30 +81,170 @@ gaussian_location_t* localizeMotionStep(double left_distance, double right_dista
 
 /* Maze Mapping
  * - Updates the global robot_maze_state based on the believed current position and the sensor data recorded */
-probabilistic_maze_t* mazeMapping(sensor_reading_t* sensor_data) {
+void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
     
     // printf("Robot:   \t(%f,\t%f,\t%f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
     
-    // calculate the sensor locations
+/* Update the maze based on the sensor_data */
+
     gaussian_location_t sensor_locations[NUM_SENSORS];
+    hit_data_t sensor_hit_data[NUM_SENSORS];
     for (int i = 0; i < NUM_SENSORS; i++) {
         
-        if (validateMeasurement(&sensor_data[i])) {
-            
-            addMotion(&robot_location, &sensor_offsets[i], &sensor_locations[i]);
-            // printf("Sensor %d:\t(%f,\t%f,\t%f)\n", i, sensor_locations[i].x_mu, sensor_locations[i].y_mu, sensor_locations[i].theta_mu);
+        addMotion(&robot_location, &sensor_offsets[i], &sensor_locations[i]);
+        // printf("Sensor %d:\t(%f,\t%f,\t%f)\n", i, sensor_locations[i].x_mu, sensor_locations[i].y_mu, sensor_locations[i].theta_mu);
 
-            processMeasurementMapping(&sensor_locations[i], &(sensor_data[i]));
+        if (validateMeasurement(&sensor_data[i])) {
+            processMeasurementMapping(&sensor_locations[i], &sensor_data[i], &sensor_hit_data[i], i);
         }
     }
 
-    return &robot_maze_state;
-}
 
-/* Localize Measure Step
- * - Updates the global robot_location based on current position, current map state and the sensor data recorded */
-gaussian_location_t* localizeMeasureStep(sensor_reading_t* sensor_data) {
-    // dothething();
+/* Update the robot's location based on the sensor_data and the new maze */
+
+    gaussian_location_t sensor_location = {
+        .x_mu = 0.0,
+        .y_mu = 0.0,
+        .theta_mu = 0.0,
+        .x_sigma = 0.0,
+        .xy_sigma = 0.0,
+        .y_sigma = 0.0,
+        .theta_sigma = 0.0
+    };
+    
+    // just use the sensor data and average out x and y location
+    double sumX = 0.0; double sumY = 0.0;
+    double tempX = 0.0; double tempY = 0.0;
+    char count = 0;
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        // printf("Sensor: %d, ", i);
+        // Don't update robot_location on anything thats not good or the wall doesn't exists
+        if (sensor_data[i].state == GOOD && sensor_hit_data[i].hit) {
+
+            double shift_forward = sensor_hit_data[i].distance_hit - sensor_data[i].distance;
+            // printf("shift_forward: %f, ", shift_forsward);
+
+            // Shift the robot_location by shift_forward in the direction of the sensor's location and add to sum
+            sumX += (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu;
+            sumY += (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu;
+            // printf("sensor_locations[%d]: ( %f, %f )\n", i, (shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu, (shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu);
+            // Serial.print("sensor_locations[");
+            // Serial.print(i);
+            // Serial.print("]: ( ");
+            // Serial.print((shift_forward * cos(sensor_locations[i].theta_mu)) + robot_location.x_mu);
+            // Serial.print(", ");
+            // Serial.print((shift_forward * sin(sensor_locations[i].theta_mu)) + robot_location.y_mu);
+            // Serial.println(" )");
+            // printf("Sums: ( %f, %f )", sumX, sumY);
+
+            count++;
+        }
+    }
+    // printf("\n");
+
+    // average the x and y values
+    if (count > 0) {
+        sensor_location.x_mu = (sumX / count);
+        sensor_location.y_mu = (sumY / count);
+    } else {
+        sensor_location.x_mu = robot_location.x_mu;
+        sensor_location.y_mu = robot_location.y_mu;
+    }
+
+    // printf("sensor_location: (%f, %f)\n", sensor_location.x_mu, sensor_location.y_mu);
+    // Serial.print("sensor_location: ( ");
+    // Serial.print(sensor_location.x_mu);
+    // Serial.print(", ");
+    // Serial.print(sensor_location.y_mu);
+    // Serial.println(" )");
+
+    // Perform a weighted average between the new location and the old location
+    robot_location.x_mu = (SENSOR_LOCATION_WEIGHT * sensor_location.x_mu) + ((1 - SENSOR_LOCATION_WEIGHT) * robot_location.x_mu);
+    robot_location.y_mu = (SENSOR_LOCATION_WEIGHT * sensor_location.y_mu) + ((1 - SENSOR_LOCATION_WEIGHT) * robot_location.y_mu);
+
+    // Create a reading for theta during special circumstances(such as both readings on one side hitting a wall)
+    char sensor_theta_count = 0;
+    double relative_forward;
+    // both left side sensors
+    if (sensor_data[0].state == GOOD && sensor_data[1].state == GOOD
+        && sensor_hit_data[0].hit && sensor_hit_data[1].hit
+        && sensor_hit_data[0].dir == sensor_hit_data[1].dir) {
+
+        sensor_theta_count++;
+        
+        if (sensor_hit_data[0].dir == North) {
+            relative_forward = 0.0;
+        } else {
+            relative_forward = directionToRAD[sensor_hit_data[0].dir] + PI/2;
+        }
+        // printf("relative_forward: %f\n", relative_forward);
+        sensor_location.theta_mu += relative_forward - tan( (sensor_data[0].distance - sensor_data[1].distance) / (SENSOR_X_OFFSET * 2));
+        // printf("Thing 1: %f\n", relative_forward - tan( (sensor_data[0].distance - sensor_data[1].distance) / (SENSOR_X_OFFSET * 2)));
+    }
+
+    // both right side sensors
+    if (sensor_data[3].state == GOOD && sensor_data[4].state == GOOD
+        && sensor_hit_data[3].hit && sensor_hit_data[4].hit
+        && sensor_hit_data[3].dir == sensor_hit_data[4].dir) {
+        
+        sensor_theta_count++;
+                
+        if (sensor_hit_data[3].dir == East)
+            relative_forward = 3*PI/2;
+        else
+            relative_forward = directionToRAD[sensor_hit_data[3].dir] - PI/2;
+        // printf("relative_forward: %f\n", relative_forward);
+        sensor_location.theta_mu += relative_forward + tan( (sensor_data[4].distance - sensor_data[3].distance) / (SENSOR_X_OFFSET * 2));
+        // printf("Thing 2: %f\n", relative_forward + tan( (sensor_data[4].distance - sensor_data[3].distance) / (SENSOR_X_OFFSET * 2)));
+    }
+
+
+    // both top sensors
+    if (sensor_data[1].state == GOOD && sensor_data[3].state == GOOD && 
+        sensor_hit_data[1].side == sensor_hit_data[3].side) {
+        // TODO
+    }
+
+
+    // both bottom sensors
+    if (sensor_data[0].state == GOOD && sensor_data[4].state == GOOD &&
+        sensor_hit_data[0].side == sensor_hit_data[4].side) {
+        // TODO
+    }
+
+
+    // If sensor reading of theta, use it
+    if (sensor_location.theta_mu != 0.0) {
+        
+        sensor_location.theta_mu = (sensor_location.theta_mu / sensor_theta_count);
+        
+        // printf("sensor_location.theta_mu: %f\n", sensor_location.theta_mu);
+
+        /* limit sensor theta between 0 and 2 pi */
+        while (sensor_location.theta_mu < 0) { sensor_location.theta_mu += TWO_PI; }
+        while (sensor_location.theta_mu >= TWO_PI) { sensor_location.theta_mu -= TWO_PI; }
+
+        double delta = sensor_location.theta_mu - robot_location.theta_mu;
+        if (-PI <= delta && delta <= PI) {
+            robot_location.theta_mu += (SENSOR_LOCATION_WEIGHT * delta) + ((1 - SENSOR_LOCATION_WEIGHT) * 0.0);
+        } else if (-TWO_PI <= delta && delta < -PI) {
+            robot_location.theta_mu += (SENSOR_LOCATION_WEIGHT * delta) + ((1 - SENSOR_LOCATION_WEIGHT) * -TWO_PI);
+        } else if (PI < delta && delta <= TWO_PI) {
+            robot_location.theta_mu += (SENSOR_LOCATION_WEIGHT * delta) + ((1 - SENSOR_LOCATION_WEIGHT) * TWO_PI);
+        } else {
+            // printf("ERROR ERROR ERROR\n");
+            //Serial.println("ERROR ERROR ERROR");
+        }
+
+        //robot_location.theta_mu = (SENSOR_LOCATION_WEIGHT * sensor_location.theta_mu) + ((1 - SENSOR_LOCATION_WEIGHT) * robot_location.theta_mu);
+
+        /* limit robot theta between 0 and 2 pi */
+        while (robot_location.theta_mu < 0) { robot_location.theta_mu += TWO_PI; }
+        while (robot_location.theta_mu >= TWO_PI) { robot_location.theta_mu -= TWO_PI; }
+    }
+
+    // printf("robot_location.theta_mu: %f\n", robot_location.theta_mu);
+
 }
 
 
@@ -176,6 +327,7 @@ void rotateCovariance(double rotate_by, double* x_sigma, double* y_sigma, double
 void addMotion(gaussian_location_t* current_location, gaussian_location_t* motion,
                     gaussian_location_t* final_location) {
 
+
 /* Inverse the input to normal coordinates */
     // theta1 = 2*pi - theta1;
     final_location->theta_mu = TWO_PI - current_location->theta_mu;
@@ -214,6 +366,13 @@ void addMotion(gaussian_location_t* current_location, gaussian_location_t* motio
     while (final_location->theta_mu < 0) { final_location->theta_mu += TWO_PI; }
     while (final_location->theta_mu >= TWO_PI) { final_location->theta_mu -= TWO_PI; }
 
+/* reset motion vector to original value */
+    // theta2 = 2*pi - theta2;
+    motion->theta_mu = TWO_PI - motion->theta_mu;
+    // y2 = -1 * y2;
+    motion->y_mu = -1 * motion->y_mu;
+
+
 }
 
 // Check if we should process measurement
@@ -222,7 +381,7 @@ bool validateMeasurement(sensor_reading_t *measurement) {
 }
 
 /* update robot_maze_state based on the given sensor reading */
-void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *measurement) {
+void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *measurement, hit_data_t* hit_data, int sensor_num) {
     
     // Use defaults for TOO_FAR and TOO_CLOSE STATES
     if (measurement->state == TOO_FAR)
@@ -236,8 +395,8 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
     //which box of the map we're in
     int cellX = coordinateDistanceToCellNumber(location->x_mu);
     int cellY = coordinateDistanceToCellNumber(location->y_mu);
-    double edgeCellX = cellNumberToCoordinateDistance(cellX) - (CELL_LENGTH + WALL_THICKNESS) / 2;
-    double edgeCellY = cellNumberToCoordinateDistance(cellY) - (CELL_LENGTH + WALL_THICKNESS) / 2;
+    double edgeCellX = cellNumberToCoordinateDistance(cellX) - (CELL_LENGTH) / 2;
+    double edgeCellY = cellNumberToCoordinateDistance(cellY) - (CELL_LENGTH) / 2;
 
     //length of ray from current position to next x or y-side
     double sideDistX;
@@ -250,7 +409,6 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
     //length of ray from one x or y-side to next x or y-side
     double deltaDistX = abs(1 / rayDirX) * (CELL_LENGTH + WALL_THICKNESS);
     double deltaDistY = abs(1 / rayDirY) * (CELL_LENGTH + WALL_THICKNESS);
-    //printf("deltaDist:\t(%f,\t%f)\n", deltaDistX, deltaDistY);
 
     //what direction to step in x or y-direction (either +1 or -1)
     int stepX;
@@ -264,7 +422,7 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         sideDistX = percent * deltaDistX;
     } else {
         stepX = 1;
-        percent = (edgeCellX + (CELL_LENGTH + WALL_THICKNESS) - location->x_mu) / (CELL_LENGTH + WALL_THICKNESS);
+        percent = (edgeCellX + (CELL_LENGTH) - location->x_mu) / (CELL_LENGTH + WALL_THICKNESS);
         sideDistX = percent * deltaDistX;
     }
     
@@ -274,18 +432,47 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         sideDistY = percent * deltaDistY;
     } else {
         stepY = 1;
-        percent = (edgeCellY + (CELL_LENGTH + WALL_THICKNESS) - location->y_mu) / (CELL_LENGTH + WALL_THICKNESS);
+        percent = (edgeCellY + (CELL_LENGTH) - location->y_mu) / (CELL_LENGTH + WALL_THICKNESS);
         sideDistY = percent * deltaDistY;
     }
-    
-    // printf("sideDist:\t(%f,\t%f)\n", sideDistX, sideDistY);
-    // printf("step:\t\t(%d,\t%d)\n", stepX, stepY);
 
-    // printf("\n");
-    // printf("State: %d, Distance: %d\n", measurement->state, measurement->distance);
+    // printf("sideDist(X,Y): (%f, %f)\n", sideDistX, sideDistY);
+    // printf("step(X,Y): (%d, %d)\n", stepX, stepY);
+
+    // In case we don't reach a wall
+    if (sideDistX < sideDistY) {
+        // Save this hit as the farthest and side as the x axis
+        hit_data->distance_hit = sideDistX;
+        hit_data->side = 0;
+        if (stepX > 0) {
+            hit_data->dir = East;
+            hit_data->wall = robot_maze_state.cells[cellX][cellY].east;
+        } else {
+            hit_data->dir = West;
+            hit_data->wall = robot_maze_state.cells[cellX][cellY].west;
+        }
+        
+    } else {
+        // Save this hit as the farthest and side as the y axis
+        hit_data->distance_hit = sideDistY;
+        hit_data->side = 1;
+        if (stepY > 0) {
+            hit_data->dir = South;
+            hit_data->wall = robot_maze_state.cells[cellX][cellY].south;
+        } else {
+            hit_data->dir = North;
+            hit_data->wall = robot_maze_state.cells[cellX][cellY].north;
+        }
+    }
+
+    if (hit_data->wall->exists > WALL_THRESHOLD) {
+        hit_data->hit = true;
+    } else {
+        hit_data->hit = false;
+    }
 
     // Traverse the for length of the measurement + threshold and still within the maze
-    while ( (sideDistX < measurement->distance + SENSOR_THRESHOLD_RANGE || sideDistY < measurement->distance + SENSOR_THRESHOLD_RANGE)
+    while ( (sideDistX < measurement->distance + WALL_HIT_THRESHOLD || sideDistY < measurement->distance + WALL_HIT_THRESHOLD)
                 && !(cellX < 0 || cellX >= (MAZE_WIDTH) || cellY < 0 || cellY >= (MAZE_HEIGHT))) {
         
         //jump to next map square, in x-direction, OR in y-direction
@@ -293,30 +480,62 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
 
             if (stepX > 0) { // Update East and move East
                 // printf("%d %d east\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].east, sideDistX, measurement);
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].east, sideDistX, measurement, sensor_num);
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].east;
+                hit_data->dir = East;
                 cellX++;
             } else { // Update West and move West
                 // printf("%d %d west\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].west, sideDistX, measurement);
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].west, sideDistX, measurement, sensor_num);
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].west;
+                hit_data->dir = West;
                 cellX--;
             }
+            
+            // Save this hit as the farthest and side as the x axis
+            hit_data->distance_hit = sideDistX;
+            hit_data->side = 0;
 
             sideDistX += deltaDistX; // Set to next x collision distance
         } else { // y-direction
             
             if (stepY > 0) { // Update South and move South
                 // printf("%d %d south\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].south, sideDistY, measurement);
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].south, sideDistY, measurement, sensor_num);
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].south;
+                hit_data->dir = South;
                 cellY++;
             } else { // Update North and move North
                 // printf("%d %d north\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].north, sideDistY, measurement);
+                updateMazeWall(robot_maze_state.cells[cellX][cellY].north, sideDistY, measurement, sensor_num);
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].north;
+                hit_data->dir = North;
                 cellY--;
             }
-            
+
+            // Save this hit as the farthest and side as the y axis
+            hit_data->distance_hit = sideDistY;
+            hit_data->side = 1;
+
             sideDistY += deltaDistY; // Set to next y collision distance
         }
+
+        if (hit_data->wall->exists > WALL_THRESHOLD) {
+            hit_data->hit = true;
+            break;
+        } else {
+            hit_data->hit = false;
+        }
     }
+
+    // printf("cell(X,Y): (%d, %d)\n", cellX, cellY);
+
+    // printf("hit_data: \n");
+    // printf("\thit: %d\n", hit_data->hit);
+    // printf("\tdistance_hit: %f\n", hit_data->distance_hit);
+    // printf("\tside: %d\n", hit_data->side);
+    // printf("\tdir: %d\n", hit_data->dir);
+    // printf("\twall: %x\n", hit_data->wall);
 
     // printf("\n");
 }
@@ -324,11 +543,11 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
 
 /* Raycast has hit a wall at distance_hit away from the original sensor measurement
  * - Note: order of operations does matter for multiplicative but not for additive */
-void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t* measurement) {
+void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t* measurement, int sensor_num) {
 
     // Additive implementation
-    // if (measurement->distance - SENSOR_THRESHOLD_RANGE < distance_hit &&
-    //         distance_hit < measurement->distance + SENSOR_THRESHOLD_RANGE) {
+    // if (measurement->distance - WALL_HIT_THRESHOLD < distance_hit &&
+    //         distance_hit < measurement->distance + WALL_HIT_THRESHOLD) {
     //     // hit should increase wall value if state is GOOD or TOO_CLOSE
     //     if (measurement->state == GOOD || measurement->state == TOO_CLOSE)
     //         wall->exists += WALL_UPDATE_AMOUNT;
@@ -339,18 +558,33 @@ void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_read
     // }
 
     // Multiplicative implementation
-    if (measurement->distance - SENSOR_THRESHOLD_RANGE < distance_hit &&
-            distance_hit < measurement->distance + SENSOR_THRESHOLD_RANGE) {
+    if (measurement->distance - WALL_HIT_THRESHOLD < distance_hit &&
+            distance_hit < measurement->distance + WALL_HIT_THRESHOLD) {
         // hit should increase wall value if state is GOOD or TOO_CLOSE
-        if (measurement->state == GOOD || measurement->state == TOO_CLOSE)
+        if (measurement->state == GOOD || measurement->state == TOO_CLOSE) {
             wall->exists = (1.0 - ((1.0 - wall->exists) * WALL_UPDATE));
+        }
     } else {
         // hit should decrease wall value if state is GOOD or TOO_FAR
-        if (measurement->state == GOOD || measurement->state == TOO_FAR)
+        if (measurement->state == GOOD || measurement->state == TOO_FAR) {
             wall->exists = wall->exists * WALL_UPDATE;
+        }
     }
 
     // bound the value of wall->exists by 1.0 and 0.0
     if (wall->exists > 1.0) wall->exists = 1.0;
     if (wall->exists < 0.0) wall->exists = 0.0;
+}
+
+
+void processMeasurementMeasure(gaussian_location_t* sensor_location, sensor_reading_t* measurement,
+                                    hit_data_t* hit_data, gaussian_location_t* new_location) {
+    // shift_forward = distance_hit-measurement
+    double shift_forward = hit_data->distance_hit - measurement->distance;
+
+    // Shift the robot_location by shift_forward in the direction of the sensor's location
+    new_location->x_mu = shift_forward * cos(sensor_location->theta_mu) + robot_location.x_mu;
+    new_location->y_mu = shift_forward * sin(sensor_location->theta_mu) + robot_location.y_mu;
+    
+    new_location->theta_mu = robot_location.theta_mu;
 }

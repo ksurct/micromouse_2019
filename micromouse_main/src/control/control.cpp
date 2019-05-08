@@ -32,6 +32,11 @@ volatile controller_state_t controllers[] = {
     },
 };
 
+
+//Function declarations
+void printEncoderData(double left_distance, double right_distance);
+
+
 /* initialize control
  * starts the PID loop with a speed of 0 on each motor */
 void initializeControl(void) {
@@ -49,6 +54,18 @@ void distanceTravelled(double* left_distance, double* right_distance) {
     *right_distance = ticksToMM(controllers[RIGHT].ticks_travelled);
     controllers[LEFT].ticks_travelled = 0;
     controllers[RIGHT].ticks_travelled = 0;
+
+    
+    #ifdef DEBUG_ENCODERS
+        printEncoderData(*left_distance, *right_distance);
+    #endif
+}
+
+void printEncoderData(double left_distance, double right_distance) {
+    Serial.print("DEBUG_ENCODERS: ");
+    Serial.print(left_distance);
+    Serial.print(", ");
+    Serial.println(right_distance);
 }
 
 /* set speed PID

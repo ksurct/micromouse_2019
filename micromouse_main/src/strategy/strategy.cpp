@@ -1,14 +1,16 @@
 /* strategy.cpp */
 
+#
 
 #include "strategy.h"
 #include "../types.h"
 #include "../settings.h"
+#include "../util/queue.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <queue>
 
+#define IS_CELL_OUT_OF_BOUNDS(cell) ((cell).x < 0 || (cell).x >= (MAZE_WIDTH) || (cell).y < 0 || (cell).y >= (MAZE_HEIGHT))
 
 /* Simple representation of a cell
  *  - For use with probabilistic_maze_t */
@@ -28,7 +30,7 @@ void setAllDiscoveredToFalse(void);
 
 
 // Global declarations
-static cell_t goal_cell = {
+cell_t goal_cell = {
     .x = GOAL_CELL_X,
     .y = GOAL_CELL_Y
 };
@@ -62,11 +64,17 @@ void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* maze_st
     // Choose the lowest valued cell we can go to
     cell_t next_cell = chooseNextCell(maze_state, &robot_cell);
 
+    #ifdef DEBUG_STRATEGY
+        Serial.print("DEBUG_STRATEGY: next_cell 2: (");
+        Serial.print(next_cell.x);
+        Serial.print(", ");
+        Serial.print(next_cell.y);
+        Serial.println(")");
+    #endif
+
     // Convert to a gaussian_location_t that edits the next_location
     convertCellToLocation(&next_cell, next_location);
 }
-
-#define IS_CELL_OUT_OF_BOUNDS(cell) ((cell).x < 0 || (cell).x >= (MAZE_WIDTH) || (cell).y < 0 || (cell).y >= (MAZE_HEIGHT))
 
 /* floodfill
  * Implements the floodfill algorithm on the 2d-array values with breadth first search
@@ -77,8 +85,14 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
     resetValues();
     setAllDiscoveredToFalse();
 
-    std::queue<cell_t> q;
-    std::queue<cell_t> next_q;
+    queue<cell_t, MAZE_WIDTH * MAZE_HEIGHT> q(cell_t {
+        .x = 0,
+        .y = 0
+    });
+    queue<cell_t, MAZE_WIDTH * MAZE_HEIGHT> next_q(cell_t {
+        .x = 0,
+        .y = 0
+    });
 
     discovered[cell.x][cell.y] = true;
 
@@ -91,8 +105,7 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
             value++;
         }
 
-        cell = q.front();
-        q.pop();
+        cell = q.pop();
 
         // Update the cell
         if (IS_CELL_OUT_OF_BOUNDS(cell)) {
@@ -157,7 +170,32 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
     //     }
     //     printf("\n");
     // }
-    // printf("\n"); 
+    // printf("\n");
+
+    #ifdef DEBUG_STRATEGY
+        Serial.println("DEBUG_STRATEGY: ");
+        for (int i=0; i<MAZE_WIDTH; i++){
+            for (int j=0; j<MAZE_HEIGHT; j++){
+                if (values[i][j] <10){
+                    Serial.print("  ");
+                    Serial.print(values[i][j]);
+                    Serial.print("  |");
+                }
+                else if (values[i][j] < 100){
+                    Serial.print(" ");
+                    Serial.print(values[i][j]);
+                    Serial.print("  |");
+                }
+                else{
+                    Serial.print(" ");
+                    Serial.print(values[i][j]);
+                    Serial.print(" |");
+                }
+            }
+            Serial.println();
+        }
+        Serial.println();
+    #endif
 }
 
 /* Uses the mean location to determine the cell this location is in */
@@ -178,9 +216,24 @@ cell_t chooseNextCell(probabilistic_maze_t* robot_maze_state, cell_t* robot_cell
     int x = robot_cell->x;
     int y = robot_cell->y;
     int lowest_value = MAX_VALUE;
-    cell_t next_cell;
+    cell_t next_cell = {
+        .x = robot_cell->x,
+        .y = robot_cell->y
+    };
+
+    #ifdef DEBUG_STRATEGY
+        Serial.print("DEBUG_STRATEGY: next_cell 1: (");
+        Serial.print(next_cell.x);
+        Serial.print(", ");
+        Serial.print(next_cell.y);
+        Serial.println(")");
+    #endif
 
     // Check each direction and save the lowest valued direction that we can go to
+
+    if (robot_cell->x == goal_cell.x && robot_cell->y == goal_cell.y) {
+        return next_cell;
+    }
     
     // Check North(0, -1)
     if (values[x][y - 1] < lowest_value && robot_maze_state->cells[x][y].north->exists < WALL_THRESHOLD) {
