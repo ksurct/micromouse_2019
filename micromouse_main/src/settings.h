@@ -43,7 +43,7 @@
 #define INIT_XY_SIGMA       0
 #define INIT_Y_MU           84.0
 #define INIT_Y_SIGMA        20.0
-#define INIT_THETA_MU       PI
+#define INIT_THETA_MU       0.0
 #define INIT_THETA_SIGMA    radians(10)
 
 #define ENCODER_VARIANCE_BASE   2.0
@@ -56,37 +56,37 @@
 #define TOO_FAR_DISTANCE    250     // the distance that of walls that we update given a TOO_FAR measurement (in mm)
 #define TOO_CLOSE_DISTANCE  10      // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
 
-#define WALL_HIT_THRESHOLD  20      // The plus or minus amount for a measurement that should result in the increase of a walls exists
+#define WALL_HIT_THRESHOLD  30      // The plus or minus amount for a measurement that should result in the increase of a walls exists
 #define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
 #define WALL_UPDATE         0.9     // The amount to multiply by to increase or decrease a wall's probability of existing
 
-#define SENSOR_LOCATION_WEIGHT 0.2  // The higher this value, the more we trust our sensor's input
+#define SENSOR_LOCATION_WEIGHT 0.3  // The higher this value, the more we trust our sensor's input
 
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
-#define GOAL_CELL_X     0       // Goal cell x coordinate
-#define GOAL_CELL_Y     3       // Goal cell y coordinate
+#define GOAL_CELL_X     4       // Goal cell x coordinate
+#define GOAL_CELL_Y     4       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.6     // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
 #define INNER_TOLERANCE_MM    10            //dummy value (in mm)
-#define INNER_TOLERANCE_RAD   radians(5)    //dummy value (in radians)
-#define OUTER_TOLERANCE_MM    20            //dummy value (in mm)
-#define OUTER_TOLERANCE_RAD   radians(10)   //dummy value (in radians)
+#define INNER_TOLERANCE_RAD   radians(3)    //dummy value (in radians)
+#define OUTER_TOLERANCE_MM    40            //dummy value (in mm)
+#define OUTER_TOLERANCE_RAD   radians(15)   //dummy value (in radians)
 
-#define STRAIGHT_TAU_P  2.5                   // dummy value
-#define STRAIGHT_TAU_I  0                   // dummy value
-#define STRAIGHT_TAU_D  0.5                 // dummy value
-#define STRAIGHT_PROFILE_STABLE_SPEED  75  // dummy value
+#define STRAIGHT_TAU_P  1.0                 // dummy value
+#define STRAIGHT_TAU_I  0.0                 // dummy value
+#define STRAIGHT_TAU_D  0.25                // dummy value
+#define STRAIGHT_PROFILE_STABLE_SPEED  75   // dummy value
 #define STRAIGHT_PROFILE_SLOPE         5    // dummy value
 #define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
 
 #define TURN_TAU_P      0                   // unused
 #define TURN_TAU_I      0                   // unused
 #define TURN_TAU_D      0                   // unused
-#define TURN_PROFILE_STABLE_SPEED  75
+#define TURN_PROFILE_STABLE_SPEED  50
 #define TURN_PROFILE_SLOPE         500
 #define TURN_PROFILE_INTERCEPT     10
 
