@@ -10,7 +10,7 @@
 
 
 void printStrategy(gaussian_location_t * next_location) {
-    Serial.print("DEBUG_STRATEGY:");
+    Serial.print("DEBUG_STRATEGY: ");
     Serial.print("next_location: (");
     Serial.print(next_location->x_mu);
     Serial.print(", ");

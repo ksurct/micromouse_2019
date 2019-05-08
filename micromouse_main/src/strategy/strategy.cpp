@@ -64,6 +64,14 @@ void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* maze_st
     // Choose the lowest valued cell we can go to
     cell_t next_cell = chooseNextCell(maze_state, &robot_cell);
 
+    #ifdef DEBUG_STRATEGY
+        Serial.print("DEBUG_STRATEGY: next_cell 2: (");
+        Serial.print(next_cell.x);
+        Serial.print(", ");
+        Serial.print(next_cell.y);
+        Serial.println(")");
+    #endif
+
     // Convert to a gaussian_location_t that edits the next_location
     convertCellToLocation(&next_cell, next_location);
 }
@@ -162,7 +170,32 @@ void floodfill(probabilistic_maze_t* maze_state, cell_t cell, int value) {
     //     }
     //     printf("\n");
     // }
-    // printf("\n"); 
+    // printf("\n");
+
+    #ifdef DEBUG_STRATEGY
+        Serial.println("DEBUG_STRATEGY: ");
+        for (int i=0; i<MAZE_WIDTH; i++){
+            for (int j=0; j<MAZE_HEIGHT; j++){
+                if (values[i][j] <10){
+                    Serial.print("  ");
+                    Serial.print(values[i][j]);
+                    Serial.print("  |");
+                }
+                else if (values[i][j] < 100){
+                    Serial.print(" ");
+                    Serial.print(values[i][j]);
+                    Serial.print("  |");
+                }
+                else{
+                    Serial.print(" ");
+                    Serial.print(values[i][j]);
+                    Serial.print(" |");
+                }
+            }
+            Serial.println();
+        }
+        Serial.println();
+    #endif
 }
 
 /* Uses the mean location to determine the cell this location is in */
@@ -183,9 +216,24 @@ cell_t chooseNextCell(probabilistic_maze_t* robot_maze_state, cell_t* robot_cell
     int x = robot_cell->x;
     int y = robot_cell->y;
     int lowest_value = MAX_VALUE;
-    cell_t next_cell;
+    cell_t next_cell = {
+        .x = robot_cell->x,
+        .y = robot_cell->y
+    };
+
+    #ifdef DEBUG_STRATEGY
+        Serial.print("DEBUG_STRATEGY: next_cell 1: (");
+        Serial.print(next_cell.x);
+        Serial.print(", ");
+        Serial.print(next_cell.y);
+        Serial.println(")");
+    #endif
 
     // Check each direction and save the lowest valued direction that we can go to
+
+    if (robot_cell->x == goal_cell.x && robot_cell->y == goal_cell.y) {
+        return next_cell;
+    }
     
     // Check North(0, -1)
     if (values[x][y - 1] < lowest_value && robot_maze_state->cells[x][y].north->exists < WALL_THRESHOLD) {

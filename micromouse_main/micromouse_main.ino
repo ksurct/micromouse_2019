@@ -164,7 +164,7 @@ void main_loop(void) {
   #endif
 
   // Determine next cell to go to (strategy step)
-  //strategy(&robot_location, &robot_maze_state, &next_location);
+  strategy(&robot_location, &robot_maze_state, &next_location);
 
   #ifdef DEBUG_STRATEGY
     printStrategy(&next_location);
