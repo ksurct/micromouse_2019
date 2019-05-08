@@ -22,6 +22,9 @@
 // Utilities
 #include "src/util/conversions.h"
 
+// Libraries
+#include <DueTimer.h>
+
 
 // Globals
 unsigned long timer;
@@ -29,6 +32,7 @@ void (*current_loop)(void);
 
 // Function Declarations
 void main_loop(void);
+void control_loop(void);
 void robot_delay(unsigned long delay_time);
 
 
@@ -84,12 +88,13 @@ void setup() {
 
   current_loop = &main_loop;
 
+  Timer3.attachInterrupt(control_loop).start(50000);
 }
 
 
 void loop() {
   // Track if we go over the allocated time for a loop
-  static unsigned long start_of_loop;
+  // static unsigned long start_of_loop;
 
   current_loop();
   
@@ -126,11 +131,6 @@ void main_loop(void) {
     (sensor_reading_t){ .state = ERROR,   .distance = 255 },
     (sensor_reading_t){ .state = ERROR,   .distance = 255 }
   };
-  static double left_distance;
-  static double right_distance;
-  static double left_speed;
-  static double right_speed;
-  static gaussian_location_t next_location = {.x_mu = 264.0, .y_mu = 264.0};
 
   // Flash heartbeat
   flashLED(1);
@@ -140,16 +140,6 @@ void main_loop(void) {
 
   #ifdef DEBUG_SENSORS
     printSensorData(sensor_data);
-  #endif
-
-  // Get distance travelled from control subsystem
-  distanceTravelled(&left_distance, &right_distance);
-
-  // Run distances through localization
-  localizeMotionStep(left_distance, right_distance);
-
-  #ifdef DEBUG_LOCALIZE_MOTION
-    printLocalizeMotion();
   #endif
 
   // Update maze and robot location with sensor readings
@@ -163,13 +153,39 @@ void main_loop(void) {
     printLocalizeMeasure();
   #endif
 
+}
+
+void control_loop(void) {
+  // Initialize variables
+  static double left_distance;
+  static double right_distance;
+  static double left_speed;
+  static double right_speed;
+  static gaussian_location_t next_location = {
+      .x_mu = 264.0,
+      .y_mu = 264.0
+  };
+
+  // Heartbeat
+  toggleLED(2);
+
+  // Get distance travelled from control subsystem
+  distanceTravelled(&left_distance, &right_distance);
+
+  // Run distances through localization
+  localizeMotionStep(left_distance, right_distance);
+
+  #ifdef DEBUG_LOCALIZE_MOTION
+    printLocalizeMotion();
+  #endif
+
   // Determine next cell to go to (strategy step)
   strategy(&robot_location, &robot_maze_state, &next_location);
 
   #ifdef DEBUG_STRATEGY
     printStrategy(&next_location);
   #endif
-  
+
   // Determine what speed to set the motors to (speed profile + error correction, or turning profile + error correction)
   calculateSpeed(&robot_location, &next_location, &left_speed, &right_speed);
 
