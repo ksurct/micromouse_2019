@@ -133,7 +133,7 @@ TEST_FUNC_BEGIN {
     initializeLocalization();
 
     double measurements[][NUM_SENSORS] = {
-        {40, 56, 40, 41, 56},
+        {40, 56, 45, 41, 56},
         {41, 56, 38, 41, 58},
         {40, 55, 41, 43, 58},
         {39, 54, 39, 41, 60},
@@ -366,13 +366,13 @@ TEST_FUNC_BEGIN {
         {85.45, 85.36, 3.17},    // DEBUG_LOCALIZE_MEASURE
         {85.50, 85.29, 3.17},    // DEBUG_LOCALIZE_MEASURE
         {85.49, 85.25, 3.16},    // DEBUG_LOCALIZE_MEASURE
-        {85.50, 85.23, 3.16}    // DEBUG_LOCALIZE_MEASURE
+        {85.50, 85.23, 3.16}     // DEBUG_LOCALIZE_MEASURE
     };
 
     sensor_reading_t sensor_test_data[NUM_SENSORS];
     sensor_test_data[0] = (sensor_reading_t){ .state = GOOD, .distance = 40 };
     sensor_test_data[1] = (sensor_reading_t){ .state = GOOD, .distance = 56  };
-    sensor_test_data[2] = (sensor_reading_t){ .state = GOOD, .distance = 40 };
+    sensor_test_data[2] = (sensor_reading_t){ .state = GOOD, .distance = 45 };
     sensor_test_data[3] = (sensor_reading_t){ .state = GOOD, .distance = 41 };
     sensor_test_data[4] = (sensor_reading_t){ .state = GOOD, .distance = 56 };
 
@@ -385,13 +385,24 @@ TEST_FUNC_BEGIN {
 
     printf("Robot_location: (%f, %f, %f)\n\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
     
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 1; i++) {
 
-        sensor_test_data[0].distance = measurements[i][0];
-        sensor_test_data[1].distance = measurements[i][1];
-        sensor_test_data[2].distance = measurements[i][2];
-        sensor_test_data[3].distance = measurements[i][3];
-        sensor_test_data[4].distance = measurements[i][4];
+        // printf("measurements[i][0]: %f\n", measurements[i][0]);
+        // sensor_test_data[0].distance = measurements[i][0];
+        // printf("sensor_test_data[0].distance: %f\n", sensor_test_data[0].distance);
+        // printf("measurements[i][1]: %f\n", measurements[i][1]);
+        // sensor_test_data[1].distance = measurements[i][1];
+        // printf("sensor_test_data[1].distance: %f\n", sensor_test_data[1].distance);
+        // printf("measurements[i][2]: %f\n", measurements[i][2]);
+        // sensor_test_data[2].distance = measurements[i][2];
+        // printf("sensor_test_data[2].distance: %f\n", sensor_test_data[2].distance);
+        // printf("measurements[i][3]: %f\n", measurements[i][3]);
+        // sensor_test_data[3].distance = measurements[i][3];
+        // printf("sensor_test_data[3].distance: %f\n", sensor_test_data[3].distance);
+        // printf("measurements[i][4]: %f\n", measurements[i][4]);
+        // sensor_test_data[4].distance = measurements[i][4];
+        // printf("sensor_test_data[4].distance: %f\n", sensor_test_data[4].distance);
+        // printf("\n");
 
         mazeMappingAndMeasureStep(sensor_test_data);
 

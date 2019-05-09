@@ -47,6 +47,7 @@ gaussian_location_t sensor_offsets[NUM_SENSORS] = {
 bool validateMeasurement(sensor_reading_t *measurement);
 void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *measurement, hit_data_t* hit_data, int sensor_num);
 void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_reading_t * reading, int sensor_num);
+bool withinHitArea(gaussian_location_t* sensor_location, double distance_hit, int side, int cellX, int cellY);
 void processMeasurementMeasure(gaussian_location_t* sensor_location, sensor_reading_t* measurement,
                                     hit_data_t* hit_data, gaussian_location_t* new_location);
 
@@ -109,6 +110,7 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
         // printf("Sensor %d:\t(%f,\t%f,\t%f)\n", i, sensor_locations[i].x_mu, sensor_locations[i].y_mu, sensor_locations[i].theta_mu);
 
         if (validateMeasurement(&sensor_data[i])) {
+            // printf("sensor_data[%d].distance: %f\n", i, sensor_data[i].distance);
             processMeasurementMapping(&sensor_locations[i], &sensor_data[i], &sensor_hit_data[i], i);
         }
     }
@@ -116,15 +118,9 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
 
 /* Update the robot's location based on the sensor_data and the new maze */
 
-    gaussian_location_t sensor_location = {
-        .x_mu = 0.0,
-        .y_mu = 0.0,
-        .theta_mu = 0.0,
-        .x_sigma = 0.0,
-        .xy_sigma = 0.0,
-        .y_sigma = 0.0,
-        .theta_sigma = 0.0
-    };
+    gaussian_location_t sensor_location = { .x_mu = 0.0, .y_mu = 0.0, .theta_mu = 0.0,
+                                        .x_sigma = 0.0, .xy_sigma = 0.0, .y_sigma = 0.0,
+                                        .theta_sigma = 0.0  };
     
     // just use the sensor data and average out x and y location
     double sumX = 0.0; double sumY = 0.0;
@@ -479,66 +475,98 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         }
     }
 
-    if (hit_data->wall->exists > WALL_THRESHOLD
-        // && Within the WALL_HIT_AREA_WIDTH
-        
-        ) {
-        hit_data->hit = true;
-    } else {
-        hit_data->hit = false;
-    }
+    hit_data->hit = false;
+    
+    // printf("WALL_HIT_THRESHOLD: %f\n", WALL_HIT_THRESHOLD);
+    // printf("measurement->distance: %f\n", measurement->distance);
+
+    // printf("hit_data 1: ");
+    // printf("\thit: %d", hit_data->hit);
+    // printf("\tdistance_hit: %f", hit_data->distance_hit);
+    // printf("\tside: %d", hit_data->side);
+    // printf("\tdir: %d", hit_data->dir);
+    // printf("\twall->exists: %f", hit_data->wall->exists);
+    // printf("\n");
 
     // Traverse the for length of the measurement + threshold and still within the maze
     while ( (sideDistX < measurement->distance + WALL_HIT_THRESHOLD || sideDistY < measurement->distance + WALL_HIT_THRESHOLD)
                 && !(cellX < 0 || cellX >= (MAZE_WIDTH) || cellY < 0 || cellY >= (MAZE_HEIGHT))) {
         
+        bool in_hit_area;
+
         //jump to next map square, in x-direction, OR in y-direction
         if (sideDistX < sideDistY) { // x-direction
 
-            if (stepX > 0) { // Update East and move East
-                // printf("%d %d east\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].east, sideDistX, measurement, sensor_num);
-                hit_data->wall = robot_maze_state.cells[cellX][cellY].east;
-                hit_data->dir = East;
-                cellX++;
-            } else { // Update West and move West
-                // printf("%d %d west\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].west, sideDistX, measurement, sensor_num);
-                hit_data->wall = robot_maze_state.cells[cellX][cellY].west;
-                hit_data->dir = West;
-                cellX--;
-            }
-            
             // Save this hit as the farthest and side as the x axis
             hit_data->distance_hit = sideDistX;
             hit_data->side = 0;
+            
+            in_hit_area = withinHitArea(location, hit_data->distance_hit, hit_data->side, cellX, cellY);
+            // printf("in_hit_area: %d\n", in_hit_area);
+
+            if (stepX > 0) { // Update East and move East
+                // printf("x east\n");
+
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].east;
+                hit_data->dir = East;
+                
+                if (in_hit_area) {
+                    updateMazeWall(hit_data->wall, sideDistX, measurement, sensor_num);
+                }
+                cellX++;
+            } else { // Update West and move West
+                // printf("x west\n");
+
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].west;
+                hit_data->dir = West;
+                
+                if (in_hit_area) {
+                    updateMazeWall(hit_data->wall, sideDistX, measurement, sensor_num);
+                }
+                cellX--;
+            }
 
             sideDistX += deltaDistX; // Set to next x collision distance
         } else { // y-direction
-            
-            if (stepY > 0) { // Update South and move South
-                // printf("%d %d south\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].south, sideDistY, measurement, sensor_num);
-                hit_data->wall = robot_maze_state.cells[cellX][cellY].south;
-                hit_data->dir = South;
-                cellY++;
-            } else { // Update North and move North
-                // printf("%d %d north\n", cellX, cellY);
-                updateMazeWall(robot_maze_state.cells[cellX][cellY].north, sideDistY, measurement, sensor_num);
-                hit_data->wall = robot_maze_state.cells[cellX][cellY].north;
-                hit_data->dir = North;
-                cellY--;
-            }
 
             // Save this hit as the farthest and side as the y axis
             hit_data->distance_hit = sideDistY;
             hit_data->side = 1;
 
+            in_hit_area = withinHitArea(location, hit_data->distance_hit, hit_data->side, cellX, cellY);
+            // printf("in_hit_area: %d\n", in_hit_area);
+            
+            if (stepY > 0) { // Update South and move South
+                // printf("y south\n");
+
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].south;
+                hit_data->dir = South;
+
+                if (in_hit_area) {
+                    updateMazeWall(hit_data->wall, sideDistY, measurement, sensor_num);
+                }
+                cellY++;
+            } else { // Update North and move North
+                // printf("y north\n");
+
+                hit_data->wall = robot_maze_state.cells[cellX][cellY].north;
+                hit_data->dir = North;
+                
+                if (in_hit_area) {
+                    updateMazeWall(hit_data->wall, sideDistY, measurement, sensor_num);
+                }
+                cellY--;
+            }
+
             sideDistY += deltaDistY; // Set to next y collision distance
         }
 
         if (hit_data->wall->exists > WALL_THRESHOLD) {
-            hit_data->hit = true;
+            if (in_hit_area) {
+                hit_data->hit = true;
+            } else {
+                hit_data->hit = false;
+            }
             break;
         } else {
             hit_data->hit = false;
@@ -547,12 +575,13 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
 
     // printf("cell(X,Y): (%d, %d)\n", cellX, cellY);
 
-    // printf("hit_data: \n");
-    // printf("\thit: %d\n", hit_data->hit);
-    // printf("\tdistance_hit: %f\n", hit_data->distance_hit);
-    // printf("\tside: %d\n", hit_data->side);
-    // printf("\tdir: %d\n", hit_data->dir);
-    // printf("\twall: %x\n", hit_data->wall);
+    // printf("hit_data 2: ");
+    // printf("\thit: %d", hit_data->hit);
+    // printf("\tdistance_hit: %f", hit_data->distance_hit);
+    // printf("\tside: %d", hit_data->side);
+    // printf("\tdir: %d", hit_data->dir);
+    // printf("\twall->exists: %f", hit_data->wall->exists);
+    // printf("\n");
 
     // printf("\n");
 }
@@ -591,6 +620,40 @@ void updateMazeWall(probabilistic_wall_t* wall, double distance_hit, sensor_read
     // bound the value of wall->exists by 1.0 and 0.0
     if (wall->exists > 1.0) wall->exists = 1.0;
     if (wall->exists < 0.0) wall->exists = 0.0;
+}
+
+bool withinHitArea(gaussian_location_t* sensor_location, double distance_hit, int side, int cellX, int cellY) {
+    
+    // Is this hit within WALL_HIT_AREA_WIDTH?
+    gaussian_location_t hit_offset = { .x_mu = distance_hit,
+                                        .y_mu = 0.0, .theta_mu = 0.0,
+                                        .x_sigma = 0.0, .xy_sigma = 0.0,
+                                        .y_sigma = 0.0, .theta_sigma = 0.0  };
+
+    gaussian_location_t hit_location = { .x_mu = 0.0, .y_mu = 0.0, .theta_mu = 0.0,
+                                        .x_sigma = 0.0, .xy_sigma = 0.0, .y_sigma = 0.0,
+                                        .theta_sigma = 0.0  };
+    
+    addMotion(sensor_location, &hit_offset, &hit_location);
+    // printf("hit_location: (%f, %f, %f)\n", hit_location.x_mu, hit_location.y_mu, hit_location.theta_mu);
+        
+    // and with in WALL_HIT_AREA_WIDTH
+    if (side == 0) {
+        // parallel to the x-axis
+        // printf("hit_data->side: %d\n", hit_data->side);
+        // printf("hit_location.x_mu: %f\n", hit_location.y_mu);
+        // printf("upper bound: %f\n", cellNumberToCoordinateDistance(cellY) + CELL_LENGTH * WALL_HIT_AREA_WIDTH / 2);
+        // printf("lower bound: %f\n", cellNumberToCoordinateDistance(cellY) - CELL_LENGTH * WALL_HIT_AREA_WIDTH / 2);
+        return IS_BETWEEN_ERROR(hit_location.y_mu, cellNumberToCoordinateDistance(cellY), CELL_LENGTH * WALL_HIT_AREA_WIDTH / 2);
+    } else {
+        // parallel to the y-axis
+        // printf("hit_data->side: %d\n", hit_data->side);
+        // printf("hit_location.y_mu: %f\n", hit_location.x_mu);
+        // printf("upper bound: %f\n", cellNumberToCoordinateDistance(cellX) + CELL_LENGTH * WALL_HIT_AREA_WIDTH / 2);
+        // printf("lower bound: %f\n", cellNumberToCoordinateDistance(cellX) - CELL_LENGTH * WALL_HIT_AREA_WIDTH / 2);
+        return IS_BETWEEN_ERROR(hit_location.x_mu, cellNumberToCoordinateDistance(cellX), CELL_LENGTH * WALL_HIT_AREA_WIDTH / 2);
+    }
+
 }
 
 

@@ -56,19 +56,19 @@
 #define TOO_FAR_DISTANCE    250     // the distance that of walls that we update given a TOO_FAR measurement (in mm)
 #define TOO_CLOSE_DISTANCE  10      // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
 
-#define WALL_HIT_THRESHOLD  40      // The plus or minus amount for a measurement that should result in the increase of a walls exists
+#define WALL_HIT_THRESHOLD  40.0    // The plus or minus amount for a measurement that should result in the increase of a walls exists
 #define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
 #define WALL_UPDATE         0.9     // The amount to multiply by to increase or decrease a wall's probability of existing
-#define WALL_HIT_AREA_WIDTH 0.75    // the central percentage of area that counts if hit
+#define WALL_HIT_AREA_WIDTH 0.9     // the central percentage of area that counts if hit
 
 #define SENSOR_LOCATION_WEIGHT 0.3  // The higher this value, the more we trust our sensor's input
 
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
-#define GOAL_CELL_X     4       // Goal cell x coordinate
-#define GOAL_CELL_Y     4       // Goal cell y coordinate
-#define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
+#define GOAL_CELL_X     2       // Goal cell x coordinate
+#define GOAL_CELL_Y     0       // Goal cell y coordinate
+#define WALL_THRESHOLD  0.75    // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
