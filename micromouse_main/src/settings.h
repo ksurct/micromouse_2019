@@ -56,7 +56,7 @@
 #define TOO_FAR_DISTANCE    250     // the distance that of walls that we update given a TOO_FAR measurement (in mm)
 #define TOO_CLOSE_DISTANCE  10      // the distance that of walls that we update given a TOO_CLOSE measurement (in mm)
 
-#define WALL_HIT_THRESHOLD  30      // The plus or minus amount for a measurement that should result in the increase of a walls exists
+#define WALL_HIT_THRESHOLD  40      // The plus or minus amount for a measurement that should result in the increase of a walls exists
 #define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
 #define WALL_UPDATE         0.9     // The amount to multiply by to increase or decrease a wall's probability of existing
 
@@ -76,11 +76,11 @@
 #define OUTER_TOLERANCE_MM    40            //dummy value (in mm)
 #define OUTER_TOLERANCE_RAD   radians(15)   //dummy value (in radians)
 
-#define STRAIGHT_TAU_P  1.0                 // dummy value
-#define STRAIGHT_TAU_I  0.0                 // dummy value
-#define STRAIGHT_TAU_D  0.25                // dummy value
+#define STRAIGHT_TAU_P  2.0                 // dummy value
+#define STRAIGHT_TAU_I  0.001               // dummy value
+#define STRAIGHT_TAU_D  1.5                 // dummy value
 #define STRAIGHT_PROFILE_STABLE_SPEED  75   // dummy value
-#define STRAIGHT_PROFILE_SLOPE         5    // dummy value
+#define STRAIGHT_PROFILE_SLOPE         3    // dummy value
 #define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
 
 #define TURN_TAU_P      0                   // unused
