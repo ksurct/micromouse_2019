@@ -58,7 +58,7 @@ Direction chooseDirectionWithinTolerance(double x_cte, double y_cte);
 void straightController(gaussian_location_t* current_location, gaussian_location_t* next_location,
                             double* left_speed, double* right_speed, Direction dir, bool same_state);
 double calculateCTE(gaussian_location_t* cur, gaussian_location_t* next, Direction dir);
-double calculateThetaCTE(gaussian_location_t* cur, gaussian_location_t* next, Direction dir, double cte);
+double calculateThetaCTE(gaussian_location_t* cur, Direction dir, double cte);
 double calculateDistanceAway(gaussian_location_t* cur, gaussian_location_t* next, Direction dir);
 double straightSpeedProfile(double distance_away);
 
@@ -331,17 +331,20 @@ void straightController(gaussian_location_t* current_location, gaussian_location
     if (same_state) {
         int_cte += cte;
         d_cte = prev_cte - cte;
-        //d_cte = cte - prev_cte;
     } else {
         int_cte = cte;
         d_cte = 0;
     }
 
-    // How far of is theta
-    //double theta_cte = calculateThetaCTE(current_location, next_location, dir, cte);
+    // How far off is theta
+    double theta_cte = calculateThetaCTE(current_location, dir, cte);
 
     // The amount we should try to rotate to the left to get back to the correct location (PID)
-    double rotate_left = (-1 * STRAIGHT_TAU_P * cte) + (-1 * STRAIGHT_TAU_I * int_cte) + (-1 * STRAIGHT_TAU_D * d_cte);
+    double rotate_left = (-1 * STRAIGHT_TAU_P * cte) +
+                            (-1 * STRAIGHT_TAU_I * int_cte) +
+                            (-1 * STRAIGHT_TAU_D * d_cte) +
+                            (STRAIGHT_TAU_THETA * theta_cte);
+
 
     // Determine the base straight forward speed
     double distance_away = calculateDistanceAway(current_location, next_location, dir);
@@ -375,18 +378,24 @@ double calculateCTE(gaussian_location_t* cur, gaussian_location_t* next, Directi
     }
 }
 
-double calculateThetaCTE(gaussian_location_t* cur, gaussian_location_t* next, Direction dir, double cte) {
+double calculateThetaCTE(gaussian_location_t* cur, Direction dir, double cte) {
 
     double goal = directionToRAD[dir];
     double theta_cte;
 
     if (dir == East) {
         // Special case
+        if (0 <= cur->theta_mu && cur->theta_mu <= PI) {
+            theta_cte = 0.0 - cur->theta_mu;
+        } else {
+            theta_cte = TWO_PI - cur->theta_mu;
+        }
 
     } else {
         // Normal case
         theta_cte = directionToRAD[dir] - cur->theta_mu;
     }
+    return theta_cte;
 }
 
 double calculateDistanceAway(gaussian_location_t* cur, gaussian_location_t* next, Direction dir) {

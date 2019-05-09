@@ -60,7 +60,7 @@ bool goTo(gaussian_location_t* final_loc, int max_steps, bool debug) {
         }
     } while(true);
     // } while (!IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, OUTER_TOLERANCE_MM) ||
-    //          !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, OUTER_TOLERANCE_MM));
+             //          !IS_BETWEEN_ERROR(robot_location.y_mu, final_loc->y_mu, OUTER_TOLERANCE_MM));
 
     // if not at goal
     if ( !IS_BETWEEN_ERROR(robot_location.x_mu, final_loc->x_mu, OUTER_TOLERANCE_MM) ||
@@ -123,76 +123,76 @@ TEST_FUNC_BEGIN {
 /* Test going straight */
 
     // Maximum steps allowed
-    max_steps = 10;
+    max_steps = 2500;
 
     // Initial location
     robot_location.x_mu = cellNumberToCoordinateDistance(0);
-    robot_location.y_mu = cellNumberToCoordinateDistance(0) + 10;
+    robot_location.y_mu = cellNumberToCoordinateDistance(0) + 5;
     robot_location.theta_mu = directionToRAD[East];
 
     // Final location
-    final_loc.x_mu = cellNumberToCoordinateDistance(1);
+    final_loc.x_mu = cellNumberToCoordinateDistance(10);
     final_loc.y_mu = cellNumberToCoordinateDistance(0);
 
-    if (!goTo(&final_loc, max_steps, true))
+    if (!goTo(&final_loc, max_steps, false))
         TEST_FAIL("Test going straight (pid)");
     else
         TEST_PASS("Test going straight (pid)");
 
+    //return -1;
+/* Test turning then going straight */
 
-// /* Test turning then going straight */
+    // Maximum steps allowed
+    max_steps = 1000;
 
-//     // Maximum steps allowed
-//     max_steps = 1000;
-
-//     // Initial location
-//     robot_location.x_mu = cellNumberToCoordinateDistance(0);
-//     robot_location.y_mu = cellNumberToCoordinateDistance(0);
-//     robot_location.theta_mu = directionToRAD[South];
+    // Initial location
+    robot_location.x_mu = cellNumberToCoordinateDistance(0);
+    robot_location.y_mu = cellNumberToCoordinateDistance(0);
+    robot_location.theta_mu = directionToRAD[South];
     
-//     // Final location
-//     final_loc.x_mu = cellNumberToCoordinateDistance(1);
-//     final_loc.y_mu = cellNumberToCoordinateDistance(0);
+    // Final location
+    final_loc.x_mu = cellNumberToCoordinateDistance(1);
+    final_loc.y_mu = cellNumberToCoordinateDistance(0);
 
-//     if (!goTo(&final_loc, max_steps, false))
-//         TEST_FAIL("Test turning then going straight");
-//     else
-//         TEST_PASS("Test turning then going straight");
+    if (!goTo(&final_loc, max_steps, false))
+        TEST_FAIL("Test turning then going straight");
+    else
+        TEST_PASS("Test turning then going straight");
 
 
-// /* Test Other */
-//     #define MOV_NUM_TESTS 10
+/* Test Other */
+    #define MOV_NUM_TESTS 10
 
-//     max_steps = 1000;
+    max_steps = 1000;
 
-//     // Final location
-//     final_loc.x_mu = cellNumberToCoordinateDistance(1);
-//     final_loc.y_mu = cellNumberToCoordinateDistance(1);
+    // Final location
+    final_loc.x_mu = cellNumberToCoordinateDistance(1);
+    final_loc.y_mu = cellNumberToCoordinateDistance(1);
     
-//     double chunk_xy = (cellNumberToCoordinateDistance(2) - cellNumberToCoordinateDistance(0)) / MOV_NUM_TESTS;
-//     double chunk_theta = TWO_PI / MOV_NUM_TESTS;
+    double chunk_xy = (cellNumberToCoordinateDistance(2) - cellNumberToCoordinateDistance(0)) / MOV_NUM_TESTS;
+    double chunk_theta = TWO_PI / MOV_NUM_TESTS;
 
-//     for (int x = 0; x < MOV_NUM_TESTS; x++) {
-//         for (int y = 0; y < MOV_NUM_TESTS; y++) {
-//             for (int theta = 0; theta < MOV_NUM_TESTS; theta++) {
+    for (int x = 0; x < MOV_NUM_TESTS; x++) {
+        for (int y = 0; y < MOV_NUM_TESTS; y++) {
+            for (int theta = 0; theta < MOV_NUM_TESTS; theta++) {
 
-//                 // Setup test
-//                 robot_location.x_mu = cellNumberToCoordinateDistance(0) + chunk_xy * x;
-//                 robot_location.y_mu = cellNumberToCoordinateDistance(0) + chunk_xy * y;
-//                 robot_location.theta_mu = chunk_theta * theta;
+                // Setup test
+                robot_location.x_mu = cellNumberToCoordinateDistance(0) + chunk_xy * x;
+                robot_location.y_mu = cellNumberToCoordinateDistance(0) + chunk_xy * y;
+                robot_location.theta_mu = chunk_theta * theta;
                 
-//                 if (!goTo(&final_loc, max_steps, false)) {
-//                     TEST_FAIL("Test other positions");
-//                     // printf("x: %d, y: %d, theta; %d\n", x, y, theta);
-//                     // printf("robot_location: (%f , %f, %f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
-//                     goto after_other_test;
-//                 }
-//             }
-//         }
-//     }
+                if (!goTo(&final_loc, max_steps, false)) {
+                    TEST_FAIL("Test other positions");
+                    // printf("x: %d, y: %d, theta; %d\n", x, y, theta);
+                    // printf("robot_location: (%f , %f, %f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
+                    goto after_other_test;
+                }
+            }
+        }
+    }
 
-//     TEST_PASS("Test other positions");
-//     after_other_test: ;
+    TEST_PASS("Test other positions");
+    after_other_test: ;
 
 } TEST_FUNC_END("strategy_test")
 

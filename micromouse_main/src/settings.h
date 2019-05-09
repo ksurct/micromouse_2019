@@ -77,10 +77,11 @@
 #define OUTER_TOLERANCE_MM    40            //dummy value (in mm)
 #define OUTER_TOLERANCE_RAD   radians(15)   //dummy value (in radians)
 
-#define STRAIGHT_TAU_P  2.0                 // dummy value
-#define STRAIGHT_TAU_I  0.001               // dummy value
-#define STRAIGHT_TAU_D  1.5                 // dummy value
-#define STRAIGHT_PROFILE_STABLE_SPEED  75   // dummy value
+#define STRAIGHT_TAU_P      2.0
+#define STRAIGHT_TAU_I      0.001
+#define STRAIGHT_TAU_D      1.5
+#define STRAIGHT_TAU_THETA  20.0
+#define STRAIGHT_PROFILE_STABLE_SPEED  75   // Straightline speed
 #define STRAIGHT_PROFILE_SLOPE         3    // dummy value
 #define STRAIGHT_PROFILE_INTERCEPT     0    // dummy value
 
