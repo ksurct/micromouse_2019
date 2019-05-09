@@ -213,6 +213,7 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
     if (sensor_data[1].state == GOOD && sensor_data[3].state == GOOD && 
         sensor_hit_data[1].side == sensor_hit_data[3].side) {
         // TODO
+        // in general: arccos(CELL_LENGTH / (sensor_data[1].distance + sensor_data[3].distance + (2 * SENSOR_Y_OFFSET)))
     }
 
 
@@ -220,6 +221,7 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
     if (sensor_data[0].state == GOOD && sensor_data[4].state == GOOD &&
         sensor_hit_data[0].side == sensor_hit_data[4].side) {
         // TODO
+        // in general: arccos(CELL_LENGTH / (sensor_data[0].distance + sensor_data[4].distance + (2 * SENSOR_Y_OFFSET)))
     }
 
 
