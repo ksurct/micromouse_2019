@@ -8,6 +8,7 @@
 #include "../types.h"
 #include "../abs.h"
 #include "../util/conversions.h"
+#include "../util/direction.h"
 
 // Temp
 #include <stdio.h>
@@ -23,6 +24,9 @@ typedef struct {
 
 
 #define ENCODER_VARIANCE(d) (((ENCODER_VARIANCE_PER_MM) * abs(d)) + (ENCODER_VARIANCE_BASE))
+
+// Check is x is between y+e and y-e
+#define IS_BETWEEN_ERROR(x,y,e) (((x) < (y) + (e)) && ((x) > (y) - (e)))
 
 
 // Globals
@@ -86,6 +90,16 @@ void mazeMappingAndMeasureStep(sensor_reading_t* sensor_data) {
     // printf("Robot:   \t(%f,\t%f,\t%f)\n", robot_location.x_mu, robot_location.y_mu, robot_location.theta_mu);
     
 /* Update the maze based on the sensor_data */
+
+    bool is_straight = IS_BETWEEN_ERROR(robot_location.theta_mu, directionToRAD[North], OUTER_TOLERANCE_RAD) ||
+                        IS_BETWEEN_ERROR(robot_location.theta_mu, directionToRAD[South], OUTER_TOLERANCE_RAD) ||
+                        IS_BETWEEN_ERROR(robot_location.theta_mu, directionToRAD[West], OUTER_TOLERANCE_RAD) ||
+                        ((robot_location.theta_mu <= TWO_PI) && (robot_location.theta_mu > TWO_PI - OUTER_TOLERANCE_RAD)) ||
+                        ((robot_location.theta_mu < OUTER_TOLERANCE_RAD) && (robot_location.theta_mu >= 0.0));
+
+    if (!is_straight) {
+        return;
+    }
 
     gaussian_location_t sensor_locations[NUM_SENSORS];
     hit_data_t sensor_hit_data[NUM_SENSORS];
@@ -465,7 +479,10 @@ void processMeasurementMapping(gaussian_location_t* location, sensor_reading_t *
         }
     }
 
-    if (hit_data->wall->exists > WALL_THRESHOLD) {
+    if (hit_data->wall->exists > WALL_THRESHOLD
+        // && Within the WALL_HIT_AREA_WIDTH
+        
+        ) {
         hit_data->hit = true;
     } else {
         hit_data->hit = false;

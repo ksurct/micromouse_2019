@@ -1,11 +1,12 @@
 /* strategy.cpp */
 
-#
+
 
 #include "strategy.h"
 #include "../types.h"
 #include "../settings.h"
 #include "../util/queue.h"
+#include "../devices/leds.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,6 +55,8 @@ void initializeStrategy(void) {
  * Given the robots location and the state of the maze calculate the next location to go to */
 void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* maze_state, gaussian_location_t* next_location) {
 
+    static cell_t prev_next_cell;
+
     // Get the current cell
     cell_t robot_cell;
     convertLocationToCell(robot_location, &robot_cell);
@@ -63,6 +66,14 @@ void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* maze_st
 
     // Choose the lowest valued cell we can go to
     cell_t next_cell = chooseNextCell(maze_state, &robot_cell);
+
+    if (prev_next_cell.x == next_cell.x && prev_next_cell.y == next_cell.y) {
+        toggleLED(2);
+        if (robot_cell.x == next_cell.x && robot_cell.y == next_cell.y) {
+            setHighLED(1);
+        }
+    }
+    prev_next_cell = next_cell;
 
     #ifdef DEBUG_STRATEGY
         Serial.print("DEBUG_STRATEGY: next_cell 2: (");

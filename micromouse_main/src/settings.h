@@ -59,6 +59,7 @@
 #define WALL_HIT_THRESHOLD  40      // The plus or minus amount for a measurement that should result in the increase of a walls exists
 #define WALL_UPDATE_AMOUNT  0.05    // The amount to increase or decrease a wall's probability of existing
 #define WALL_UPDATE         0.9     // The amount to multiply by to increase or decrease a wall's probability of existing
+#define WALL_HIT_AREA_WIDTH 0.75    // the central percentage of area that counts if hit
 
 #define SENSOR_LOCATION_WEIGHT 0.3  // The higher this value, the more we trust our sensor's input
 
@@ -67,7 +68,7 @@
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
 #define GOAL_CELL_X     4       // Goal cell x coordinate
 #define GOAL_CELL_Y     4       // Goal cell y coordinate
-#define WALL_THRESHOLD  0.6     // Probability that we believe that a wall actually exists
+#define WALL_THRESHOLD  0.7     // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
