@@ -6,9 +6,6 @@
 #include "link_Arduino.h"
 
 
-// General
-#define SETUP_TIME 2000     // Milliseconds to wait befor starting to run
-
 // Debugging, uncomment to print out relevant data
 //#define DEBUG_TIMER
 //#define DEBUG_SENSORS
@@ -19,8 +16,8 @@
 //#define DEBUG_STRATEGY
 //#define DEBUG_MOVEMENT
 
-// Main
-#define MAIN_LOOP_TIME 250    // Delay between the start of each main_loop call in milliseconds
+// General
+#define SETUP_TIME 2000     // Milliseconds to wait befor starting to run
 
 // Maze Specifications
 #define MAZE_SIZE       16          // If square, the length each side of the maze
@@ -66,12 +63,14 @@
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
-#define GOAL_CELL_X     2       // Goal cell x coordinate
-#define GOAL_CELL_Y     0       // Goal cell y coordinate
+#define GOAL_CELL_X     11       // Goal cell x coordinate
+#define GOAL_CELL_Y     1       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.75    // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
+#define MOVEMENT_LOOP_TIME 50000    // Delay between the start of each movement_loop call in milliseconds
+
 #define INNER_TOLERANCE_MM    10            //dummy value (in mm)
 #define INNER_TOLERANCE_RAD   radians(3)    //dummy value (in radians)
 #define OUTER_TOLERANCE_MM    40            //dummy value (in mm)
@@ -88,8 +87,8 @@
 #define TURN_TAU_P      0                   // unused
 #define TURN_TAU_I      0                   // unused
 #define TURN_TAU_D      0                   // unused
-#define TURN_PROFILE_STABLE_SPEED  50
-#define TURN_PROFILE_SLOPE         500
+#define TURN_PROFILE_STABLE_SPEED  75
+#define TURN_PROFILE_SLOPE         200
 #define TURN_PROFILE_INTERCEPT     10
 
 // Control
@@ -99,6 +98,8 @@
 #define INT_BOUND           500     // Integral Bound
 #define MAX_SPEED           250     // Maximum possible speed
 #define MIN_SPEED           50      // Minimum possible speed
+
+#define ENCODER_BIAS    4.0     // The amount to add to encoders measurement in ticks / 
 
 // Encoders
 #define LEFT_ENCODER_PIN_A  49

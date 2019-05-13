@@ -32,7 +32,7 @@ void (*current_loop)(void);
 
 // Function Declarations
 void main_loop(void);
-void control_loop(void);
+void movement_loop(void);
 void robot_delay(unsigned long delay_time);
 
 
@@ -88,7 +88,7 @@ void setup() {
 
   current_loop = &main_loop;
 
-  Timer3.attachInterrupt(control_loop).start(50000);
+  Timer3.attachInterrupt(movement_loop).start(MOVEMENT_LOOP_TIME);
 }
 
 
@@ -155,7 +155,7 @@ void main_loop(void) {
 
 }
 
-void control_loop(void) {
+void movement_loop(void) {
   // Initialize variables
   static double left_distance;
   static double right_distance;

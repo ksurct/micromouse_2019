@@ -94,6 +94,17 @@ void calculateSpeed(gaussian_location_t* current_location, gaussian_location_t* 
 
     bool same_state = (current_state == prev_state);
 
+    /* Bad Code - This is a hack and this is really bad code, but it might actually help with death spikes */
+    
+    // After get done turning, set theta to be perfectly aligned
+    if (current_state == OUT_XY_IN_THETA && prev_state == OUT_XY_OUT_THETA ||
+            current_state == IN_XY_IN_THETA && prev_state == IN_XY_OUT_THETA) {
+        
+        current_location->theta_mu = directionToRAD[direction];
+    }
+
+    /* end of Bad Code */
+
     // printf("State : %d, Same: %d, Direction: %d\n", current_state, same_state, direction);
 
     switch (current_state) {

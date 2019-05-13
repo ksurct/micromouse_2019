@@ -52,8 +52,8 @@ void initializeControl(void) {
 void distanceTravelled(double* left_distance, double* right_distance) {
     *left_distance = ticksToMM(controllers[LEFT].ticks_travelled);
     *right_distance = ticksToMM(controllers[RIGHT].ticks_travelled);
-    controllers[LEFT].ticks_travelled = 0;
-    controllers[RIGHT].ticks_travelled = 0;
+    controllers[LEFT].ticks_travelled = ENCODER_BIAS;
+    controllers[RIGHT].ticks_travelled = ENCODER_BIAS;
 
     
     #ifdef DEBUG_ENCODERS
