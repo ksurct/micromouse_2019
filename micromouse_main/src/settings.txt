@@ -1,0 +1,5 @@
+
+// 2x speed
+#define STRAIGHT_PROFILE_STABLE_SPEED  150  // Straightline speed
+
+#define ENCODER_BIAS    6.0     // The amount to add to encoders measurement in ticks / 
