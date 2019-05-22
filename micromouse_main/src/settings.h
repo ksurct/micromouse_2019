@@ -7,7 +7,7 @@
 
 
 // Debugging, uncomment to print out relevant data
-//#define DEBUG_TIMER
+//#define DEBUG_IDLE_TIMER
 //#define DEBUG_SENSORS
 //#define DEBUG_ENCODERS
 //#define DEBUG_LOCALIZE_MOTION
@@ -17,7 +17,9 @@
 //#define DEBUG_MOVEMENT
 
 // General
-#define SETUP_TIME 2000     // Milliseconds to wait befor starting to run
+#define SETUP_TIME      2000    // Milliseconds to wait befor starting to run
+#define IDLE_LOOP_TIME  50      // Idle loop time in milliseconds
+#define RESET_PIN       54      // Pin for the main reset button on the board
 
 // Maze Specifications
 #define MAZE_SIZE       16          // If square, the length each side of the maze
@@ -69,7 +71,7 @@
 #define MAX_VALUE       999     // Maximum value that can be in values
 
 // Movement
-#define MOVEMENT_LOOP_TIME 50000    // Delay between the start of each movement_loop call in milliseconds
+#define MOVEMENT_LOOP_TIME 50000    // Delay between the start of each movement_loop call in microseconds
 
 #define INNER_TOLERANCE_MM    10            //dummy value (in mm)
 #define INNER_TOLERANCE_RAD   radians(3)    //dummy value (in radians)

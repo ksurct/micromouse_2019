@@ -27,13 +27,22 @@
 
 
 // Globals
-unsigned long timer;
-void (*current_loop)(void);
+enum ButtonState {
+  BUTTON_TRIGGER, // Only in this state once per button press
+  BUTTON_WAIT,    // Waiting for button to go from high to low
+  BUTTON_IDLE     // Waiting for button to go from low to high
+};
+
+void (*current_loop)(void); // Which loop should we be running
 
 // Function Declarations
-void main_loop(void);
 void movement_loop(void);
+enum ButtonState button_state_machine(enum ButtonState state);
 void robot_delay(unsigned long delay_time);
+
+// loop states
+void main_loop(void);
+void idle_loop(void);
 
 
 /* Entry point to the code for the robot, all initialization
@@ -52,6 +61,8 @@ void setup() {
 
   // Wait 2 seconds for humans to go away
   robot_delay(SETUP_TIME);
+
+  pinMode(RESET_PIN, INPUT_PULLUP);
 
   // Setup Sensors
   success = sensorSetup();
@@ -83,9 +94,6 @@ void setup() {
   // Initialize Control subsystem
   initializeControl();
 
-  // Initialize timer and starting loop
-  timer = millis();
-
   current_loop = &main_loop;
 
   Timer3.attachInterrupt(movement_loop).start(MOVEMENT_LOOP_TIME);
@@ -93,37 +101,34 @@ void setup() {
 
 
 void loop() {
-  // Track if we go over the allocated time for a loop
-  // static unsigned long start_of_loop;
+
+  static enum ButtonState button_state = BUTTON_IDLE;
+  
+  button_state = button_state_machine(button_state);
+
+  if (current_loop == &main_loop){
+    
+    if (button_state == BUTTON_TRIGGER) {
+      current_loop = &idle_loop;
+      Timer3.stop();
+    }
+  } else if (current_loop == &idle_loop) {
+
+    if (button_state == BUTTON_TRIGGER) {
+      current_loop = &main_loop;
+      Timer3.start(MOVEMENT_LOOP_TIME);
+    }
+  } else {
+    // Something is going wrong, sound the alarms
+    // Set LEDS high and go to idle loop
+    current_loop = &idle_loop;
+  }
 
   current_loop();
-  
-//  if (millis() - timer > MAIN_LOOP_TIME) {
-//    start_of_loop = millis();
-//
-//    current_loop();
-//
-//    #ifdef DEBUG_TIMER
-//      Serial.print("DEBUG_TIMER: ");
-//    #endif
-//
-//    // Reset timer
-//    while (millis() - timer > MAIN_LOOP_TIME) {
-//      timer += MAIN_LOOP_TIME;
-//
-//      #ifdef DEBUG_TIMER
-//        Serial.print(timer);
-//        Serial.print(", ");
-//      #endif
-//    }
-//    #ifdef DEBUG_TIMER
-//      Serial.println();
-//    #endif
-//  }
 }
 
 void main_loop(void) {
-  // Initialize variables
+
   static sensor_reading_t sensor_data[NUM_SENSORS] = {
     (sensor_reading_t){ .state = ERROR,   .distance = 255 },
     (sensor_reading_t){ .state = ERROR,   .distance = 255 },
@@ -142,7 +147,7 @@ void main_loop(void) {
     printSensorData(sensor_data);
   #endif
 
-  // Update maze and robot location with sensor readings
+  // Update both maze state and robot location with sensor readings
   mazeMappingAndMeasureStep(sensor_data);
 
   #ifdef DEBUG_LOCALIZE_MAPPING
@@ -155,6 +160,21 @@ void main_loop(void) {
 
 }
 
+void idle_loop(void) {
+
+  static unsigned long idle_timer = millis();
+
+  // This is part of debounceing the button while in the idle state
+  while (millis() - idle_timer < IDLE_LOOP_TIME);
+  
+  idle_timer += IDLE_LOOP_TIME;
+
+  #ifdef DEBUG_IDLE_TIMER
+    Serial.print("DEBUG_IDLE_TIMER: ");
+    Serial.println(idle_timer);
+  #endif
+}
+
 void movement_loop(void) {
   // Initialize variables
   static double left_distance;
@@ -162,8 +182,8 @@ void movement_loop(void) {
   static double left_speed;
   static double right_speed;
   static gaussian_location_t next_location = {
-      .x_mu = 264.0,
-      .y_mu = 264.0
+      .x_mu = 84.0,
+      .y_mu = 84.0
   };
 
   // Heartbeat
@@ -195,6 +215,32 @@ void movement_loop(void) {
 
   // Set speed using the motor controllers (pid loop)
   setSpeedPID(left_speed, right_speed);
+}
+
+enum ButtonState button_state_machine(enum ButtonState state) {
+  
+  char button = digitalRead(RESET_PIN);
+
+  switch (state) {
+    case BUTTON_TRIGGER:
+      state = BUTTON_WAIT;
+      break;
+    case BUTTON_WAIT:
+      if (button == LOW) {
+        state = BUTTON_IDLE;
+      }
+      break;
+    case BUTTON_IDLE:
+      if (button == HIGH) {
+        state = BUTTON_TRIGGER;
+      }
+      break;
+    default:
+      // Something has gone wrong
+      state = BUTTON_IDLE;
+      break;
+  }
+  return state;
 }
 
 // Delay for time, time and flash leds
