@@ -62,6 +62,7 @@ void setup() {
   // Wait 2 seconds for humans to go away
   robot_delay(SETUP_TIME);
 
+  // Setup pin for reset button
   pinMode(RESET_PIN, INPUT_PULLUP);
 
   // Setup Sensors
@@ -226,12 +227,12 @@ enum ButtonState button_state_machine(enum ButtonState state) {
       state = BUTTON_WAIT;
       break;
     case BUTTON_WAIT:
-      if (button == LOW) {
+      if (button == HIGH) {
         state = BUTTON_IDLE;
       }
       break;
     case BUTTON_IDLE:
-      if (button == HIGH) {
+      if (button == LOW) {
         state = BUTTON_TRIGGER;
       }
       break;
