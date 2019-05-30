@@ -48,7 +48,7 @@ bool discovered[MAZE_WIDTH][MAZE_HEIGHT];
 /* initialize strategy
  * Initializes the maze solving algorithm */
 void initializeStrategy(void) {
-
+    done_flag = false;
     resetValues();
     setAllDiscoveredToFalse();
 }
