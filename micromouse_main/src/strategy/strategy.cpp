@@ -70,12 +70,11 @@ void strategy(gaussian_location_t* robot_location, probabilistic_maze_t* maze_st
     cell_t next_cell = chooseNextCell(maze_state, &robot_cell);
 
     if (prev_next_cell.x == next_cell.x && prev_next_cell.y == next_cell.y) {
-        
+        toggleLED(2);
         if (robot_cell.x == next_cell.x && robot_cell.y == next_cell.y) {
+            setHighLED(1);
             done_flag = true;
         }
-    } else {
-        toggleLED(3);
     }
 
     prev_next_cell = next_cell;
