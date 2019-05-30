@@ -84,9 +84,6 @@ void setup() {
   // Initialize Strategy subsystem
   initializeStrategy();
 
-  // Initialize Control subsystem
-  initializeControl();
-
   // Initialize timer and starting loop
   timer = millis();
 
@@ -115,8 +112,12 @@ void go_to_running_state(void) {
 
   // Wait 2 seconds for humans to go away
   robot_delay(SETUP_TIME);
-  current_loop = &main_loop;
+  
+  // Initialize Control subsystem
+  initializeControl();
+  
   Timer3.attachInterrupt(movement_loop).start(MOVEMENT_LOOP_TIME);
+  current_loop = &main_loop;
 }
 
 void main_loop(void) {
@@ -130,7 +131,7 @@ void main_loop(void) {
   };
 
   // Flash heartbeat
-  //toggleLED(1);
+  flashLED(1);
 
   // Get sensor data
   readSensors(sensor_data);
@@ -164,7 +165,7 @@ void movement_loop(void) {
   };
 
   // Heartbeat
-  //toggleLED(2);
+  toggleLED(2);
 
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
