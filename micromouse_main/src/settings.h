@@ -63,8 +63,8 @@
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
-#define GOAL_CELL_X     11       // Goal cell x coordinate
-#define GOAL_CELL_Y     1       // Goal cell y coordinate
+#define GOAL_CELL_X     7       // Goal cell x coordinate
+#define GOAL_CELL_Y     7       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.75    // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
