@@ -56,6 +56,7 @@ void setup() {
   ledSetup();
 
   pinMode(RESET_PIN, INPUT_PULLUP);
+  attachInterrupt(RESET_PIN, go_to_idle_state, FALLING);
 
   // Setup Sensors
   success = sensorSetup();
@@ -95,9 +96,9 @@ void loop() {
 
   current_loop();
 
-  if (done_flag) {
-    go_to_idle_state();
-  }
+  // if (done_flag) {
+  //   go_to_idle_state();
+  // }
 
 }
 
