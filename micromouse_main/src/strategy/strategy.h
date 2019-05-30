@@ -7,6 +7,8 @@
 #include "../types.h"
 #include "../localization/probabilistic_maze.h"
 
+// This Flag will be set high once the robot reaches the goal location
+extern bool done_flag;
 
 /* initialize strategy
  * Initializes the maze solving algorithm */

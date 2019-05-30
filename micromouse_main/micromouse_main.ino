@@ -31,8 +31,13 @@ unsigned long timer;
 void (*current_loop)(void);
 
 // Function Declarations
+void go_to_idle_state(void);
+void go_to_running_state(void);
+
 void main_loop(void);
 void movement_loop(void);
+void idle_loop(void);
+
 void robot_delay(unsigned long delay_time);
 
 
@@ -50,8 +55,7 @@ void setup() {
   // Setup LEDs
   ledSetup();
 
-  // Wait 2 seconds for humans to go away
-  robot_delay(SETUP_TIME);
+  pinMode(RESET_PIN, INPUT_PULLUP);
 
   // Setup Sensors
   success = sensorSetup();
@@ -86,40 +90,33 @@ void setup() {
   // Initialize timer and starting loop
   timer = millis();
 
-  current_loop = &main_loop;
-
-  Timer3.attachInterrupt(movement_loop).start(MOVEMENT_LOOP_TIME);
+  go_to_running_state();
 }
 
 
 void loop() {
-  // Track if we go over the allocated time for a loop
-  // static unsigned long start_of_loop;
 
   current_loop();
-  
-//  if (millis() - timer > MAIN_LOOP_TIME) {
-//    start_of_loop = millis();
-//
-//    current_loop();
-//
-//    #ifdef DEBUG_TIMER
-//      Serial.print("DEBUG_TIMER: ");
-//    #endif
-//
-//    // Reset timer
-//    while (millis() - timer > MAIN_LOOP_TIME) {
-//      timer += MAIN_LOOP_TIME;
-//
-//      #ifdef DEBUG_TIMER
-//        Serial.print(timer);
-//        Serial.print(", ");
-//      #endif
-//    }
-//    #ifdef DEBUG_TIMER
-//      Serial.println();
-//    #endif
-//  }
+
+  if (done_flag) {
+    go_to_idle_state();
+  }
+
+}
+
+void go_to_idle_state(void) {
+  done_flag = false;
+  setAllLEDSHigh();
+  current_loop = &idle_loop;
+  Timer3.stop();
+}
+
+void go_to_running_state(void) {
+
+  // Wait 2 seconds for humans to go away
+  robot_delay(SETUP_TIME);
+  current_loop = &main_loop;
+  Timer3.attachInterrupt(movement_loop).start(MOVEMENT_LOOP_TIME);
 }
 
 void main_loop(void) {
@@ -133,7 +130,7 @@ void main_loop(void) {
   };
 
   // Flash heartbeat
-  flashLED(1);
+  //toggleLED(1);
 
   // Get sensor data
   readSensors(sensor_data);
@@ -167,7 +164,7 @@ void movement_loop(void) {
   };
 
   // Heartbeat
-  toggleLED(2);
+  //toggleLED(2);
 
   // Get distance travelled from control subsystem
   distanceTravelled(&left_distance, &right_distance);
@@ -197,10 +194,20 @@ void movement_loop(void) {
   setSpeedPID(left_speed, right_speed);
 }
 
+void idle_loop(void) {
+
+  // Check button
+  if (digitalRead(RESET_PIN) == LOW) {
+    go_to_running_state();
+  }
+}
+
 // Delay for time, time and flash leds
 void robot_delay(unsigned long delay_time) {
   unsigned long end_time = millis() + delay_time;
   
+  setAllLEDSLow();
+
   while (millis() < end_time ) {
     toggleLED(1); delay(100); toggleLED(1);
 

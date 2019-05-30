@@ -17,7 +17,8 @@
 //#define DEBUG_MOVEMENT
 
 // General
-#define SETUP_TIME 2000     // Milliseconds to wait befor starting to run
+#define SETUP_TIME  2000    // Milliseconds to wait befor starting to run
+#define RESET_PIN   24      // Pin that the reset button in connected to
 
 // Maze Specifications
 #define MAZE_SIZE       16          // If square, the length each side of the maze
@@ -63,8 +64,8 @@
 // Strategy
 #define INIT_CELL_X     0       // Initial Cell x coordinate
 #define INIT_CELL_Y     0       // Initial Cell y coordinate
-#define GOAL_CELL_X     11       // Goal cell x coordinate
-#define GOAL_CELL_Y     1       // Goal cell y coordinate
+#define GOAL_CELL_X     4       // Goal cell x coordinate
+#define GOAL_CELL_Y     4       // Goal cell y coordinate
 #define WALL_THRESHOLD  0.75    // Probability that we believe that a wall actually exists
 #define MAX_VALUE       999     // Maximum value that can be in values
 
