@@ -1,7 +1,10 @@
   /* encoders.cpp */
 
+
 #include <Arduino.h>
+
 #include "encoders.h"
+
 
 #define DIRECT_PIN_READ(base, mask)     (((*(base)) & (mask)) ? 1 : 0)
 
@@ -10,15 +13,15 @@ typedef struct {
   volatile uint32_t * pinB_register;
   uint32_t pinA_bitmask;
   uint32_t pinB_bitmask;
-  uint8_t state;
+  unsigned char state;
   int position;
 } Encoder_state_t;
 
 volatile Encoder_state_t encoders[2];
 
 void encoderISR1() {
-    static uint8_t id = 1;
-    uint8_t s = encoders[id].state & 3;
+    static unsigned char id = 1;
+    unsigned char s = encoders[id].state & 3;
     if (DIRECT_PIN_READ(encoders[id].pinA_register, encoders[id].pinA_bitmask)) s |= 4;
     if (DIRECT_PIN_READ(encoders[id].pinB_register, encoders[id].pinB_bitmask)) s |= 8;
     switch (s) {
@@ -37,8 +40,8 @@ void encoderISR1() {
 }
 
 void encoderISR0() {
-    static uint8_t id = 0;
-    uint8_t s = encoders[id].state & 3;
+    static unsigned char id = 0;
+    unsigned char s = encoders[id].state & 3;
     if (DIRECT_PIN_READ(encoders[id].pinA_register, encoders[id].pinA_bitmask)) s |= 4;
     if (DIRECT_PIN_READ(encoders[id].pinB_register, encoders[id].pinB_bitmask)) s |= 8;
     switch (s) {
@@ -57,19 +60,18 @@ void encoderISR0() {
 }
 
 // Create an Encoder object and save it to the pointer
-void encoderSetup(uint8_t pinA, uint8_t pinB, uint8_t id)
-{ 
+void encoderSetup(unsigned char id, unsigned char pinA, unsigned char pinB)
+{
     pinMode(pinA, INPUT_PULLUP);
     pinMode(pinB, INPUT_PULLUP);
-    
-    
+
     encoders[id].pinA_register = portInputRegister(digitalPinToPort(pinA));
     encoders[id].pinB_register = portInputRegister(digitalPinToPort(pinB));
     encoders[id].pinA_bitmask = digitalPinToBitMask(pinA);
     encoders[id].pinB_bitmask = digitalPinToBitMask(pinB);
     encoders[id].state = 0;
     encoders[id].position = 0;
-    
+
     if (id == 1) {
         attachInterrupt(digitalPinToInterrupt(pinA), encoderISR1, CHANGE);
         attachInterrupt(digitalPinToInterrupt(pinB), encoderISR1, CHANGE);
@@ -77,11 +79,11 @@ void encoderSetup(uint8_t pinA, uint8_t pinB, uint8_t id)
         attachInterrupt(digitalPinToInterrupt(pinA), encoderISR0, CHANGE);
         attachInterrupt(digitalPinToInterrupt(pinB), encoderISR0, CHANGE);
     }
-} 
+}
 
 // Read the position relative to the old position
 // and reset the position to zero
-int readEncoder(uint8_t id) 
+int readEncoder(unsigned char id) 
 { 
     int currentPosition = encoders[id].position;
     encoders[id].position = 0;

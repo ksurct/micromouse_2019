@@ -22,21 +22,19 @@
 #define _SENSORS_H_
 
 
-#include <Arduino.h>
-
 #include "Adafruit_VL6180X.h"
-#include "../settings.h"
+
 #include "../types.h"
 
-
-extern sensor_t sensors[];
 
 /* Set up all the sensors to be used 
  *  Returns: true if successful */
 bool sensorSetup();
 
-/* Read from all the sensors
- *  Returns: true if successful */
-bool readSensors(sensor_t* sensor_data);
+/* Read from all the sensors */
+void readSensors(sensor_reading_t* sensor_data);
+
+void printSensorData(sensor_reading_t* sensor_data);
+
 
 #endif //_SENSORS_H_

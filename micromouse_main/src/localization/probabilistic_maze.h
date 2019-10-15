@@ -1,7 +1,7 @@
 /* probabilistic_maze.h
  *  
  *  This file defines a probabilistic maze where each
- *  wall holds the probablity of that wall exsits.
+ *  wall holds the probability of that wall exists.
  * 
  * Structure of overall maze:
  * 
@@ -16,12 +16,12 @@
  * 
  * --------------------------------------------------
  * 
- * Structure of cells [row, column]:
+ * Structure of cells [x, y]:
  * 
- *  [0,0][0,1] ... [0,W]
- *  [1,0][1,1] ... [1,W]
- *   ...  ...  ...  ...
- *  [H,0][H,1] ... [H,W]
+ *  [0,0]   [1,0]  ...  [W-1,0]
+ *  [0,1]   [1,1]  ...  [W-1,1]
+ *   ...     ...   ...    ...
+ *  [0,H-1][1,H-1] ... [W-1,H-1]
  * 
  * Note: H = MAZE_HEIGHT
  *       W = MAZE_WIDTH
@@ -47,16 +47,16 @@ typedef struct {
 
 
 typedef struct {
-    probabilistic_cell_t cells[MAZE_HEIGHT][MAZE_WIDTH];
+    probabilistic_cell_t cells[MAZE_WIDTH][MAZE_HEIGHT];
     probabilistic_wall_t wall_buffer[MAZE_HEIGHT * (MAZE_WIDTH + 1) + (MAZE_HEIGHT + 1) * MAZE_WIDTH];
 } probabilistic_maze_t;
 
 
-/* Initalize the state of the maze
+/* Initialize the state of the maze
  *   - Responsible for setting up the pointers to the
  * wall in such a way that there are no duplicates.
  */
-void initalizeMaze(probabilistic_maze_t* maze);
+void initializeMaze(probabilistic_maze_t* maze);
 
 
 #endif //_PROBABILISTIC_MAZE_H_

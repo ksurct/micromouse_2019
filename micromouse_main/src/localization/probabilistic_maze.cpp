@@ -3,11 +3,11 @@
 #include "probabilistic_maze.h"
 #include "../settings.h"
 
-/* Initalize the state of the maze
+/* initialize the state of the maze
  *   - Responsible for setting up the pointers to the
  * wall in such a way that there are no duplicates.
  */
-void initalizeMaze(probabilistic_maze_t* maze) {
+void initializeMaze(probabilistic_maze_t* maze) {
     for (int i = 0; i < sizeof(maze->wall_buffer) / sizeof(maze->wall_buffer[0]); ++i) {
         maze->wall_buffer[i].exists = 0.5;
     }

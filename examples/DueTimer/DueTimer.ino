@@ -3,7 +3,7 @@
 // Libraries
 #include <DueTimer.h>
 
-// Fucntion Declarations
+// Function Declarations
 void main_loop(void);
 void setup(void);
 
